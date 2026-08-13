@@ -1,0 +1,433 @@
+/* Páginas internas (Primeiros passos, Documentação, Manuais, Acessos, Sharepoint).
+   Carregado depois de styles.css — reaproveita os tokens de lá e define só o
+   que é específico do conteúdo interno.
+
+   O markup destas classes não existe no HTML: é gerado por js/paginas.js a
+   partir dos dados de js/paginas/*.js. Ao mudar um seletor daqui, confira o
+   renderizador correspondente lá. */
+
+/* A troca de views depende disso: sem o !important, qualquer regra de display
+   futura em .view venceria o [hidden] e as duas apareceriam juntas. */
+[hidden]{ display: none !important; }
+
+:root{
+  --panel: #FAF9F4;        /* mesma superfície dos cards da home */
+  --panel-line: #E5E1DA;
+  --chip: #E5E1DA;
+}
+
+body.dark-mode{
+  --panel: #232E33;
+  --panel-line: #33424A;
+  --chip: #2E3A40;
+}
+
+/* Marca o item do menu correspondente à página aberta. */
+nav a[aria-current="page"]{
+  color: var(--ink);
+  font-weight: 650;
+}
+nav a[aria-current="page"]::after{
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -7px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+.back-link{
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  align-self: flex-start;
+  margin-bottom: 22px;
+  padding: 7px 14px 7px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--bg-2);
+  color: var(--ink-soft);
+  font-size: 13.5px;
+  font-weight: 550;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.back-link:hover{
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+.back-link:focus-visible{
+  outline: 2px solid var(--accent-1);
+  outline-offset: 2px;
+}
+.back-link svg{ width: 15px; height: 15px; }
+
+.page-eyebrow{
+  font-size: 12px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-1);
+  margin: 0 0 8px;
+}
+
+/* Escopado em #view-pagina de propósito: .intro também é usado pela home, e
+   sem o escopo estas regras sobrescreveriam o título dela. */
+#view-pagina .intro h1{
+  font-size: 30px;
+}
+#view-pagina .intro p{
+  max-width: 62ch;
+  line-height: 1.55;
+}
+
+/* Grade genérica de blocos de conteúdo.
+   `min(100%, 280px)` no lugar de 280px fixo: em telas mais estreitas que a
+   coluna mínima, a célula encolhe junto em vez de estourar a largura. */
+.panel-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: var(--sp-3);
+}
+
+.panel{
+  display: block;
+  padding: var(--card-pad);
+  border: 1px solid var(--panel-line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow-panel);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+/* Só os painéis que são link ganham o hover de card. */
+a.panel{
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+a.panel:hover{
+  transform: translateY(-3px);
+  border-color: var(--accent-soft);
+  box-shadow: var(--shadow-card);
+}
+a.panel:focus-visible{
+  outline: 2px solid var(--accent-1);
+  outline-offset: 3px;
+}
+
+.panel h3{
+  font-size: 16.5px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  margin: 0 0 8px;
+}
+.panel p{
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  margin: 0;
+}
+.panel p + p{ margin-top: 10px; }
+
+.panel-meta{
+  display: inline-flex;
+  align-items: center;
+  margin-top: 14px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--chip);
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Seções dentro da página. */
+.page-section{
+  margin-top: var(--sp-6);
+}
+.page-section > h2{
+  font-size: 20px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  margin: 0 0 6px;
+}
+.page-section > h2 + p{
+  margin: 0 0 22px;
+  color: var(--ink-soft);
+  font-size: 14.5px;
+  max-width: 62ch;
+}
+
+/* Rótulo de um bloco dentro da seção. É <p>, não heading — ver js/paginas.js. */
+.block-title{
+  margin: 30px 0 12px;
+  font-size: 13px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+.block-title:first-child{ margin-top: 0; }
+
+/* Lista de observações (tipo 'notas'). */
+.notes{
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 9px;
+}
+.notes li{
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 70ch;
+}
+.notes li::marker{ color: var(--accent); }
+
+/* Faixa de destaque dentro de um passo: caminho de menu, nome de categoria. */
+.callout{
+  margin: 12px 0 0;
+  padding: 12px 15px;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--chip);
+  color: var(--ink);
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* Grade de sistema + perfil de acesso (tipo 'sistemas'). */
+.sys-list{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  gap: 8px;
+}
+.sys-list li{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 3px 10px;
+  padding: 12px 16px;
+  border: 1px solid var(--panel-line);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+}
+.sys-name{
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: -0.005em;
+}
+.sys-role{
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+
+/* Ficha de contato de fabricante (tipo 'fabricantes'). */
+.field-list{
+  margin: 16px 0 0;
+  display: grid;
+  gap: 9px;
+}
+.field-list > div{
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 12px;
+  align-items: baseline;
+}
+.field-list dt{
+  font-size: 11.5px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+}
+.field-list dd{
+  margin: 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.field-list a{ color: var(--accent-1); }
+.field-vazio{
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+/* Lista numerada de etapas (Primeiros passos, Manuais). */
+.steps{
+  list-style: none;
+  counter-reset: etapa;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+.steps li{
+  counter-increment: etapa;
+  position: relative;
+  padding: 20px 24px 20px 64px;
+  border: 1px solid var(--panel-line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow-panel);
+}
+/* O número vai em tinta escura sobre o azul da paleta: branco sobre #89A8B2
+   ficaria em 2.5:1 e some na leitura. */
+.steps li::before{
+  content: counter(etapa);
+  position: absolute;
+  left: 22px;
+  top: 20px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 650;
+}
+.steps h3{
+  font-size: 15.5px;
+  font-weight: 650;
+  margin: 0 0 6px;
+}
+.steps p{
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+/* Lista de links e arquivos (Documentação, Acessos, Sharepoint). */
+.link-list{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.link-list a,
+.link-list .link-pendente{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border: 1px solid var(--panel-line);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 550;
+  box-shadow: var(--shadow-panel);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.link-list a:hover{
+  border-color: var(--accent);
+  background: var(--bg-2);
+}
+.link-list a:focus-visible{
+  outline: 2px solid var(--accent-1);
+  outline-offset: 2px;
+}
+.link-list svg{
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--accent-1);
+}
+/* A seta é decorativa e não deve competir com o ícone de formato. */
+.link-list svg.link-arrow{ color: var(--ink-soft); }
+/* O texto empurra chip e seta para a direita — com ou sem chip de formato.
+   `pretty` aqui porque título e descrição do item são <span>, e a regra geral
+   de quebra em styles.css alcança só p/li/dd. */
+.link-list .link-text{
+  flex: 1;
+  min-width: 0;          /* item de flex não encolhe abaixo do conteúdo sem isto */
+  text-wrap: pretty;
+}
+.link-list .link-desc{
+  display: block;
+  margin-top: 3px;
+  font-size: 13px;
+  font-weight: 450;
+  color: var(--ink-soft);
+}
+.link-list .link-arrow{ color: var(--ink-soft); }
+
+/* Chip de formato (PDF, DOC, Link): mesmo desenho do .panel-meta. */
+.link-list .link-format{
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  background: var(--chip);
+  color: var(--ink-soft);
+  font-size: 11.5px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* Documento previsto mas ainda sem arquivo ou endereço: fica na lista, no
+   lugar certo, sem fingir que já dá para abrir. */
+.link-list .link-pendente{
+  border-style: dashed;
+  cursor: default;
+}
+.link-list .link-pendente,
+.link-list .link-pendente svg{ color: var(--ink-soft); }
+.link-list .link-pendente .field-vazio{ font-size: 13px; }
+
+/* Aviso de conteúdo ainda não definido. */
+.notice{
+  margin-top: var(--sp-6);
+  padding: 18px 22px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-2);
+  color: var(--ink-soft);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+@media (max-width: 900px){
+  /* No drawer o nav vira lista de blocos: o sublinhado fica solto no meio do
+     padding, então o item ativo é marcado pelo fundo. */
+  nav a[aria-current="page"]{ background: var(--bg-2); }
+  nav a[aria-current="page"]::after{ display: none; }
+
+  #view-pagina .intro h1{ font-size: 25px; }
+  .steps li{ padding: 18px 20px 18px 58px; }
+  .steps li::before{ left: 18px; top: 18px; }
+
+  /* Em telas estreitas a coluna fixa do rótulo aperta demais o valor. */
+  .field-list > div{ grid-template-columns: 1fr; gap: 2px; }
+}
+
+@media (max-width: 600px){
+  /* Item de lista com ícone + texto + chip + seta não cabe numa linha só:
+     o chip desce para junto do texto e nada estoura a largura da tela. */
+  .link-list a,
+  .link-list .link-pendente{
+    flex-wrap: wrap;
+    gap: 10px 12px;
+    padding: 14px 16px;
+    font-size: 14.5px;
+  }
+  .link-list .link-text{ flex: 1 1 60%; }
+  .panel{ padding: var(--sp-4); }
+  .notice{ padding: 16px 18px; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  a.panel, .back-link, .link-list a, .link-list .link-pendente{ transition: none; }
+  a.panel:hover{ transform: none; }
+}

@@ -1,0 +1,348 @@
+/* Edição pela própria página: botões nos itens, barra de incluir e a janela de
+   formulário/login. Carregado depois de pagina.css — reaproveita os tokens de
+   styles.css e não redefine nenhum.
+
+   O markup daqui não existe no HTML nem em js/paginas.js: é criado por
+   js/documentos.js, e só para quem entrou com usuário. Sem servidor, nada
+   destas classes chega à página — o portal fica idêntico ao que sempre foi.
+
+   Ao mexer num seletor daqui, confira o arquivo js/documentos.js. */
+
+/* ---------- Botões ---------- */
+
+.ed-btn{
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border: 1px solid var(--panel-line);
+  border-radius: var(--radius-pill);
+  background: var(--panel);
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.ed-btn svg{
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+.ed-btn:hover{
+  border-color: var(--accent);
+  background: var(--bg-2);
+  color: var(--ink);
+}
+.ed-btn:focus-visible{
+  outline: 2px solid var(--accent-1);
+  outline-offset: 2px;
+}
+.ed-btn:disabled{
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Excluir só aparece para quem é `dev`. Vermelho porque é destrutivo e mesmo
+   assim passa pelo confirm() do navegador antes de sair.
+   É a única cor fora da paleta no projeto, e de propósito: aviso de ação
+   irreversível não pode se confundir com o azul do resto da interface. O tom é
+   dessaturado para conviver com o bege sem gritar. */
+.ed-btn.ed-perigo:hover{
+  border-color: #A85A4E;
+  background: transparent;
+  color: #A85A4E;
+}
+body.dark-mode .ed-btn.ed-perigo:hover{
+  border-color: #E3A197;
+  color: #E3A197;
+}
+
+.ed-btn.ed-primario{
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.ed-btn.ed-primario:hover{
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--on-accent);
+}
+body.dark-mode .ed-btn.ed-primario:hover{
+  background: var(--pal-azul-claro);
+  border-color: var(--pal-azul-claro);
+}
+
+/* ---------- Item da lista com botões ---------- */
+
+/* O <li> normal é só a caixa do link. Com ações, ele vira a linha: o link (ou o
+   "a definir") ocupa o espaço que sobra e os botões ficam à direita. */
+.link-list li.com-acoes{
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+.link-list li.com-acoes > a,
+.link-list li.com-acoes > .link-pendente{
+  flex: 1;
+  min-width: 0;
+}
+
+.ed-acoes{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Barra do "Incluir", logo abaixo de cada lista. */
+.ed-barra{
+  display: flex;
+  margin-top: 10px;
+}
+
+@media (max-width: 700px){
+  /* Lado a lado os botões espremem o título do documento. Empilhados, o item
+     continua legível e as ações ficam logo abaixo dele. */
+  .link-list li.com-acoes{
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .ed-acoes{ justify-content: flex-end; }
+}
+
+/* Ponto no botão Perfil enquanto há sessão aberta — o único sinal permanente de
+   que a pessoa está logada. */
+.perfil-ativo{ position: relative; }
+.perfil-ativo::after{
+  content: "";
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 2px var(--bg);
+}
+.menu-action.perfil-ativo::after{
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+}
+
+/* ---------- Janela (login, perfil e formulário do item) ---------- */
+
+/* `position: fixed` explícito: com showModal() o navegador já centraliza, mas o
+   fallback (só o atributo `open`, em navegador antigo) posiciona no fluxo da
+   página e a janela apareceria no meio do texto. */
+.ed-janela{
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 64px);
+  padding: 0;
+  border: 1px solid var(--panel-line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: var(--shadow-card-lg);
+  overflow: auto;
+}
+.ed-janela::backdrop{
+  background: rgba(34, 51, 58, 0.45);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+.ed-form{
+  display: grid;
+  gap: 16px;
+  padding: 24px;
+}
+
+.ed-cabecalho{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.ed-titulo{
+  margin: 0;
+  font-size: 18px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+.ed-fechar{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.ed-fechar svg{ width: 17px; height: 17px; }
+.ed-fechar:hover{ background: var(--bg-2); color: var(--ink); }
+.ed-fechar:focus-visible{ outline: 2px solid var(--accent-1); outline-offset: 2px; }
+
+.ed-campos{
+  display: grid;
+  gap: 14px;
+}
+
+.ed-campo{
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.ed-campo > span,
+.ed-campo > legend{
+  padding: 0;
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--ink-soft);
+}
+.ed-campo > span em{
+  font-style: normal;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.ed-campo input[type="text"],
+.ed-campo input[type="password"],
+.ed-campo select{
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14.5px;
+  transition: border-color 0.15s ease;
+}
+.ed-campo input[type="text"]:hover,
+.ed-campo input[type="password"]:hover,
+.ed-campo select:hover{ border-color: var(--accent); }
+.ed-campo input::placeholder{ color: var(--ink-soft); opacity: 0.75; }
+.ed-campo input:focus-visible,
+.ed-campo select:focus-visible,
+.ed-campo input[type="file"]:focus-visible{
+  outline: 2px solid var(--accent-1);
+  outline-offset: 1px;
+}
+.ed-campo input[type="file"]{
+  width: 100%;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+}
+
+/* Escolha entre endereço e arquivo. */
+.ed-tipo{
+  gap: 8px;
+  padding: 14px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+}
+.ed-tipo label,
+.ed-check{
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+}
+.ed-tipo input,
+.ed-check input{
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+}
+.ed-check{
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+/* Arquivo que o item já usa hoje, ao editar. */
+.ed-atual{
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
+
+.ed-dica{
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+/* Ficha do perfil: mesmo desenho da ficha de fabricante em pagina.css. */
+.ed-ficha{
+  margin: 0;
+  display: grid;
+  gap: 9px;
+}
+.ed-ficha > div{
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 12px;
+  align-items: baseline;
+}
+.ed-ficha dt{
+  font-size: 11.5px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+}
+.ed-ficha dd{
+  margin: 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+/* Erro vindo do servidor (senha errada, endereço recusado, arquivo grande
+   demais). As mensagens já chegam em português — ver servidor/dados.js. */
+.ed-erro{
+  margin: 0;
+  padding: 11px 14px;
+  border-left: 3px solid #A85A4E;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--chip);
+  color: var(--ink);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+body.dark-mode .ed-erro{ border-left-color: #E3A197; }
+
+.ed-rodape{
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .ed-btn{ transition: none; }
+}

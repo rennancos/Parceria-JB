@@ -1,0 +1,316 @@
+/* Seção "Nossa equipe".
+   Carregado depois de styles.css — reaproveita os tokens de lá e define
+   só os que são específicos do card de pessoa (fundo claro tipo "ficha"). */
+
+:root{
+  --team-card: #FAF9F4;
+  --team-card-hover: #FFFFFE;
+  --team-ring: #E5E1DA;        /* anel em volta da foto */
+  --team-chip: #E5E1DA;        /* chip de área e botões de contato */
+}
+
+body.dark-mode{
+  --team-card: #232E33;
+  --team-card-hover: #2A363C;
+  --team-ring: #33424A;
+  --team-chip: #2E3A40;
+}
+
+.team-section{
+  position: relative;
+  z-index: 2;
+  margin-top: var(--sp-8);
+  padding-top: var(--sp-6);
+  border-top: 1px solid var(--line);
+}
+
+.team-header{
+  text-align: center;
+  margin-bottom: var(--sp-6);
+}
+
+.team-tag{
+  display: inline-block;
+  padding: 5px 13px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--bg-2);
+  font-size: 11.5px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+
+.team-header h2{
+  margin: var(--sp-3) 0 8px;
+  font-size: 28px;
+  font-weight: 680;
+  letter-spacing: -0.02em;
+}
+
+.team-header p{
+  margin: 0;
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+
+.team-count{
+  display: inline-block;
+  margin-top: 14px;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--team-chip);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+/* Preenchido pelo JS; sem ele o chip vazio viraria uma bolinha solta. */
+.team-count:empty{ display: none; }
+
+/* ---------- Faixa de destaque ---------- */
+
+.team-featured[hidden]{ display: none; }
+
+.team-featured{
+  margin-bottom: var(--sp-7);
+  padding-bottom: var(--sp-6);
+  border-bottom: 1px solid var(--line);
+}
+
+/* O espaço até as fotos é esta margem. A grade abaixo tem padding-top: 62px,
+   mas a foto sobe -55px dentro do card, então sobram só 7px reais — daí os 32px
+   aqui. Antes esse respiro vinha de um `<br></br>` no index.html, que o parser
+   transformava em duas quebras. */
+.team-featured-title{
+  margin: 0 0 var(--sp-5);
+  text-align: center;
+  font-size: 12px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+
+/* Mesmo padding-top da grade normal: abre espaço para a foto, que sobe -55px.
+   Os destaques são poucos, então a grade é centralizada em vez de esticada. */
+.team-featured-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 280px));
+  justify-content: center;
+  gap: 82px var(--sp-5);
+  padding-top: 62px;
+}
+
+/* Borda e anel em azul da paleta separam o destaque da grade comum. */
+.team-card.is-featured{
+  border-color: var(--accent);
+  box-shadow: 0 8px 24px rgba(137,168,178,0.22);
+}
+.team-card.is-featured:hover{
+  box-shadow: 0 16px 36px rgba(137,168,178,0.28);
+}
+.team-card.is-featured .team-photo-wrapper{
+  box-shadow: 0 0 0 5px var(--accent);
+}
+
+.team-badge{
+  align-self: center;
+  margin: 0 0 10px;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* padding-top abre espaço para a foto da primeira linha, que sobe -55px. */
+.team-grid{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 82px var(--sp-5);
+  padding-top: 62px;
+}
+
+.team-card{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 250px;
+  padding: 88px var(--sp-4) var(--sp-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--team-card);
+  text-align: center;
+  box-shadow: var(--shadow-panel);
+  transition: transform 0.18s ease, box-shadow 0.18s ease,
+              background 0.18s ease, border-color 0.18s ease;
+}
+.team-card:hover{
+  background: var(--team-card-hover);
+  border-color: var(--accent-soft);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card);
+}
+
+/* Foto sobreposta ao topo do card.
+   É flex + centralizada nos dois eixos: a imagem ocupa a área interna inteira,
+   sem encostar na borda do anel e sem depender do formato do arquivo. */
+.team-photo-wrapper{
+  position: absolute;
+  top: -55px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 132px;
+  height: 132px;
+  padding: 6px;
+  border-radius: 34px;
+  background: var(--team-card);
+  box-shadow: 0 0 0 5px var(--team-ring);
+}
+
+/* Iniciais (data-initials vem do JS) são o fundo padrão do avatar: valem
+   enquanto a foto não carrega e ficam de vez se o arquivo não existir.
+   O JS marca .is-loaded quando a imagem carrega de verdade. */
+.team-photo-wrapper::after{
+  content: attr(data-initials);
+  position: absolute;
+  inset: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 28px;
+  background: var(--bg-2);
+  color: var(--ink-soft);
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.team-photo-wrapper.is-loaded::after{ content: none; }
+
+/* Retratos vêm em proporções diferentes (jpg de crachá, png quadrado):
+   `cover` + `object-position: center` recorta sempre pelo centro, então o
+   rosto fica no meio do círculo em qualquer arquivo. */
+.team-photo{
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 28px;
+}
+
+.team-info{
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.team-info h3{
+  margin: 0 0 var(--sp-1);
+  font-size: 17.5px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.team-role{
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.team-area{
+  margin: var(--sp-2) auto 0;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--team-chip);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* margin-top: auto encosta os ícones na base, alinhando-os entre cards
+   mesmo quando um nome ou cargo ocupa duas linhas. */
+.team-links{
+  display: flex;
+  justify-content: center;
+  gap: var(--sp-2);
+  margin-top: auto;
+  padding-top: var(--sp-4);
+}
+
+.team-link{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--line);
+  background: var(--team-chip);
+  color: var(--ink-soft);
+  text-decoration: none;
+  transition: transform 0.15s ease, background 0.15s ease,
+              color 0.15s ease, border-color 0.15s ease;
+}
+.team-link svg{ width: 17px; height: 17px; }
+
+a.team-link:hover{
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+  transform: scale(1.08);
+}
+a.team-link:focus-visible{
+  outline: 2px solid var(--accent-1);
+  outline-offset: 2px;
+}
+
+.team-link.is-disabled{
+  opacity: 0.45;
+  cursor: default;
+}
+
+@media (max-width: 900px){
+  .team-section{ margin-top: var(--sp-7); }
+  .team-header{ margin-bottom: var(--sp-5); }
+  .team-header h2{ font-size: 24px; }
+  .team-featured{
+    margin-bottom: var(--sp-6);
+    padding-bottom: var(--sp-6);
+  }
+  .team-grid,
+  .team-featured-grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 78px var(--sp-4);
+  }
+  /* auto-fit com max fixo deixaria um destaque órfão sobrando à esquerda. */
+  .team-featured-grid{ justify-content: stretch; }
+}
+
+@media (max-width: 600px){
+  .team-header h2{ font-size: 22px; }
+  .team-grid,
+  .team-featured-grid{
+    grid-template-columns: minmax(0, 1fr);
+    gap: 80px;
+    padding-top: 62px;
+  }
+  .team-card{ min-height: 0; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .team-card, .team-link{ transition: none; }
+  .team-card:hover{ transform: none; }
+  a.team-link:hover{ transform: none; }
+}

@@ -1,0 +1,55 @@
+# ---------- Segredos ----------
+# O .env nunca entra no repositório; o modelo versionado é o .env.example.
+.env
+.env.*
+!.env.example
+
+# Chaves e credenciais avulsas, se alguma aparecer na pasta
+*.pem
+*.key
+*.p12
+*.pfx
+credenciais*
+secrets*
+
+# ---------- Dados do servidor ----------
+# usuarios.json tem hash de senha; documentos.json é o conteúdo que a equipe
+# edita pela própria página — produção, não código. Versionar os dois traria o
+# risco pior: um `git pull` no deploy passando por cima do acervo da VM.
+# Backup deste diretório é obrigatório — ver md/09-edicao-pela-pagina.md.
+servidor/dados/
+
+# ---------- Sistema operacional ----------
+# desktop.ini e Thumbs.db são gerados pelo Windows/OneDrive nesta pasta.
+Thumbs.db
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# ---------- Editor ----------
+.vscode/
+.idea/
+*.swp
+
+# Permissões locais do Claude Code (por máquina, não do projeto).
+# .claude/settings.json — se existir — é do time e continua versionado.
+.claude/settings.local.json
+
+# ---------- Ferramentas, caso entrem depois ----------
+node_modules/
+dist/
+build/
+*.log
+npm-debug.log*
+
+# ---------- Dados pessoais ----------
+# As fotos são de pessoas reais. Descomente a linha abaixo se o repositório
+# for sair do controle de quem já tem acesso a elas — a página degrada
+# sozinha para as iniciais quando o arquivo não existe (ver README).
+# Fotos/EQUIPE/
+
+# Rascunho com a lista de e-mails corporativos da equipe. Nenhum código lê
+# este arquivo — o site tira o e-mail do array em js/equipe.js. É material de
+# apoio, e material de apoio com dado pessoal não precisa de histórico.
+docs/email equipe.txt

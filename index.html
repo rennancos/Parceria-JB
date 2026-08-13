@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parceria JB — Portal</title>
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/equipe.css">
+<link rel="stylesheet" href="css/pagina.css">
+<link rel="stylesheet" href="css/edicao.css">
+</head>
+<body>
+<!-- Aplica o tema salvo antes da página pintar, para não piscar branco ao recarregar. -->
+<script>try{if(localStorage.getItem('pajb-tema')==='dark')document.body.classList.add('dark-mode');}catch(e){}</script>
+
+<div class="backdrop">
+  <header>
+    <a class="brand" href="#" aria-label="Parceria JB — página inicial">
+      <span class="brand-mark"><img src="Fotos/LOGOS/TVGLOBO_LOGO.png" alt="Logo Parceria JB"></span>
+      <span class="brand-name">Parceria JB</span>
+    </a>
+
+    <div class="menu-panel" id="primary-menu">
+      <div class="menu-panel-head">
+        <span class="menu-panel-title">Menu</span>
+        <button class="icon-btn menu-close" type="button" aria-label="Fechar menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <!-- data-pagina é a chave em PAGINAS: js/router.js usa para marcar o item
+           ativo com aria-current. Cada href aponta para o hash dessa chave. -->
+      <nav aria-label="Navegação principal">
+        <a href="#primeiros-passos" data-pagina="primeiros-passos">Primeiros passos</a>
+        <a href="#documentacao" data-pagina="documentacao">Documentação</a>
+        <a href="#acessos-parceria" data-pagina="acessos-parceria">Acessos Parceria</a>
+        <a href="#sharepoint" data-pagina="sharepoint">Sharepoint</a>
+      </nav>
+
+      <div class="menu-actions">
+        <button class="menu-action" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Buscar
+        </button>
+        <button class="menu-action" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Notificações
+        </button>
+        <!-- data-perfil: js/documentos.js liga estes dois botões ao login da
+             edição pela própria página. Sem o servidor no ar eles continuam
+             decorativos, como sempre foram. -->
+        <button class="menu-action" type="button" data-perfil>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Perfil
+        </button>
+      </div>
+    </div>
+
+    <div class="icons">
+      <button class="icon-btn icon-secondary" aria-label="Buscar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+      <button class="icon-btn icon-secondary" aria-label="Notificações">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </button>
+      <button class="icon-btn icon-secondary" aria-label="Perfil" data-perfil>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </button>
+      <button class="icon-btn theme-toggle" aria-label="Ativar black mode" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18h6"/>
+          <path d="M10 22h4"/>
+          <path d="M12 3a8 8 0 0 0-4 15h8a8 8 0 0 0-4-15z"/>
+        </svg>
+      </button>
+      <button class="icon-btn menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="primary-menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="scrim" aria-hidden="true"></div>
+  <main>
+    <!-- Home. Fica no markup; js/router.js só a esconde quando uma página
+         interna está aberta. -->
+    <div class="view" id="view-home">
+    <div class="intro">
+      <p class="intro-tag">Portal da parceria</p>
+      <h1>Bem-vindo ao portal Parceria JB</h1>
+      <p>Tudo o que você precisa para começar, consultar e trabalhar em um só lugar.</p>
+    </div>
+
+    <div class="cards">
+      <a class="card" href="#primeiros-passos">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+        </div>
+        <div class="card-body">
+          <p class="card-eyebrow">Comece por aqui</p>
+          <h2>Primeiros passos</h2>
+          <p>Um guia rápido para se orientar na parceria: acessos, contatos e o essencial para começar bem.</p>
+        </div>
+        <div class="card-cta">
+          Acessar
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </div>
+      </a>
+
+      <a class="card" href="#documentacao">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+        </div>
+        <div class="card-body">
+          <p class="card-eyebrow">Central de conteúdo</p>
+          <h2>Documentação</h2>
+          <p>Processos, políticas, materiais de referência e os manuais das áreas, por link ou em arquivo.</p>
+        </div>
+        <div class="card-cta">
+          Acessar
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </div>
+      </a>
+
+      <a class="card" href="#acessos-parceria">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M5 5h14M5 19h14"/><path d="M7 12h10"/></svg>
+        </div>
+        <div class="card-body">
+          <p class="card-eyebrow">Acessos rápidos</p>
+          <h2>Acessos Parceria</h2>
+          <p>Links estratégicos, portais e materiais prioritários para uso frequente.</p>
+        </div>
+        <div class="card-cta">
+          Acessar
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </div>
+      </a>
+
+      <a class="card" href="#sharepoint">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V10"/><path d="M19 21V10"/><path d="M7 10h10"/><path d="M8 7h8"/><path d="M10 4h4"/><path d="M6 14h12"/></svg>
+        </div>
+        <div class="card-body">
+          <p class="card-eyebrow">Acesso corporativo</p>
+          <h2>Sharepoint</h2>
+          <p>Documentos, arquivos e materiais compartilhados da parceria disponíveis em um só lugar.</p>
+        </div>
+        <div class="card-cta">
+          Acessar
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </div>
+      </a>
+    </div>
+
+    <section class="team-section" aria-labelledby="team-title">
+      <div class="team-header">
+        <span class="team-tag">Nossa equipe</span>
+        <h2 id="team-title">Parceria JB</h2>
+        <p>Conheçam a nossa equipe</p>
+        <span class="team-count" id="team-count"></span>
+      </div>
+
+      <!-- Destaques: quem tem o campo `destaque` no array sobe para cá
+           e sai da grade principal. Gerado por js/equipe.js. -->
+      <div class="team-featured" id="team-featured" hidden>
+        <!-- O espaço até a grade é margem do .team-featured-title, no equipe.css.
+             Antes vinha de uma quebra manual escrita com tag de fechamento de
+             br, que o parser de HTML conta como uma segunda quebra: eram duas
+             linhas em branco onde se queria uma margem. -->
+        <p class="team-featured-title">Idealizadores e desenvolvedores</p>
+        <div class="team-featured-grid" id="team-featured-grid"></div>
+      </div>
+
+      <!-- Os cards são gerados por js/equipe.js a partir do array `equipe`. -->
+      <div class="team-grid" id="team-grid"></div>
+    </section>
+    </div><!-- /#view-home -->
+
+    <!-- Páginas internas. Preenchido por js/router.js a partir de PAGINAS. -->
+    <div class="view" id="view-pagina" hidden></div>
+  </main>
+
+  <!-- Fora do <main> de propósito: o rodapé acompanha a home e as páginas
+       internas, que trocam só o conteúdo de dentro do main. Os links usam os
+       mesmos hashes do menu, então o router os atende igual. -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="brand-mark"><img src="Fotos/LOGOS/TVGLOBO_LOGO.png" alt=""></span>
+        <span>
+          <span class="footer-title">Parceria JB</span>
+          <span class="footer-sub">Portal interno de acessos e documentação</span>
+        </span>
+      </div>
+
+      <nav class="footer-nav" aria-label="Navegação do rodapé">
+        <a href="#primeiros-passos">Primeiros passos</a>
+        <a href="#documentacao">Documentação</a>
+        <a href="#acessos-parceria">Acessos Parceria</a>
+        <a href="#sharepoint">Sharepoint</a>
+      </nav>
+
+      <p class="footer-note">Uso interno — Soluções de Mídias.</p>
+    </div>
+  </footer>
+</div>
+
+<script src="js/equipe.js"></script>
+
+<!-- A ORDEM IMPORTA: paginas.js cria PAGINAS, cada arquivo de js/paginas/ se
+     registra nele, e router.js só roda depois que todos estiverem lá.
+     Para acrescentar uma página, crie o arquivo e inclua a linha aqui. -->
+<script src="js/paginas.js"></script>
+<script src="js/paginas/primeiros-passos.js"></script>
+<script src="js/paginas/documentacao.js"></script>
+<script src="js/paginas/acessos-parceria.js"></script>
+<script src="js/paginas/sharepoint.js"></script>
+<script src="js/router.js"></script>
+
+<!-- Edição pela própria página. Depois do router de propósito: depende do
+     renderizador e do router já existirem. Sem o servidor Node no ar (file://
+     ou `pnpm start`), este arquivo não faz nada e a página fica como está. -->
+<script src="js/documentos.js"></script>
+
+<script src="js/script.js"></script>
+
+
+</body>
+</html>

@@ -1,1 +1,79 @@
-# Parceria-JB
+# Parceria JB — Portal
+
+Portal interno da Parceria JB: ponto único de entrada para primeiros passos, documentação, manuais, acessos e SharePoint da operação.
+
+Sem build e sem framework — HTML, CSS e JavaScript em arquivos separados, lidos direto pelo navegador. A página abre até por duplo clique em `index.html`.
+
+> **Repositório privado, e precisa continuar assim.** O código carrega nomes e e-mails reais da equipe (`js/equipe.js`), fotos de pessoas (`Fotos/EQUIPE/`) e marca corporativa. Leia [md/02-seguranca.md](md/02-seguranca.md) antes de publicar isto em qualquer lugar.
+
+## Como rodar
+
+A raiz do projeto é esta pasta (`PA_JB/`) — é onde ficam o `.git` e o `package.json`.
+
+```bash
+cd PA_JB       # a partir de DEV PAJB
+pnpm install   # só na primeira vez
+pnpm dev       # http://localhost:8000
+```
+
+Duplo clique em `index.html` também funciona. A diferença prática — `localStorage`, teste em celular, fidelidade ao resultado final — está em [md/01-como-rodar.md](md/01-como-rodar.md).
+
+Para ter também a API pela qual a equipe edita os documentos sem abrir código:
+
+```bash
+pnpm servidor   # site + API num processo só, sem dependência nenhuma
+pnpm usuarios   # cadastro de quem edita
+```
+
+O portal funciona sem esse serviço: quando não há API respondendo, os botões de edição simplesmente não aparecem.
+
+## As três ideias que explicam o resto
+
+**1. Um HTML só.** Não há um arquivo por página. O menu troca o conteúdo dentro do mesmo `index.html`, a partir do hash da URL.
+
+**2. Conteúdo é dado, não markup.** Texto das páginas e lista de pessoas vivem em `.js` como objetos e arrays; o HTML é gerado a partir deles. Quem edita conteúdo nunca toca em tag.
+
+**3. Tem que funcionar em `file://`.** Isso proíbe `fetch()` de arquivo local e `<script type="module">` — é a razão de os dados serem `.js` e não `.json`, e de o servidor local ser um estático burro em vez do Vite.
+
+## Estrutura
+
+```
+PA_JB/
+├── index.html      # ÚNICO html: header, home e o container das páginas
+├── css/            # styles, equipe, pagina, edicao
+├── js/
+│   ├── script.js   # tema (black mode) + menu mobile
+│   ├── equipe.js   # array `equipe` + cards de pessoa
+│   ├── paginas.js  # registro PAGINAS + renderizador
+│   ├── router.js   # escolhe a página pelo hash da URL
+│   ├── documentos.js  # edição pela página (inerte sem servidor)
+│   └── paginas/    # um arquivo por item do menu — só dados
+├── docs/           # documentos e manuais em arquivo (DOC/PDF)
+├── servidor/       # OPCIONAL: site + API de edição, sem dependências
+├── Fotos/          # logos e fotos da equipe
+└── md/             # a documentação — não é lida pelo site
+```
+
+Os caminhos em `index.html` são relativos, então a estrutura de pastas precisa ser preservada ao mover ou publicar o projeto.
+
+## Documentação
+
+Índice completo em [md/README.md](md/README.md). Um documento por parte:
+
+| Documento | Para quê |
+|---|---|
+| [01-como-rodar.md](md/01-como-rodar.md) | Subir o projeto, `file://` vs `http://`, o que o pnpm faz (e não faz) aqui |
+| [02-seguranca.md](md/02-seguranca.md) | O que não pode vazar. **Leia antes de publicar em qualquer lugar.** |
+| [03-home.md](md/03-home.md) | A página inicial: header, grade de cards, as duas *views* |
+| [04-paginas-internas.md](md/04-paginas-internas.md) | Como as páginas do menu funcionam e como editar o conteúdo delas |
+| [05-equipe.md](md/05-equipe.md) | A seção "Nossa equipe": array, fotos, destaques |
+| [06-estilos-e-tema.md](md/06-estilos-e-tema.md) | Tokens de cor, black mode, responsivo, drawer, acessibilidade |
+| [07-pendencias.md](md/07-pendencias.md) | O que está inacabado ou merece atenção |
+| [08-futuros-passos.md](md/08-futuros-passos.md) | Roteiro: subir na VM, conteúdo real, busca — e o que **não** fazer |
+| [09-edicao-pela-pagina.md](md/09-edicao-pela-pagina.md) | A equipe editando documentos pela própria página: uso, administração e o servidor por trás |
+
+Para mexer em conteúdo, **04** e **05** bastam. Para aparência, **06**.
+
+## Status
+
+A edição pela própria página está funcionando de ponta a ponta e testada nos dois papéis (`equipe` e `dev`); falta subir na VM. O conteúdo ainda é parcial — os itens de Documentação estão sem destino ("a definir"), `docs/` está vazia e a equipe está com dados de exemplo. A lista completa está em [md/07-pendencias.md](md/07-pendencias.md).

@@ -79,8 +79,16 @@ nav a[aria-current="page"]::after{
 #view-pagina .intro h1{
   font-size: 30px;
 }
+/* A medida vem travada duas vezes: 68ch no .intro (styles.css, compartilhado
+   com a home) e de novo no parágrafo. Nas páginas internas o texto é guia, não
+   chamada de capa — a linha curta deixava faixa vazia à direita. Os 78ch abaixo
+   soltam as duas travas sem passar do limite de leitura confortável, e o escopo
+   em #view-pagina preserva a coluna estreita da home. */
+#view-pagina .intro{
+  max-width: 78ch;
+}
 #view-pagina .intro p{
-  max-width: 62ch;
+  max-width: 78ch;
   line-height: 1.55;
 }
 
@@ -158,7 +166,7 @@ a.panel:focus-visible{
   margin: 0 0 22px;
   color: var(--ink-soft);
   font-size: 14.5px;
-  max-width: 62ch;
+  max-width: 78ch;
 }
 
 /* Rótulo de um bloco dentro da seção. É <p>, não heading — ver js/paginas.js. */

@@ -49,7 +49,7 @@ nav a[aria-current="page"]::after{
   border-radius: var(--radius-pill);
   background: var(--bg-2);
   color: var(--ink-soft);
-  font-size: 13.5px;
+  font-size: var(--fs-xs);
   font-weight: 550;
   text-decoration: none;
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
@@ -66,7 +66,7 @@ nav a[aria-current="page"]::after{
 .back-link svg{ width: 15px; height: 15px; }
 
 .page-eyebrow{
-  font-size: 12px;
+  font-size: var(--fs-2xs);
   font-weight: 650;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -75,20 +75,25 @@ nav a[aria-current="page"]::after{
 }
 
 /* Escopado em #view-pagina de propósito: .intro também é usado pela home, e
-   sem o escopo estas regras sobrescreveriam o título dela. */
+   sem o escopo estas regras sobrescreveriam o título dela.
+   Um passo abaixo da home (--fs-2xl no lugar de --fs-3xl): título de página
+   interna é orientação, não capa. Como os dois são fluidos, a diferença entre
+   eles se mantém proporcional em qualquer largura. */
 #view-pagina .intro h1{
-  font-size: 30px;
+  font-size: var(--fs-2xl);
 }
-/* A medida vem travada duas vezes: 68ch no .intro (styles.css, compartilhado
-   com a home) e de novo no parágrafo. Nas páginas internas o texto é guia, não
-   chamada de capa — a linha curta deixava faixa vazia à direita. Os 78ch abaixo
-   soltam as duas travas sem passar do limite de leitura confortável, e o escopo
-   em #view-pagina preserva a coluna estreita da home. */
+/* Toda linha de texto corrido da página para em --medida (ver styles.css): a
+   descrição daqui, o texto de cada seção, as notas e o texto dentro dos passos.
+   É uma trava só, no mesmo x, e é o que impede a página de mostrar quatro
+   larguras de parágrafo empilhadas numa tela grande.
+
+   A trava fica no .intro inteiro, não no parágrafo: assim eyebrow, h1 e
+   descrição terminam juntos. O escopo em #view-pagina preserva a coluna mais
+   estreita da home, que é chamada de capa e não texto de leitura. */
 #view-pagina .intro{
-  max-width: 78ch;
+  max-width: var(--medida);
 }
 #view-pagina .intro p{
-  max-width: 78ch;
   line-height: 1.55;
 }
 
@@ -127,13 +132,13 @@ a.panel:focus-visible{
 }
 
 .panel h3{
-  font-size: 16.5px;
+  font-size: var(--fs-lg);
   font-weight: 650;
   letter-spacing: -0.01em;
   margin: 0 0 8px;
 }
 .panel p{
-  font-size: 14px;
+  font-size: var(--fs-sm);
   line-height: 1.55;
   color: var(--ink-soft);
   margin: 0;
@@ -148,7 +153,7 @@ a.panel:focus-visible{
   border-radius: var(--radius-pill);
   background: var(--chip);
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: var(--fs-2xs);
   font-weight: 600;
 }
 
@@ -157,7 +162,7 @@ a.panel:focus-visible{
   margin-top: var(--sp-6);
 }
 .page-section > h2{
-  font-size: 20px;
+  font-size: var(--fs-xl);
   font-weight: 650;
   letter-spacing: -0.01em;
   margin: 0 0 6px;
@@ -165,14 +170,14 @@ a.panel:focus-visible{
 .page-section > h2 + p{
   margin: 0 0 22px;
   color: var(--ink-soft);
-  font-size: 14.5px;
-  max-width: 78ch;
+  font-size: var(--fs-sm);
+  max-width: var(--medida);
 }
 
 /* Rótulo de um bloco dentro da seção. É <p>, não heading — ver js/paginas.js. */
 .block-title{
   margin: 30px 0 12px;
-  font-size: 13px;
+  font-size: var(--fs-xs);
   font-weight: 650;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -188,14 +193,19 @@ a.panel:focus-visible{
   gap: 9px;
 }
 .notes li{
-  font-size: 14.5px;
+  font-size: var(--fs-base);
   line-height: 1.55;
   color: var(--ink-soft);
-  max-width: 70ch;
+  /* O <ul> tem padding-left de 20px para o marcador: descontado aqui, a nota
+     termina no mesmo x dos parágrafos soltos da seção. */
+  max-width: calc(var(--medida) - 20px);
 }
 .notes li::marker{ color: var(--accent); }
 
-/* Faixa de destaque dentro de um passo: caminho de menu, nome de categoria. */
+/* Faixa de destaque dentro de um passo: caminho de menu, nome de categoria.
+   É um <p> dentro do .steps li, então a trava de largura vem do `.steps p`
+   acima — a faixa termina no mesmo x do texto do passo, em vez de atravessar
+   o card inteiro com 400px de texto dentro. */
 .callout{
   margin: 12px 0 0;
   padding: 12px 15px;
@@ -203,7 +213,7 @@ a.panel:focus-visible{
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   background: var(--chip);
   color: var(--ink);
-  font-size: 13.5px;
+  font-size: var(--fs-sm);
   font-weight: 600;
   line-height: 1.5;
 }
@@ -228,12 +238,12 @@ a.panel:focus-visible{
   background: var(--panel);
 }
 .sys-name{
-  font-size: 14px;
+  font-size: var(--fs-sm);
   font-weight: 650;
   letter-spacing: -0.005em;
 }
 .sys-role{
-  font-size: 12.5px;
+  font-size: var(--fs-xs);
   color: var(--ink-soft);
 }
 
@@ -250,7 +260,7 @@ a.panel:focus-visible{
   align-items: baseline;
 }
 .field-list dt{
-  font-size: 11.5px;
+  font-size: var(--fs-2xs);
   font-weight: 650;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -258,7 +268,7 @@ a.panel:focus-visible{
 }
 .field-list dd{
   margin: 0;
-  font-size: 14px;
+  font-size: var(--fs-sm);
   overflow-wrap: anywhere;
 }
 .field-list a{ color: var(--accent-1); }
@@ -279,7 +289,11 @@ a.panel:focus-visible{
 .steps li{
   counter-increment: etapa;
   position: relative;
-  padding: 20px 24px 20px 64px;
+  /* --recuo é o padding-left, repetido como token porque o texto lá dentro
+     desconta ele da medida para terminar alinhado com o resto da página.
+     Mudou o padding aqui, mude o token junto. */
+  --recuo: 64px;
+  padding: 20px 24px 20px var(--recuo);
   border: 1px solid var(--panel-line);
   border-radius: var(--radius);
   background: var(--panel);
@@ -300,16 +314,23 @@ a.panel:focus-visible{
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: var(--fs-xs);
   font-weight: 650;
 }
+/* O card do passo continua com a largura cheia; só o texto dentro dele para na
+   medida, descontado o recuo do número à esquerda. Sem isto o passo mostrava
+   302px de texto numa faixa de 1010px. */
+.steps h3,
+.steps p{
+  max-width: calc(var(--medida) - var(--recuo));
+}
 .steps h3{
-  font-size: 15.5px;
+  font-size: var(--fs-md);
   font-weight: 650;
   margin: 0 0 6px;
 }
 .steps p{
-  font-size: 14px;
+  font-size: var(--fs-sm);
   line-height: 1.55;
   color: var(--ink-soft);
   margin: 0;
@@ -334,7 +355,7 @@ a.panel:focus-visible{
   background: var(--panel);
   color: var(--ink);
   text-decoration: none;
-  font-size: 15px;
+  font-size: var(--fs-md);
   font-weight: 550;
   box-shadow: var(--shadow-panel);
   transition: border-color 0.15s ease, background 0.15s ease;
@@ -366,7 +387,7 @@ a.panel:focus-visible{
 .link-list .link-desc{
   display: block;
   margin-top: 3px;
-  font-size: 13px;
+  font-size: var(--fs-xs);
   font-weight: 450;
   color: var(--ink-soft);
 }
@@ -378,7 +399,7 @@ a.panel:focus-visible{
   border-radius: var(--radius-pill);
   background: var(--chip);
   color: var(--ink-soft);
-  font-size: 11.5px;
+  font-size: var(--fs-2xs);
   font-weight: 650;
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -392,17 +413,19 @@ a.panel:focus-visible{
 }
 .link-list .link-pendente,
 .link-list .link-pendente svg{ color: var(--ink-soft); }
-.link-list .link-pendente .field-vazio{ font-size: 13px; }
+.link-list .link-pendente .field-vazio{ font-size: var(--fs-xs); }
 
-/* Aviso de conteúdo ainda não definido. */
+/* Aviso de conteúdo ainda não definido. Também para na medida: é texto de
+   leitura, não faixa de largura cheia. */
 .notice{
+  max-width: var(--medida);
   margin-top: var(--sp-6);
   padding: 18px 22px;
   border: 1px dashed var(--line-strong);
   border-radius: var(--radius-sm);
   background: var(--bg-2);
   color: var(--ink-soft);
-  font-size: 13.5px;
+  font-size: var(--fs-sm);
   line-height: 1.55;
 }
 
@@ -412,8 +435,7 @@ a.panel:focus-visible{
   nav a[aria-current="page"]{ background: var(--bg-2); }
   nav a[aria-current="page"]::after{ display: none; }
 
-  #view-pagina .intro h1{ font-size: 25px; }
-  .steps li{ padding: 18px 20px 18px 58px; }
+  .steps li{ --recuo: 58px; padding: 18px 20px 18px var(--recuo); }
   .steps li::before{ left: 18px; top: 18px; }
 
   /* Em telas estreitas a coluna fixa do rótulo aperta demais o valor. */
@@ -428,7 +450,6 @@ a.panel:focus-visible{
     flex-wrap: wrap;
     gap: 10px 12px;
     padding: 14px 16px;
-    font-size: 14.5px;
   }
   .link-list .link-text{ flex: 1 1 60%; }
   .panel{ padding: var(--sp-4); }

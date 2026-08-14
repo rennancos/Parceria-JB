@@ -1,5 +1,6 @@
 /* Fonte do conteúdo: md/jotbird-document.md ("Guia de Primeiros Passos").
-   Ao atualizar o guia, atualize os dois não há geração automática a partir do markdown. Formato dos campos: ver o cabeçalho de js/paginas.js. */
+   Ao atualizar o guia, atualize os dois: não há geração automática a partir do
+   markdown. Formato dos campos: ver o cabeçalho de js/paginas.js. */
 PAGINAS['primeiros-passos'] = {
   titulo: 'Primeiros passos',
   eyebrow: 'Comece por aqui',
@@ -55,7 +56,7 @@ PAGINAS['primeiros-passos'] = {
             },
             {
               titulo: 'Solicite os perfis da equipe',
-              texto: 'Peça os acessos aos sistemas utilizados pela equipe a lista abaixo cobre os mais frequentes.'
+              texto: 'Peça os acessos aos sistemas utilizados pela equipe. A lista abaixo cobre os mais frequentes.'
             }
           ]
         },

@@ -34,9 +34,9 @@ const equipe = [
   { nome: "Carlos Machado", cargo: "Analista de Soluções de Soluções de Midias III", area: "Integração",           foto: "Fotos/EQUIPE/carlos machado.webp", email: "carlos.machado@g.globo", perfil: "#" },
   { nome: "Darlon Martins", cargo: "Analista de Soluções de Soluções de Midias II", area: "Integração",        foto: "Fotos/EQUIPE/darlon martins.webp", email: "darlon.martins@g.globo", perfil: "#" },
   { nome: "Marcelo Silva", cargo: "Analista de Broadcast", area: "Integração",     foto: "Fotos/EQUIPE/marcelo silva.webp", email: "marcelo.silva_centauro@prestador.globo", perfil: "#" },
-  { nome: "Eduardo Souza", cargo: "Analista de Broadcast", area: "Comunicação",  foto: "Fotos/EQUIPE/eduardo braga.webp", email: "eduardo.bsouza_centauro@prestador.globo", perfil: "#" },
-  { nome: "Vinicius Ribeiro", cargo: "Analista de Broadcast", area: "Vídeo", foto: "Fotos/EQUIPE/vinicius ribeiro.webp", email: "vinicius.ribeiro_youcast@prestador.globo", perfil: "#" },
-]
+  { nome: "Eduardo Souza", cargo: "Analista de Broadcast", area: "Integração",  foto: "Fotos/EQUIPE/eduardo braga.webp", email: "eduardo.bsouza_centauro@prestador.globo", perfil: "#" },
+  { nome: "Vinicius Ribeiro", cargo: "Analista de Broadcast", area: "Integração", foto: "Fotos/EQUIPE/vinicius ribeiro.webp", email: "vinicius.ribeiro_youcast@prestador.globo", perfil: "#" },
+] 
 /* ---------- Renderização ---------- */
 
 const teamGrid = document.getElementById('team-grid');

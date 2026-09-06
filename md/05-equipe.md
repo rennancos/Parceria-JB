@@ -10,8 +10,8 @@ Os dados ficam em `js/equipe.js`, no array `equipe` — separados do layout. Par
 {
   nome: "Rennan Silva",
   cargo: "Analista de Soluções de Mídia",
-  area: "Vídeo",                          // Vídeo | Áudio | IP | Grafismo | Comunicação
-  foto: "Fotos/EQUIPE/rennan-silva.jpg",
+  area: "Captação",                       // ver a lista fechada abaixo
+  foto: "Fotos/EQUIPE/rennan-silva.webp",
   email: "rennan@empresa.com",
   perfil: "#"                             // link do Teams/intranet
 }
@@ -23,7 +23,17 @@ Os dados ficam em `js/equipe.js`, no array `equipe` — separados do layout. Par
 
 ## Fotos
 
-Vão em `Fotos/EQUIPE/`, recortadas em proporção quadrada (o CSS usa `object-fit: cover`; ~300×300px já basta). O nome do arquivo é livre — o que vale é o caminho em `foto`.
+**O original vai em `Fotos/EQUIPE/originais/`, e o que o portal carrega é gerado a partir dele.** Solte o arquivo lá — no tamanho e formato em que ele chegou, sem recortar — e rode:
+
+```bash
+npm run fotos
+```
+
+Isso grava `Fotos/EQUIPE/<mesmo-nome>.webp` em 264×264 (o dobro dos 132 px em que o card desenha, para telas retina), com o mesmo recorte quadrado central que o `object-fit: cover` do CSS já fazia. É o `.webp` que vai em `foto`. O nome do arquivo é livre — o que vale é o caminho.
+
+Rodar de novo é seguro: o script regera tudo a partir dos originais e não estraga o que já existe. Precisa de ffmpeg no PATH e de nenhum pacote npm.
+
+**Não aponte `foto` para o original.** Os masters são fotos de câmera — o maior tinha 4,4 MB e 6720×4480 para preencher um círculo de 132 px. Servi-los custava 15 MB por visita e o mesmo peso dentro de cada instalador Windows; os `.webp` somam ~400 KB. Por isso `originais/` está fora da lista de `files` do [electron-builder.yml](../electron-builder.yml).
 
 **Avatar de fallback.** As iniciais do nome (`.team-photo-wrapper::after`, via `data-initials`) são o estado padrão do avatar; a foto só as cobre depois de carregar, quando o JS marca `.is-loaded` no wrapper. Consequências:
 
@@ -50,3 +60,5 @@ Os cards em destaque ganham `.is-featured` (borda e anel da foto em `--accent-1`
 **Escape.** O array é editado à mão e entra via `innerHTML`, então `escapar()` trata `& < > " '` — um "&" num cargo não quebra o markup.
 
 **`area` ainda não filtra nada.** O campo é espelhado em `data-area` no card, pronto para uma busca ou filtro futuro, mas não há nenhum hoje.
+
+**A lista de áreas é fechada, e a grafia importa.** Hoje são sete: `Captação`, `Gestão`, `Grafismo`, `INEWS`, `Integração`, `JCORP`, `MAM` — siglas em caixa alta, o resto capitulado. O chip do card aplica `text-transform: uppercase`, então uma grafia divergente **não aparece na tela**: some até o dia em que o filtro existir e agrupar "captação" e "CAPTAÇÃO" como duas áreas diferentes. Era o caso de 20 dos 36 registros antes da normalização. Ao acrescentar alguém, copie a grafia de um registro existente; ao criar uma área nova, acrescente-a a esta lista.

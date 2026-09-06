@@ -107,19 +107,21 @@ Estar na rede interna é a proteção principal, mas duas coisas continuam valen
 
 ## 3. Funcionalidade
 
-### Busca — o item de melhor custo-benefício
+### ~~Busca~~ — feita
 
-O botão "Buscar" existe no header e no drawer, e não faz nada. Vale notar que **a arquitetura escolhida praticamente entrega a busca de graça**: todo o conteúdo do portal já está carregado em memória, em `PAGINAS` e `equipe`, como objeto estruturado. Não há índice para construir, backend para consultar nem biblioteca para instalar.
+**Saiu do roteiro: existe e está em uso.** O botão "Buscar" do header e do drawer abre uma busca sobre todo o conteúdo do portal, e a previsão se confirmou — **a arquitetura entregou a busca quase de graça**: `PAGINAS` e `equipe` já estavam em memória, então não houve índice para construir, backend para consultar nem biblioteca para instalar. Continua funcionando com o portal aberto por duplo clique.
 
-Uma busca que varra títulos, textos, nomes de sistema e pessoas, e devolva "onde isso aparece", é da ordem de algumas dezenas de linhas em `js/`. É o tipo de coisa que costuma exigir infraestrutura e aqui não exige.
+Documentação em [11-busca.md](11-busca.md). O que ficou de fora está listado lá, no fim.
 
 ### Filtro por área na equipe
 
-`data-area` já está em cada card, exatamente para isso. Com 37 pessoas a grade já é longa; com filtro por Vídeo / Áudio / IP / Grafismo / Comunicação fica navegável. Depende de os dados reais entrarem primeiro — filtrar "Pessoa 07" não ajuda ninguém.
+`data-area` já está em cada card, exatamente para isso. Com 36 pessoas a grade já é longa; com filtro por Captação / MAM / Integração / Grafismo / Gestão / INEWS / JCORP fica navegável.
+
+**Duas coisas que faltavam já entraram:** os dados reais da equipe e a grafia única das áreas (a mesma área vinha escrita de até três formas, o que teria gerado 11 grupos onde há 7 — ver [05-equipe.md](05-equipe.md)). A busca também já acha pessoa por área; o que falta é o filtro na própria grade, que é outro gesto: varrer versus reduzir.
 
 ### Notificações e Perfil
 
-Também decorativos. Diferente da busca, **estes precisam de decisão antes de código**: notificação de quê, vinda de onde? Perfil de quem, com que login? Sem backend nem autenticação, provavelmente não têm resposta hoje. A alternativa honesta é removê-los até que tenham — botão que não faz nada ensina o usuário a não clicar.
+Notificações continua decorativo; Perfil ganhou função com a edição pela página. Diferente do que foi a busca, **estes precisam de decisão antes de código**: notificação de quê, vinda de onde? Perfil de quem, com que login? Sem backend nem autenticação, provavelmente não têm resposta hoje. A alternativa honesta é removê-los até que tenham — botão que não faz nada ensina o usuário a não clicar.
 
 ### Tema seguindo o sistema
 
@@ -174,8 +176,8 @@ Restrições que sustentam as decisões já tomadas. Quebrar qualquer uma exige 
 
 ## Como priorizar
 
-Com a VM definida, o caminho fica: **subir a VM (2) → conteúdo real (1) → busca e filtro (3) → sustentação (4)**.
+Com a VM definida e a busca feita, o caminho fica: **subir a VM (2) → conteúdo real (1) → filtro por área (3) → sustentação (4)**.
 
 A VM primeiro porque é rápida — não há build, é `git clone` e apontar um servidor estático para a pasta — e porque muda o projeto de "roda na minha máquina" para "tem endereço". Um portal com endereço e conteúdo pela metade já é útil e já rende correção de quem usa; um portal completo que ninguém consegue abrir não rende nada.
 
-Conteúdo em seguida, porque é o gargalo real e não depende de mais nenhuma decisão técnica. Busca e filtro só fazem sentido quando houver conteúdo para buscar. E a sustentação vem por último não por ser menos importante, mas porque protege um investimento que ainda não foi feito.
+Conteúdo em seguida, porque é o gargalo real e não depende de mais nenhuma decisão técnica — e agora rende o dobro: cada item preenchido passa a ser achável pela busca no mesmo instante, sem nenhum passo a mais. E a sustentação vem por último não por ser menos importante, mas porque protege um investimento que ainda não foi feito.

@@ -21,8 +21,8 @@
 ## Comportamento
 
 - **O tema não respeita o `prefers-color-scheme`** do sistema na primeira visita — usa só o que estiver salvo em `localStorage`, e o padrão é claro.
-- **Não há filtro nem busca na equipe.** O campo `area` já existe em cada pessoa e é espelhado em `data-area` no card, pronto para isso, mas nada consome.
-- **Os botões Buscar e Notificações são decorativos.** Não têm comportamento associado, no header nem no drawer. **Perfil deixou de ser:** com o serviço da edição pela página no ar, ele abre o login e, logado, mostra nome, papel e "Sair" — ver [09-edicao-pela-pagina.md](09-edicao-pela-pagina.md). Sem o serviço, continua sem função.
+- **Não há filtro por área na equipe.** A busca já acha pessoa por nome, cargo, área e e-mail, mas não existe um filtro na própria grade. O campo `area` é espelhado em `data-area` no card, pronto para isso, e desde a normalização a grafia é única — ver [05-equipe.md](05-equipe.md).
+- **O botão Notificações é decorativo.** Não tem comportamento associado, no header nem no drawer. **Buscar deixou de ser:** abre a busca do portal — ver [11-busca.md](11-busca.md). **Perfil deixou de ser:** com o serviço da edição pela página no ar, ele abre o login e, logado, mostra nome, papel e "Sair" — ver [09-edicao-pela-pagina.md](09-edicao-pela-pagina.md). Sem o serviço, continua sem função.
 
 ## O que já foi resolvido
 

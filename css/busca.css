@@ -1,0 +1,288 @@
+/* Busca (js/busca.js).
+
+   Nenhuma cor literal: tudo passa pelos tokens de css/styles.css, senão o
+   componente some num dos dois temas — ver md/06-estilos-e-tema.md.
+
+   A janela é um <dialog> modal, como o da edição: o ::backdrop, o foco preso e
+   o Esc são do navegador. Aqui só há aparência. */
+
+/* ---------- Janela ---------- */
+
+/* Alinhada ao topo, não centralizada: a lista cresce para baixo conforme se
+   digita, e uma caixa centralizada saltaria a cada tecla. */
+.busca-janela{
+  position: fixed;
+  inset: 0;
+  margin: 10vh auto auto;
+  width: min(640px, calc(100vw - 2 * var(--sp-3)));
+  max-height: 76vh;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: var(--shadow-card-lg);
+  overflow: hidden;                 /* quem rola é a lista, não a janela */
+
+  display: flex;
+  flex-direction: column;
+}
+
+.busca-janela::backdrop{
+  background: rgba(34, 51, 58, 0.45);
+  backdrop-filter: blur(2px);
+}
+
+/* O <h2> existe para o aria-labelledby da janela; não precisa aparecer. */
+.busca-rotulo{
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Campo ---------- */
+
+.busca-campo{
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  border-bottom: 1px solid var(--line);
+}
+
+.busca-campo > svg{
+  flex: none;
+  width: 20px;
+  height: 20px;
+  color: var(--ink-soft);
+}
+
+.busca-campo input{
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--fs-md);
+  outline: none;                    /* o anel fica na janela inteira, abaixo */
+}
+
+.busca-campo input::placeholder{ color: var(--ink-soft); opacity: 0.85; }
+
+/* O campo recebe o foco assim que a janela abre, e é o único lugar onde o
+   cursor fica: o anel vai na linha inteira para que ele seja visível sem
+   competir com o texto digitado. */
+.busca-campo:focus-within{
+  box-shadow: inset 0 -2px 0 0 var(--accent-1);
+}
+
+/* Some o "x" nativo do type=search: já existe um botão de fechar ao lado, e os
+   dois juntos confundem. */
+.busca-campo input::-webkit-search-cancel-button{ display: none; }
+
+.busca-fechar{
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  background: var(--bg-2);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.busca-fechar svg{ width: 16px; height: 16px; }
+.busca-fechar:hover{ background: var(--card-hover); color: var(--ink); }
+.busca-fechar:focus-visible{ outline: 2px solid var(--accent-1); outline-offset: 2px; }
+
+/* ---------- Resumo (contagem, vazio, mínimo de caracteres) ---------- */
+
+/* role="status": o número de resultados é anunciado sem roubar o foco. Fica
+   fora da lista para não virar uma option do listbox. */
+.busca-resumo{
+  margin: 0;
+  padding: var(--sp-2) var(--sp-3);
+  color: var(--ink-soft);
+  font-size: var(--fs-xs);
+}
+
+.busca-resumo:empty{ display: none; }
+
+/* ---------- Resultados ---------- */
+
+/* flex-basis auto, e NÃO `flex: 1`. Com basis 0 a lista não contribui altura
+   nenhuma para a janela — que é dimensionada pelo conteúdo, não por altura
+   fixa — e o resultado é uma lista de altura zero: os itens existem no DOM,
+   respondem a clique e a leitor de tela, e não aparecem para ninguém.
+   Com `0 1 auto` ela cresce com o conteúdo e só encolhe (rolando) ao bater no
+   max-height da janela. */
+.busca-lista{
+  flex: 0 1 auto;
+  min-height: 0;                    /* deixa encolher abaixo do conteúdo, para rolar */
+  margin: 0;
+  padding: 0 var(--sp-2) var(--sp-2);
+  list-style: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;     /* rolar até o fim não rola a página atrás */
+}
+
+.busca-lista:empty{ display: none; }
+
+.busca-item{
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+/* Sem :hover para o item ativo: quem manda é o aria-selected, que segue tanto
+   o teclado quanto o mouse. Assim teclado e ponteiro nunca mostram dois itens
+   destacados ao mesmo tempo. */
+.busca-item[aria-selected="true"]{
+  background: var(--bg-2);
+  box-shadow: inset 2px 0 0 0 var(--accent-1);
+}
+
+.busca-tipo{
+  flex: none;
+  margin-top: 2px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--tile);
+  color: var(--ink-soft);
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.busca-texto{
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;                     /* deixa o text-overflow funcionar no filho */
+}
+
+.busca-titulo{
+  color: var(--ink);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.busca-sub,
+.busca-contexto{
+  color: var(--ink-soft);
+  font-size: var(--fs-xs);
+  /* Duas linhas no máximo: o subtítulo de uma seção pode ser um parágrafo
+     inteiro, e um resultado não pode empurrar os outros para fora da tela. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.busca-contexto{
+  font-size: var(--fs-2xs);
+  opacity: 0.85;
+}
+
+/* O trecho que casou. Fundo + peso, e não só cor de texto: cor sozinha
+   falharia o critério 1.4.1 do WCAG (não usar só cor para informar).
+
+   `color: inherit` é deliberado. A primeira tentativa pintava o texto com
+   --on-accent sobre --accent-soft, e esse par não é garantido: numa das
+   paletas do projeto ele dá ~2:1, bem abaixo dos 4.5:1 exigidos pelo AA.
+   Herdando a cor, o texto grifado mantém a MESMA cor que já tinha — que só
+   está ali porque já contrasta com a superfície — e o fundo entra como um véu
+   translúcido do acento, que escurece ou clareia junto com o tema. Assim o
+   contraste passa a não depender de nenhum par de tokens.
+
+   O `background` sólido antes do color-mix é o fallback de quem não suporta a
+   função: navegador antigo ignora a segunda declaração e fica com a primeira. */
+.busca-lista mark{
+  padding: 0 1px;
+  border-radius: 3px;
+  background: var(--accent-soft);
+  background: color-mix(in srgb, var(--accent) 32%, transparent);
+  color: inherit;
+  font-weight: 700;
+}
+
+/* ---------- Rodapé com as teclas ---------- */
+
+.busca-rodape{
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin: 0;
+  padding: var(--sp-2) var(--sp-3);
+  border-top: 1px solid var(--line);
+  background: var(--bg-2);
+  color: var(--ink-soft);
+  font-size: var(--fs-2xs);
+}
+
+.busca-rodape kbd{
+  display: inline-block;
+  min-width: 18px;
+  padding: 1px 5px;
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  background: var(--card);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: var(--fs-2xs);
+  text-align: center;
+}
+
+/* No celular o rodapé de atalhos não serve para nada — não há teclado físico,
+   e ele rouba altura da lista, que é o que importa numa tela pequena. */
+@media (max-width: 600px){
+  .busca-janela{
+    margin-top: var(--sp-3);
+    max-height: calc(100vh - 2 * var(--sp-3));
+  }
+  .busca-rodape{ display: none; }
+}
+
+/* ---------- Página atrás da janela ---------- */
+
+/* O <dialog> modal já torna o resto inerte, mas não trava a rolagem do body:
+   sem isto, rolar sobre o backdrop move a página atrás. */
+body.busca-aberta{ overflow: hidden; }
+
+/* ---------- Realce de quem foi encontrado ---------- */
+
+/* Buscar uma pessoa leva até o card dela, no meio de 36 iguais. O anel diz
+   qual é — some sozinho, porque é resposta a uma ação, não estado. */
+.team-card.is-encontrado{
+  animation: busca-realce 2s ease-out;
+}
+
+@keyframes busca-realce{
+  0%, 60%{ box-shadow: 0 0 0 3px var(--accent-1), var(--shadow-card-lg); }
+  100%   { box-shadow: 0 0 0 3px transparent, var(--shadow-card); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .busca-fechar{ transition: none; }
+  /* O realce continua existindo — só para de animar. Sem ele, quem pediu menos
+     movimento perderia a única indicação de qual card foi encontrado. */
+  .team-card.is-encontrado{
+    animation: none;
+    box-shadow: 0 0 0 3px var(--accent-1), var(--shadow-card-lg);
+  }
+}

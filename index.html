@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="css/equipe.css">
 <link rel="stylesheet" href="css/pagina.css">
 <link rel="stylesheet" href="css/edicao.css">
+<link rel="stylesheet" href="css/busca.css">
 </head>
 <body>
 <!-- Aplica o tema salvo antes da página pintar, para não piscar branco ao recarregar. -->
@@ -38,7 +39,7 @@
       </nav>
 
       <div class="menu-actions">
-        <button class="menu-action" type="button">
+        <button class="menu-action" type="button" data-busca>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           Buscar
         </button>
@@ -57,7 +58,7 @@
     </div>
 
     <div class="icons">
-      <button class="icon-btn icon-secondary" aria-label="Buscar">
+      <button class="icon-btn icon-secondary" type="button" aria-label="Buscar" data-busca>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       </button>
       <button class="icon-btn icon-secondary" aria-label="Notificações">
@@ -215,6 +216,7 @@
 <script src="js/paginas/acessos-parceria.js"></script>
 <script src="js/paginas/sharepoint.js"></script>
 <script src="js/router.js"></script>
+<script src="js/busca.js"></script>
 
 <!-- Edição pela própria página. Depois do router de propósito: depende do
      renderizador e do router já existirem. Sem o servidor Node no ar (file://

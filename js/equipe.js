@@ -70,10 +70,19 @@ function escapar(texto){
 const ICONE_EMAIL = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>`;
 const ICONE_PERFIL = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18z"/></svg>`;
 
+/* Mesmo cálculo do slug em js/busca.js — os dois PRECISAM concordar, senão a
+   busca leva a um id que não existe e o card não é realçado. */
+function idDaPessoa(nome){
+  return 'pessoa-' + String(nome ?? '')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
 function criarCard(pessoa){
   const card = document.createElement('article');
   card.className = pessoa.destaque ? 'team-card is-featured' : 'team-card';
   card.dataset.area = pessoa.area || '';
+  card.id = idDaPessoa(pessoa.nome);
 
   const nome = escapar(pessoa.nome);
   const temPerfil = pessoa.perfil && pessoa.perfil !== '#';

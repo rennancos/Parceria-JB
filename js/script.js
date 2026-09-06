@@ -1,29 +1,3 @@
-/* Tema (black mode).
-   A classe `dark-mode` já pode ter sido aplicada pelo script inline no topo do
-   <body> — ele lê o localStorage antes da página pintar, para não piscar branco
-   ao navegar entre páginas. Aqui só sincronizamos o botão com esse estado. */
-const TEMA_KEY = 'pajb-tema';
-const themeToggle = document.querySelector('.theme-toggle');
-
-function sincronizarBotaoTema(escuro){
-  if (!themeToggle) return;
-  themeToggle.setAttribute('aria-pressed', String(escuro));
-  themeToggle.setAttribute('aria-label', escuro ? 'Desativar black mode' : 'Ativar black mode');
-}
-
-sincronizarBotaoTema(document.body.classList.contains('dark-mode'));
-
-themeToggle?.addEventListener('click', () => {
-  const nextState = themeToggle.getAttribute('aria-pressed') !== 'true';
-  document.body.classList.toggle('dark-mode', nextState);
-  sincronizarBotaoTema(nextState);
-  // localStorage pode estourar em file:// com storage bloqueado — o tema
-  // continua funcionando na página atual, só não sobrevive à navegação.
-  try {
-    localStorage.setItem(TEMA_KEY, nextState ? 'dark' : 'light');
-  } catch (e) {}
-});
-
 /* Menu lateral (drawer). Vale em qualquer largura: o mesmo botão
    hambúrguer abre o painel no celular e no desktop. */
 const menuToggle = document.querySelector('.menu-toggle');

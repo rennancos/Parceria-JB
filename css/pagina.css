@@ -16,12 +16,6 @@
   --chip: #E5E1DA;
 }
 
-body.dark-mode{
-  --panel: #232E33;
-  --panel-line: #33424A;
-  --chip: #2E3A40;
-}
-
 /* Marca o item correspondente à página aberta, nos dois menus. */
 .top-nav a[aria-current="page"],
 .menu-panel nav a[aria-current="page"]{

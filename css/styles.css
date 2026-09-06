@@ -113,35 +113,6 @@
 
 /* Black mode: a mesma paleta, invertida de papel — o azul e o bege viram
    tinta sobre um ardósia escuro derivado do próprio #22333A. */
-body.dark-mode{
-  --bg: #182024;
-  --bg-2: #212B30;
-  --card: #232E33;
-  --card-hover: #2A363C;
-  --tile: #2E3A40;
-
-  --ink: #F1F0E8;
-  --ink-soft: #B3C8CF;
-
-  --line: #33424A;
-  --line-strong: #46585F;
-
-  --header-bg: rgba(24,32,36,0.90);
-
-  --accent-1: #B3C8CF;
-  --accent: #89A8B2;
-  --accent-soft: #5C7F8A;
-  --on-accent: #141D21;
-
-  --stripe: rgba(179,200,207,0.05);
-  --glow: rgba(137,168,178,0.10);
-
-  --shadow-card: 0 8px 24px rgba(0,0,0,0.38);
-  --shadow-card-lg: 0 16px 36px rgba(0,0,0,0.46);
-  --shadow-tile: 0 1px 2px rgba(0,0,0,0.30);
-  --shadow-panel: 0 4px 14px rgba(0,0,0,0.28);
-}
-
 *{ box-sizing: border-box; }
 
 h1, h2, h3, h4{ text-wrap: balance; }
@@ -227,6 +198,8 @@ img{
   background: radial-gradient(closest-side, var(--glow), transparent 70%);
   pointer-events: none;
 }
+
+.ops-dashboard{ display: none; }
 
 /* ---------- Cabeçalho ---------- */
 
@@ -455,26 +428,6 @@ body.menu-open{ overflow: hidden; }
   outline-offset: 2px;
 }
 .icon-btn svg{ width: 18px; height: 18px; }
-
-.theme-toggle{
-  border-color: var(--line-strong);
-  background: var(--card);
-  color: var(--ink);
-}
-.theme-toggle:hover{
-  background: var(--bg-2);
-  border-color: var(--accent);
-}
-.theme-toggle svg{ width: 17px; height: 17px; }
-body.dark-mode .theme-toggle{
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--on-accent);
-}
-body.dark-mode .theme-toggle:hover{
-  background: var(--accent-soft);
-  border-color: var(--accent-soft);
-}
 
 /* ---------- Corpo ---------- */
 
@@ -773,8 +726,49 @@ footer{
   .card:hover{ transform: none; }
 }
 
-/* Paleta operacional solicitada; a estrutura e o layout permanecem inalterados. */
-:root{--pal-azul:#1E293B;--pal-azul-claro:#6495ED;--pal-bege:#1E293B;--pal-creme:#0F172A;--bg:#0F172A;--bg-2:#1E293B;--card:#1E293B;--card-hover:#1E293B;--tile:#1E293B;--ink:#F8FAFC;--ink-soft:#94A3B8;--line:#94A3B8;--line-strong:#6495ED;--header-bg:rgba(15,23,42,.92);--accent-1:#6495ED;--accent:#6495ED;--accent-soft:#94A3B8;--on-accent:#F8FAFC;--stripe:rgba(100,149,237,.08);--glow:rgba(100,149,237,.12);--shadow-card:0 6px 18px rgba(0,0,0,.16);--shadow-card-lg:0 10px 26px rgba(0,0,0,.22);--shadow-tile:0 1px 2px rgba(0,0,0,.12);--shadow-panel:0 3px 10px rgba(0,0,0,.12)}
-.ops-dashboard{display:none!important}.legacy-home{display:block!important}
-body.dark-mode{--bg:#0F172A;--bg-2:#1E293B;--card:#1E293B;--card-hover:#1E293B;--tile:#1E293B;--ink:#F8FAFC;--ink-soft:#94A3B8;--line:#94A3B8;--line-strong:#6495ED;--header-bg:rgba(15,23,42,.92);--accent-1:#6495ED;--accent:#6495ED;--accent-soft:#94A3B8;--on-accent:#F8FAFC}
-.ops-dashboard{display:none!important}.legacy-home{display:block!important}
+/* Optional visual variants. Activate with body.classList in DevTools. */
+body{
+  --bg: #141414;
+  --bg-2: #1C1C1B;
+  --card: #22211F;
+  --card-hover: #2A2926;
+  --tile: #302E2A;
+  --ink: #F2EFE8;
+  --ink-soft: #AAA69E;
+  --line: rgba(242,239,232,.12);
+  --line-strong: rgba(242,239,232,.22);
+  --header-bg: rgba(20,20,20,.90);
+  --accent-1: #D8B98B;
+  --accent: #B99668;
+  --accent-soft: #D0B184;
+  --on-accent: #191713;
+  --stripe: rgba(242,239,232,.035);
+  --glow: rgba(185,150,104,.10);
+  --shadow-card: 0 1px 2px rgba(0,0,0,.30), 0 8px 24px rgba(0,0,0,.18);
+  --shadow-card-lg: 0 1px 2px rgba(0,0,0,.34), 0 16px 36px rgba(0,0,0,.24);
+  --shadow-tile: 0 1px 2px rgba(0,0,0,.24);
+  --shadow-panel: 0 1px 2px rgba(0,0,0,.22), 0 4px 12px rgba(0,0,0,.12);
+  --team-card: var(--card);
+  --team-card-hover: var(--card-hover);
+  --team-ring: var(--accent);
+  --team-chip: var(--tile);
+  --panel: var(--card);
+  --panel-line: var(--line);
+  --chip: var(--tile);
+  background: var(--bg);
+}
+
+body h1,
+body h2,
+body h3,
+body .brand-name{
+  font-family: Syne, "Arial Black", sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+body .top-nav a,
+body .card-eyebrow,
+body .team-tag,
+body .page-eyebrow{
+  letter-spacing: .14em;
+}

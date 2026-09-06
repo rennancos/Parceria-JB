@@ -56,11 +56,6 @@
   background: transparent;
   color: #A85A4E;
 }
-body.dark-mode .ed-btn.ed-perigo:hover{
-  border-color: #E3A197;
-  color: #E3A197;
-}
-
 .ed-btn.ed-primario{
   border-color: var(--accent);
   background: var(--accent);
@@ -71,11 +66,6 @@ body.dark-mode .ed-btn.ed-perigo:hover{
   background: var(--accent-soft);
   color: var(--on-accent);
 }
-body.dark-mode .ed-btn.ed-primario:hover{
-  background: var(--pal-azul-claro);
-  border-color: var(--pal-azul-claro);
-}
-
 /* ---------- Item da lista com botões ---------- */
 
 /* O <li> normal é só a caixa do link. Com ações, ele vira a linha: o link (ou o
@@ -337,7 +327,6 @@ body.dark-mode .ed-btn.ed-primario:hover{
   font-size: var(--fs-sm);
   line-height: 1.5;
 }
-body.dark-mode .ed-erro{ border-left-color: #E3A197; }
 
 .ed-rodape{
   display: flex;

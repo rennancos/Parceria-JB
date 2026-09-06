@@ -235,6 +235,7 @@ Depois, sempre que quiser um instalador:
 npm run app          # abre o aplicativo sem empacotar — para testar rápido
 npm run app:build    # gera dist/Parceria-JB-Setup-<versão>.exe
 npm run app:teste    # 32 testes do fluxo de atualização, sem publicar nada
+npm run icone        # regera app/icone.ico a partir da marca — só se ela mudar
 ```
 
 `npm run app` é o modo de desenvolvimento: abre a janela com o portal, com as Ferramentas do desenvolvedor disponíveis em *Exibir*.
@@ -245,6 +246,19 @@ npm run app:teste    # 32 testes do fluxo de atualização, sem publicar nada
 - `%TEMP%\pajb-build\win-unpacked\` — a pasta solta, útil para conferir o que entrou no pacote.
 
 `dist/` está no `.gitignore`: instalador não entra no repositório.
+
+### O ícone
+
+O executável, o atalho e a janela usam `app/icone.ico`, que é versionado — quem gera o instalador não precisa de nada além do repositório.
+
+Ele não é desenhado à mão: `npm run icone` o monta a partir de `Fotos/LOGOS/TVGLOBO_LOGO.png`, com os seis tamanhos que o Windows escolhe conforme o lugar (256 na lista de programas e no Alt+Tab, 16 na barra de título). **Só rode se a marca mudar.**
+
+Duas armadilhas ficaram resolvidas dentro de `ferramentas/gerar-icone.js`, e é por isso que a origem não é apontada direto no `electron-builder.yml`:
+
+- **O arquivo de origem é um JPEG**, apesar da extensão `.png` — `head -c4` mostra `ff d8 ff e0` em vez da assinatura PNG. O ffmpeg decide pelo conteúdo e lê sem reclamar; o electron-builder decide pela extensão e recusaria.
+- **A arte tem 148×148 e o Windows pede 256×256.** A ampliação acontece na geração, uma vez. Se algum dia aparecer a marca em vetor ou num PNG maior, troque a origem e rode de novo: os seis tamanhos saem mais nítidos sem mexer em mais nada.
+
+A ferramenta depende de ffmpeg no `PATH`, como `npm run fotos`, e de nenhum pacote npm.
 
 ### O projeto está dentro do OneDrive — e isso importa aqui
 
@@ -413,8 +427,6 @@ Isso é intencional, não pendência. A edição depende da API, e a API vive na
 
 **3. Sem assinatura digital.** SmartScreen na primeira execução e risco de falso positivo em antivírus. Ver [Antivírus e assinatura digital](#antivírus-e-assinatura-digital).
 
-**4. Sem ícone próprio.** O aplicativo sai com o ícone padrão do Electron. Falta um `.ico` de 256×256 em `app/icone.ico` e descomentar a linha `icon:` do `electron-builder.yml`. `Fotos/LOGOS/TVGLOBO_LOGO.png` não serve: **apesar da extensão, o arquivo é um JPEG** — dá para conferir com `node -e "console.log(require('fs').readFileSync('Fotos/LOGOS/TVGLOBO_LOGO.png').slice(0,4))"`, que mostra `ff d8 ff e0` em vez da assinatura PNG.
+**4. Instalação por usuário.** Numa máquina compartilhada, cada login instala e atualiza o seu. É o preço de não pedir administrador.
 
-**5. Instalação por usuário.** Numa máquina compartilhada, cada login instala e atualiza o seu. É o preço de não pedir administrador.
-
-**6. Só x64.** Sem 32 bits e sem ARM, por ora.
+**5. Só x64.** Sem 32 bits e sem ARM, por ora.

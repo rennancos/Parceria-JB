@@ -46,10 +46,11 @@ asar: false
 
 win:
   target: nsis
-  # icon: app/icone.ico
-  # ↑ Descomente quando houver um .ico de verdade (256×256, com os tamanhos
-  #   menores dentro). Sem ele o aplicativo sai com o ícone padrão do Electron.
-  #   Fotos/LOGOS/TVGLOBO_LOGO.png não serve: apesar do nome, é um JPEG.
+  icon: app/icone.ico
+  # Gerado por `npm run icone` a partir de Fotos/LOGOS/TVGLOBO_LOGO.png, com os
+  # seis tamanhos que o Windows usa (256 a 16). O arquivo de origem não pode ser
+  # apontado aqui direto: apesar do nome, é um JPEG, e o electron-builder decide
+  # pela extensão. Se a marca mudar, troque a origem e rode `npm run icone`.
 
 nsis:
   # Um clique: instala em %LOCALAPPDATA%\Programs\, sem pedir pasta e sem UAC.

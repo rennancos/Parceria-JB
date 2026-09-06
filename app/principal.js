@@ -49,6 +49,10 @@ function criarJanela(){
     // js/router.js escreve a cada troca de página) assume. Por isso é o nome
     // do produto, e não uma cópia do título da home.
     title: 'Parceria JB',
+    // O executável instalado já carrega este ícone (electron-builder o embute no
+    // .exe), mas `npm run app` roda pelo electron.exe: sem esta linha a janela de
+    // desenvolvimento aparece com o átomo do Electron, e não com a marca.
+    icon: path.join(__dirname, 'icone.ico'),
     webPreferences: {
       // Os três juntos são o que mantém a página sem acesso a Node. A página é
       // nossa, mas ela também renderiza conteúdo que a equipe edita — não custa

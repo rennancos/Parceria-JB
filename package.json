@@ -13,7 +13,8 @@
     "app:build": "node app/empacotar.js",
     "app:manifesto": "node app/manifesto.js",
     "app:teste": "electron app/teste-atualizacao.js",
-    "fotos": "node ferramentas/otimizar-fotos.js"
+    "fotos": "node ferramentas/otimizar-fotos.js",
+    "icone": "node ferramentas/gerar-icone.js"
   },
   "devDependencies": {
     "serve": "^14.2.4",

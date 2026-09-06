@@ -172,7 +172,12 @@ body{
    cabeçalho sticky pararia de grudar no topo. `clip` corta sem criar rolagem.
    Em navegador sem suporte a `clip`, o comportamento cai em `visible` — o
    cabeçalho continua correto, que é o que não pode falhar. */
-html{ overflow-x: clip; }
+html{
+  overflow-x: clip;
+  /* Calha sempre reservada: com o drawer aberto o body vira overflow:hidden
+     e, sem isto, a página daria um pulo lateral quando a barra sumisse. */
+  scrollbar-gutter: stable;
+}
 
 body{
   background: var(--bg);
@@ -281,19 +286,15 @@ header{
   letter-spacing: -0.01em;
 }
 
-.menu-panel{ display: contents; }
-.menu-panel-head,
-.menu-actions,
-.menu-toggle{ display: none; }
-
-.scrim{ display: none; }
-
-nav{
+/* Barra de navegação do topo. Elemento próprio, separado do drawer: os dois
+   coexistem, cada um com o seu layout, e o botão hambúrguer não depende mais
+   da largura da tela para ter o que abrir. */
+.top-nav{
   display: flex;
   align-items: center;
   gap: 30px;
 }
-nav a{
+.top-nav a{
   color: var(--ink-soft);
   text-decoration: none;
   font-size: var(--fs-sm);
@@ -301,12 +302,129 @@ nav a{
   transition: color 0.15s ease;
   position: relative;
 }
-nav a:hover{ color: var(--ink); }
-nav a:focus-visible{
+.top-nav a:hover{ color: var(--ink); }
+.top-nav a:focus-visible{
   outline: 2px solid var(--accent-1);
   outline-offset: 5px;
   border-radius: 4px;
 }
+
+/* ---------- Menu lateral (drawer) ----------
+
+   Vale em qualquer largura: o hambúrguer abre este painel no celular e no
+   desktop. Ele fica fora do <header> de propósito — o cabeçalho tem z-index e
+   backdrop-filter, e um "position: fixed" lá dentro ficaria preso ao contexto
+   de empilhamento dele, atrás do scrim. */
+.menu-panel{
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 30;
+  width: min(320px, 84vw);
+  height: 100dvh;
+  padding: 18px 18px 28px;
+  overflow-y: auto;
+  background: var(--bg);
+  border-left: 1px solid var(--line-strong);
+  box-shadow: -18px 0 40px rgba(34,51,58,0.16);
+  transform: translateX(100%);
+  visibility: hidden;
+  transition: transform 0.25s ease, visibility 0.25s ease;
+}
+/* "visibility: hidden" também tira o conteúdo do painel da ordem de tabulação
+   enquanto ele está fechado: não precisa de inert nem de tabindex negativo. */
+body.menu-open .menu-panel{
+  transform: translateX(0);
+  visibility: visible;
+}
+
+.menu-panel-head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.menu-panel-title{
+  font-size: var(--fs-2xs);
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+
+/* No drawer o link deixa de ser item de barra e vira linha de toque: sobe um
+   passo na escala (--fs-sm → --fs-md) porque o alvo é o dedo, não o mouse. */
+.menu-panel nav{
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+}
+.menu-panel nav a{
+  display: block;
+  padding: 13px 12px;
+  border-radius: var(--radius-xs);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: var(--fs-md);
+  font-weight: 550;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.menu-panel nav a:hover{ background: var(--bg-2); }
+.menu-panel nav a:focus-visible{
+  outline: 2px solid var(--accent-1);
+  outline-offset: 2px;
+}
+
+.menu-actions{
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.menu-action{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 12px;
+  border: none;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--fs-md);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.menu-action:hover{ background: var(--bg-2); }
+.menu-action:focus-visible{
+  outline: 2px solid var(--accent-1);
+  outline-offset: 2px;
+}
+.menu-action svg{ width: 18px; height: 18px; flex-shrink: 0; color: var(--ink-soft); }
+
+.scrim{
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgba(34,51,58,0.28);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+body.menu-open .scrim{
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Trava a rolagem do fundo com o painel aberto. A calha reservada no html
+   evita que a página escorregue de lado quando a barra de rolagem some. */
+body.menu-open{ overflow: hidden; }
 
 .icons{
   display: flex;
@@ -596,7 +714,7 @@ footer{
   header{ padding: 14px 24px; }
   main{ padding: var(--sp-6) 24px var(--sp-7); }
   footer{ padding: var(--sp-6) 24px var(--sp-5); }
-  nav{ gap: 20px; }
+  .top-nav{ gap: 20px; }
 }
 
 /* ---------- Tablet ---------- */
@@ -616,109 +734,11 @@ footer{
 
   .intro{ margin-bottom: var(--sp-5); }
 
+  /* Cabeçalho estreito: a navegação e os ícones secundários saem da barra e
+     passam a existir só dentro do drawer, que já traz os dois. */
+  .top-nav{ display: none; }
   .icons{ gap: 6px; }
-  .menu-toggle{ display: flex; }
   .icon-secondary{ display: none; }
-
-  .menu-panel{
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 0;
-    right: 0;
-    z-index: 30;
-    width: min(320px, 84vw);
-    height: 100dvh;
-    padding: 18px 18px 28px;
-    overflow-y: auto;
-    background: var(--bg);
-    border-left: 1px solid var(--line-strong);
-    box-shadow: -18px 0 40px rgba(34,51,58,0.16);
-    transform: translateX(100%);
-    visibility: hidden;
-    transition: transform 0.25s ease, visibility 0.25s ease;
-  }
-  body.menu-open .menu-panel{
-    transform: translateX(0);
-    visibility: visible;
-  }
-
-  .menu-panel-head{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 14px;
-  }
-  .menu-panel-title{
-    font-size: var(--fs-2xs);
-    font-weight: 650;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ink-soft);
-  }
-
-  nav{
-    flex-direction: column;
-    align-items: stretch;
-    gap: 2px;
-  }
-  /* No drawer o link deixa de ser item de barra e vira linha de toque: sobe um
-     passo na escala (--fs-sm → --fs-md) porque o alvo é o dedo, não o mouse. */
-  nav a{
-    padding: 13px 12px;
-    border-radius: var(--radius-xs);
-    font-size: var(--fs-md);
-    color: var(--ink);
-    transition: background 0.15s ease, color 0.15s ease;
-  }
-  nav a:hover{ background: var(--bg-2); }
-
-  .menu-actions{
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    margin-top: 18px;
-    padding-top: 16px;
-    border-top: 1px solid var(--line);
-  }
-  .menu-action{
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 13px 12px;
-    border: none;
-    border-radius: var(--radius-xs);
-    background: transparent;
-    color: var(--ink);
-    font: inherit;
-    font-size: var(--fs-md);
-    text-align: left;
-    cursor: pointer;
-    transition: background 0.15s ease;
-  }
-  .menu-action:hover{ background: var(--bg-2); }
-  .menu-action:focus-visible{
-    outline: 2px solid var(--accent-1);
-    outline-offset: 2px;
-  }
-  .menu-action svg{ width: 18px; height: 18px; flex-shrink: 0; color: var(--ink-soft); }
-
-  .scrim{
-    display: block;
-    position: fixed;
-    inset: 0;
-    z-index: 20;
-    background: rgba(34,51,58,0.28);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.25s ease, visibility 0.25s ease;
-  }
-  body.menu-open .scrim{
-    opacity: 1;
-    visibility: visible;
-  }
-
-  body.menu-open{ overflow: hidden; }
 
   .footer-inner{ gap: var(--sp-4); }
 }
@@ -746,8 +766,15 @@ footer{
   .menu-panel,
   .scrim,
   .icon-btn,
-  nav a,
+  .top-nav a,
+  .menu-panel nav a,
   .menu-action{ transition: none; }
 
   .card:hover{ transform: none; }
 }
+
+/* Paleta operacional solicitada; a estrutura e o layout permanecem inalterados. */
+:root{--pal-azul:#1E293B;--pal-azul-claro:#6495ED;--pal-bege:#1E293B;--pal-creme:#0F172A;--bg:#0F172A;--bg-2:#1E293B;--card:#1E293B;--card-hover:#1E293B;--tile:#1E293B;--ink:#F8FAFC;--ink-soft:#94A3B8;--line:#94A3B8;--line-strong:#6495ED;--header-bg:rgba(15,23,42,.92);--accent-1:#6495ED;--accent:#6495ED;--accent-soft:#94A3B8;--on-accent:#F8FAFC;--stripe:rgba(100,149,237,.08);--glow:rgba(100,149,237,.12);--shadow-card:0 6px 18px rgba(0,0,0,.16);--shadow-card-lg:0 10px 26px rgba(0,0,0,.22);--shadow-tile:0 1px 2px rgba(0,0,0,.12);--shadow-panel:0 3px 10px rgba(0,0,0,.12)}
+.ops-dashboard{display:none!important}.legacy-home{display:block!important}
+body.dark-mode{--bg:#0F172A;--bg-2:#1E293B;--card:#1E293B;--card-hover:#1E293B;--tile:#1E293B;--ink:#F8FAFC;--ink-soft:#94A3B8;--line:#94A3B8;--line-strong:#6495ED;--header-bg:rgba(15,23,42,.92);--accent-1:#6495ED;--accent:#6495ED;--accent-soft:#94A3B8;--on-accent:#F8FAFC}
+.ops-dashboard{display:none!important}.legacy-home{display:block!important}

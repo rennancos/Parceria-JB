@@ -22,12 +22,16 @@ body.dark-mode{
   --chip: #2E3A40;
 }
 
-/* Marca o item do menu correspondente à página aberta. */
-nav a[aria-current="page"]{
+/* Marca o item correspondente à página aberta, nos dois menus. */
+.top-nav a[aria-current="page"],
+.menu-panel nav a[aria-current="page"]{
   color: var(--ink);
   font-weight: 650;
 }
-nav a[aria-current="page"]::after{
+/* No drawer o link é um bloco: o sublinhado ficaria solto no meio do padding,
+   então lá o item ativo é marcado pelo fundo. */
+.menu-panel nav a[aria-current="page"]{ background: var(--bg-2); }
+.top-nav a[aria-current="page"]::after{
   content: "";
   position: absolute;
   left: 0;
@@ -430,11 +434,6 @@ a.panel:focus-visible{
 }
 
 @media (max-width: 900px){
-  /* No drawer o nav vira lista de blocos: o sublinhado fica solto no meio do
-     padding, então o item ativo é marcado pelo fundo. */
-  nav a[aria-current="page"]{ background: var(--bg-2); }
-  nav a[aria-current="page"]::after{ display: none; }
-
   .steps li{ --recuo: 58px; padding: 18px 20px 18px var(--recuo); }
   .steps li::before{ left: 18px; top: 18px; }
 

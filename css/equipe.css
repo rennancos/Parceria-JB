@@ -315,3 +315,25 @@ a.team-link:focus-visible{
   .team-card:hover{ transform: none; }
   a.team-link:hover{ transform: none; }
 }
+
+/* Equipe: grade fluida, cards compactos e contraste alto. */
+:root{--team-card:#F3F5F8;--team-card-hover:#F3F5F8;--team-ring:#6F9BB8;--team-chip:#364254}
+body.dark-mode{--team-card:#F3F5F8;--team-card-hover:#F3F5F8;--team-ring:#6F9BB8;--team-chip:#364254}
+.team-section{overflow:visible}
+.team-header{margin-bottom:40px}
+.team-featured{margin-bottom:56px;padding-bottom:40px;border-bottom:1px solid var(--accent)}
+.team-featured-title{margin-bottom:40px;color:var(--ink);font-size:12px}
+.team-featured-grid,.team-grid{grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:40px;padding-top:60px}
+.team-card{min-height:286px;padding:78px 22px 20px;border-color:var(--accent);border-radius:16px;background:#F3F5F8;box-shadow:0 8px 18px rgba(15,23,42,.18)}
+.team-card:hover{background:#F3F5F8;box-shadow:0 12px 24px rgba(15,23,42,.22)}
+.team-photo-wrapper{top:-60px;width:124px;height:124px;padding:5px;border-radius:50%;background:#F3F5F8;box-shadow:0 0 0 4px var(--team-ring)}
+.team-photo-wrapper::after,.team-photo{border-radius:50%}
+.team-info h3{color:#1F2630;font-size:20px;font-weight:700}
+.team-role{color:#45556C;font-size:13px}
+.team-area{background:#364254;color:#F3F5F8}
+.team-badge{background:#6F9BB8;color:#F3F5F8}
+.team-links{padding-top:20px}
+.team-link{width:32px;height:32px;border-color:#45556C;background:#364254;color:#F3F5F8}
+.team-featured-grid{justify-content:stretch}
+@media (max-width:900px){.team-featured-grid,.team-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:40px;padding-top:60px}}
+@media (max-width:600px){.team-featured-grid,.team-grid{grid-template-columns:1fr;gap:76px;padding-top:60px}.team-card{min-height:286px}}

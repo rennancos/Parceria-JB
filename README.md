@@ -27,6 +27,15 @@ pnpm usuarios   # cadastro de quem edita
 
 O portal funciona sem esse serviço: quando não há API respondendo, os botões de edição simplesmente não aparecem.
 
+O mesmo portal também é distribuível como **aplicativo Windows**, com verificação de atualização ao abrir:
+
+```bash
+npm run app         # abre o aplicativo, sem empacotar
+npm run app:build   # gera dist/Parceria-JB-Setup-<versão>.exe
+```
+
+É Electron, e só existe em `app/` — o site não mudou uma linha para isso. Passo a passo em [md/10-aplicativo-windows.md](md/10-aplicativo-windows.md).
+
 ## As três ideias que explicam o resto
 
 **1. Um HTML só.** Não há um arquivo por página. O menu troca o conteúdo dentro do mesmo `index.html`, a partir do hash da URL.
@@ -50,6 +59,7 @@ PA_JB/
 │   └── paginas/    # um arquivo por item do menu — só dados
 ├── docs/           # documentos e manuais em arquivo (DOC/PDF)
 ├── servidor/       # OPCIONAL: site + API de edição, sem dependências
+├── app/            # OPCIONAL: o aplicativo Windows (Electron) — o site não usa
 ├── Fotos/          # logos e fotos da equipe
 └── md/             # a documentação — não é lida pelo site
 ```
@@ -71,6 +81,8 @@ Os caminhos em `index.html` são relativos, então a estrutura de pastas precisa
 | [07-pendencias.md](md/07-pendencias.md) | O que está inacabado ou merece atenção |
 | [08-futuros-passos.md](md/08-futuros-passos.md) | Roteiro: subir na VM, conteúdo real, busca — e o que **não** fazer |
 | [09-edicao-pela-pagina.md](md/09-edicao-pela-pagina.md) | A equipe editando documentos pela própria página: uso, administração e o servidor por trás |
+| [10-aplicativo-windows.md](md/10-aplicativo-windows.md) | O portal como `.exe`: gerar o instalador, versionar, publicar atualização |
+| [11-busca.md](md/11-busca.md) | A busca do portal: o que indexa, como ordena e as armadilhas do componente |
 
 Para mexer em conteúdo, **04** e **05** bastam. Para aparência, **06**.
 

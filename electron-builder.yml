@@ -1,0 +1,72 @@
+# Como o executável Windows é montado. Lido por `npm run app:build`.
+# A explicação de cada escolha está em md/10-aplicativo-windows.md.
+
+appId: br.com.parceriajb.portal        # precisa bater com o setAppUserModelId de app/principal.js
+productName: Parceria JB
+copyright: Uso interno Soluções de Mídias
+
+# `npm run app:build` NÃO usa este `output`: app/empacotar.js o substitui por uma
+# pasta em %TEMP%, porque o projeto mora dentro do OneDrive e a sincronização
+# trava a montagem no meio (EBUSY/EPERM). O instalador pronto é copiado de volta
+# para dist/. O valor abaixo vale para quem chamar o electron-builder na mão.
+directories:
+  output: dist
+  buildResources: app
+
+# LISTA FECHADA, e é o ponto mais importante deste arquivo. Sem ela o
+# electron-builder empacota a pasta inteira — e junto iriam servidor/ (com
+# servidor/dados/, que tem hash de senha), .env, md/ e o histórico do git.
+# Entrando uma pasta nova que o site precise, ela também precisa entrar aqui.
+files:
+  - index.html
+  - css/**/*
+  - js/**/*
+  - Fotos/**/*
+  - docs/**/*
+  - app/**/*
+  - package.json
+
+  # Ferramentas de quem publica, não do aplicativo. Sem nenhum segredo dentro —
+  # ficam de fora porque não têm o que fazer na máquina de quem só usa o portal.
+  - '!app/empacotar.js'
+  - '!app/manifesto.js'
+  - '!app/teste-atualizacao.js'
+
+  # Os masters dos retratos. Fotos/EQUIPE/*.webp (264x264, ~400 KB no total) é o
+  # que o portal carrega; originais/ existe só para regerar com `npm run fotos`.
+  # São ~15 MB que não têm o que fazer dentro de cada instalação.
+  - '!Fotos/EQUIPE/originais/**'
+
+# Sem asar: os arquivos ficam soltos dentro do aplicativo, como na pasta do
+# projeto. Duas razões práticas — `shell.openPath` não consegue abrir um PDF de
+# dentro de um .asar, e "a pasta é o aplicativo" continua valendo, que é o que
+# permite conferir na mão o que foi instalado. O .asar não é proteção nenhuma
+# (qualquer um extrai), então não se está abrindo mão de segurança.
+asar: false
+
+win:
+  target: nsis
+  # icon: app/icone.ico
+  # ↑ Descomente quando houver um .ico de verdade (256×256, com os tamanhos
+  #   menores dentro). Sem ele o aplicativo sai com o ícone padrão do Electron.
+  #   Fotos/LOGOS/TVGLOBO_LOGO.png não serve: apesar do nome, é um JPEG.
+
+nsis:
+  # Um clique: instala em %LOCALAPPDATA%\Programs\, sem pedir pasta e sem UAC.
+  # É o que faz a atualização ser um duplo clique em vez de um assistente — e o
+  # que permite que quem usa instale sem depender do suporte.
+  oneClick: true
+  perMachine: false
+  runAfterFinish: true
+
+  # O nome carrega a versão, e app/manifesto.js confere isso antes de publicar.
+  artifactName: Parceria-JB-Setup-${version}.exe
+
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Parceria JB
+
+  # Desinstalar NÃO apaga o que ficou em %APPDATA% (tema, preferências). É o
+  # padrão do electron-builder; está escrito aqui para ninguém trocar sem saber
+  # que atualização e desinstalação passam pelo mesmo instalador.
+  deleteAppDataOnUninstall: false

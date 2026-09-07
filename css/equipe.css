@@ -9,13 +9,6 @@
   --team-chip: #E5E1DA;        /* chip de área e botões de contato */
 }
 
-body.dark-mode{
-  --team-card: #232E33;
-  --team-card-hover: #2A363C;
-  --team-ring: #33424A;
-  --team-chip: #2E3A40;
-}
-
 .team-section{
   position: relative;
   z-index: 2;
@@ -35,7 +28,7 @@ body.dark-mode{
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-pill);
   background: var(--bg-2);
-  font-size: 11.5px;
+  font-size: var(--fs-2xs);
   font-weight: 650;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -44,14 +37,14 @@ body.dark-mode{
 
 .team-header h2{
   margin: var(--sp-3) 0 8px;
-  font-size: 28px;
+  font-size: var(--fs-2xl);
   font-weight: 680;
   letter-spacing: -0.02em;
 }
 
 .team-header p{
   margin: 0;
-  font-size: 15px;
+  font-size: var(--fs-base);
   color: var(--ink-soft);
 }
 
@@ -61,7 +54,7 @@ body.dark-mode{
   padding: 5px 12px;
   border-radius: var(--radius-pill);
   background: var(--team-chip);
-  font-size: 12.5px;
+  font-size: var(--fs-xs);
   font-weight: 600;
   color: var(--ink-soft);
 }
@@ -85,7 +78,7 @@ body.dark-mode{
 .team-featured-title{
   margin: 0 0 var(--sp-5);
   text-align: center;
-  font-size: 12px;
+  font-size: var(--fs-2xs);
   font-weight: 650;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -121,7 +114,7 @@ body.dark-mode{
   border-radius: var(--radius-pill);
   background: var(--accent);
   color: var(--on-accent);
-  font-size: 11px;
+  font-size: var(--fs-2xs);
   font-weight: 650;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -188,6 +181,9 @@ body.dark-mode{
   border-radius: 28px;
   background: var(--bg-2);
   color: var(--ink-soft);
+  /* As iniciais são proporcionais ao avatar (132px de caixa), não à página:
+     `em` do próprio elemento seguiria o texto do card e desalinharia do
+     círculo. Daí o único tamanho em px que não vem da escala fluida. */
   font-size: 34px;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -215,14 +211,14 @@ body.dark-mode{
 
 .team-info h3{
   margin: 0 0 var(--sp-1);
-  font-size: 17.5px;
+  font-size: var(--fs-lg);
   font-weight: 650;
   letter-spacing: -0.01em;
 }
 
 .team-role{
   margin: 0;
-  font-size: 13.5px;
+  font-size: var(--fs-xs);
   line-height: 1.5;
   color: var(--ink-soft);
 }
@@ -232,7 +228,7 @@ body.dark-mode{
   padding: 3px 10px;
   border-radius: var(--radius-pill);
   background: var(--team-chip);
-  font-size: 11.5px;
+  font-size: var(--fs-2xs);
   font-weight: 600;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -284,7 +280,6 @@ a.team-link:focus-visible{
 @media (max-width: 900px){
   .team-section{ margin-top: var(--sp-7); }
   .team-header{ margin-bottom: var(--sp-5); }
-  .team-header h2{ font-size: 24px; }
   .team-featured{
     margin-bottom: var(--sp-6);
     padding-bottom: var(--sp-6);
@@ -299,7 +294,6 @@ a.team-link:focus-visible{
 }
 
 @media (max-width: 600px){
-  .team-header h2{ font-size: 22px; }
   .team-grid,
   .team-featured-grid{
     grid-template-columns: minmax(0, 1fr);

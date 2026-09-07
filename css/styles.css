@@ -73,43 +73,54 @@
   --sp-8: 96px;
 
   --card-pad: 28px;
+
+  /* ---------- Escala de texto fluida ----------
+     Cada passo cresce junto com a largura da tela em vez de trocar de valor
+     de repente no breakpoint: clamp(mínimo, base + inclinação, máximo).
+
+     Os pares min → max abaixo valem entre 360px e 1180px de viewport (1180px é
+     a largura máxima do <main>): abaixo de 360px trava no mínimo, acima de
+     1180px trava no máximo, e no meio interpola sozinho. Por isso os arquivos
+     não repetem font-size dentro de media query — mudar um tamanho aqui muda
+     em todas as larguras de uma vez.
+
+     Mínimo e máximo em rem de propósito: acompanham o tamanho de fonte que a
+     pessoa configurou no navegador. Só a inclinação usa vw, que ignora essa
+     configuração — se a escala inteira fosse em vw, aumentar a fonte do
+     navegador não teria efeito nenhum na página. */
+  --fs-2xs:  clamp(0.6875rem, 0.6463rem + 0.183vw, 0.7813rem);  /* 11   → 12.5 */
+  --fs-xs:   clamp(0.75rem,   0.7088rem + 0.183vw, 0.8438rem);  /* 12   → 13.5 */
+  --fs-sm:   clamp(0.8125rem, 0.7713rem + 0.183vw, 0.9063rem);  /* 13   → 14.5 */
+  --fs-base: clamp(0.875rem,  0.8201rem + 0.244vw, 1rem);       /* 14   → 16   */
+  --fs-md:   clamp(0.9375rem, 0.8826rem + 0.244vw, 1.0625rem);  /* 15   → 17   */
+  --fs-lg:   clamp(1.0313rem, 0.9489rem + 0.366vw, 1.2188rem);  /* 16.5 → 19.5 */
+  --fs-xl:   clamp(1.1875rem, 1.1052rem + 0.366vw, 1.375rem);   /* 19   → 22   */
+  --fs-2xl:  clamp(1.3125rem, 1.0656rem + 1.098vw, 1.875rem);   /* 21   → 30   */
+  --fs-3xl:  clamp(1.5rem,    1.2256rem + 1.22vw,  2.125rem);   /* 24   → 34   */
+
+  /* Medida de leitura: onde toda linha de texto corrido para, nas páginas
+     internas. 44rem ≈ 704px ≈ 75 caracteres — abaixo do limite em que o olho
+     começa a errar a volta para a linha seguinte.
+
+     Em rem, e não em ch, de propósito. `ch` é calculado sobre o tamanho de
+     fonte do PRÓPRIO elemento: a mesma trava de `78ch` valia 673px na
+     descrição (16px) e 610px no texto de seção (14,5px), então blocos que o
+     CSS declarava iguais paravam a 63px um do outro e o texto ficava com a
+     margem direita serrilhada. Em rem todos param no mesmo x, qualquer que
+     seja o tamanho da fonte deles. */
+  --medida: 44rem;
 }
 
 /* Black mode: a mesma paleta, invertida de papel — o azul e o bege viram
    tinta sobre um ardósia escuro derivado do próprio #22333A. */
-body.dark-mode{
-  --bg: #182024;
-  --bg-2: #212B30;
-  --card: #232E33;
-  --card-hover: #2A363C;
-  --tile: #2E3A40;
-
-  --ink: #F1F0E8;
-  --ink-soft: #B3C8CF;
-
-  --line: #33424A;
-  --line-strong: #46585F;
-
-  --header-bg: rgba(24,32,36,0.90);
-
-  --accent-1: #B3C8CF;
-  --accent: #89A8B2;
-  --accent-soft: #5C7F8A;
-  --on-accent: #141D21;
-
-  --stripe: rgba(179,200,207,0.05);
-  --glow: rgba(137,168,178,0.10);
-
-  --shadow-card: 0 8px 24px rgba(0,0,0,0.38);
-  --shadow-card-lg: 0 16px 36px rgba(0,0,0,0.46);
-  --shadow-tile: 0 1px 2px rgba(0,0,0,0.30);
-  --shadow-panel: 0 4px 14px rgba(0,0,0,0.28);
-}
-
 *{ box-sizing: border-box; }
 
 h1, h2, h3, h4{ text-wrap: balance; }
 p, li, dd, figcaption, blockquote{ text-wrap: pretty; }
+
+/* O corpo usa entrelinha de leitura (1.55); título com esse valor fica solto,
+   ainda mais quando a escala fluida o quebra em duas linhas no celular. */
+h1, h2, h3, h4{ line-height: 1.25; }
 
 html, body{
   margin: 0;
@@ -120,12 +131,24 @@ html, body{
   -webkit-font-smoothing: antialiased;
 }
 
+/* Tamanho herdado por qualquer texto sem regra própria — também fluido, para
+   não sobrar nenhum ponto da página com escala travada. */
+body{
+  font-size: var(--fs-base);
+  line-height: 1.55;
+}
+
 /* `clip` e não `hidden`: nenhum elemento pode gerar rolagem lateral, mas
    `overflow-x: hidden` transformaria o documento em contêiner de rolagem e o
    cabeçalho sticky pararia de grudar no topo. `clip` corta sem criar rolagem.
    Em navegador sem suporte a `clip`, o comportamento cai em `visible` — o
    cabeçalho continua correto, que é o que não pode falhar. */
-html{ overflow-x: clip; }
+html{
+  overflow-x: clip;
+  /* Calha sempre reservada: com o drawer aberto o body vira overflow:hidden
+     e, sem isto, a página daria um pulo lateral quando a barra sumisse. */
+  scrollbar-gutter: stable;
+}
 
 body{
   background: var(--bg);
@@ -229,37 +252,150 @@ header{
 }
 
 .brand-name{
-  font-size: 17px;
+  font-size: var(--fs-md);
   font-weight: 650;
   letter-spacing: -0.01em;
 }
 
-.menu-panel{ display: contents; }
-.menu-panel-head,
-.menu-actions,
-.menu-toggle{ display: none; }
-
-.scrim{ display: none; }
-
-nav{
+/* Barra de navegação do topo. Elemento próprio, separado do drawer: os dois
+   coexistem, cada um com o seu layout, e o botão hambúrguer não depende mais
+   da largura da tela para ter o que abrir. */
+.top-nav{
   display: flex;
   align-items: center;
   gap: 30px;
 }
-nav a{
+.top-nav a{
   color: var(--ink-soft);
   text-decoration: none;
-  font-size: 14.5px;
+  font-size: var(--fs-sm);
   font-weight: 550;
   transition: color 0.15s ease;
   position: relative;
 }
-nav a:hover{ color: var(--ink); }
-nav a:focus-visible{
+.top-nav a:hover{ color: var(--ink); }
+.top-nav a:focus-visible{
   outline: 2px solid var(--accent-1);
   outline-offset: 5px;
   border-radius: 4px;
 }
+
+/* ---------- Menu lateral (drawer) ----------
+
+   Vale em qualquer largura: o hambúrguer abre este painel no celular e no
+   desktop. Ele fica fora do <header> de propósito — o cabeçalho tem z-index e
+   backdrop-filter, e um "position: fixed" lá dentro ficaria preso ao contexto
+   de empilhamento dele, atrás do scrim. */
+.menu-panel{
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 30;
+  width: min(320px, 84vw);
+  height: 100dvh;
+  padding: 18px 18px 28px;
+  overflow-y: auto;
+  background: var(--bg);
+  border-left: 1px solid var(--line-strong);
+  box-shadow: -18px 0 40px rgba(34,51,58,0.16);
+  transform: translateX(100%);
+  visibility: hidden;
+  transition: transform 0.25s ease, visibility 0.25s ease;
+}
+/* "visibility: hidden" também tira o conteúdo do painel da ordem de tabulação
+   enquanto ele está fechado: não precisa de inert nem de tabindex negativo. */
+body.menu-open .menu-panel{
+  transform: translateX(0);
+  visibility: visible;
+}
+
+.menu-panel-head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.menu-panel-title{
+  font-size: var(--fs-2xs);
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+
+/* No drawer o link deixa de ser item de barra e vira linha de toque: sobe um
+   passo na escala (--fs-sm → --fs-md) porque o alvo é o dedo, não o mouse. */
+.menu-panel nav{
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+}
+.menu-panel nav a{
+  display: block;
+  padding: 13px 12px;
+  border-radius: var(--radius-xs);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: var(--fs-md);
+  font-weight: 550;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.menu-panel nav a:hover{ background: var(--bg-2); }
+.menu-panel nav a:focus-visible{
+  outline: 2px solid var(--accent-1);
+  outline-offset: 2px;
+}
+
+.menu-actions{
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.menu-action{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 12px;
+  border: none;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--fs-md);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.menu-action:hover{ background: var(--bg-2); }
+.menu-action:focus-visible{
+  outline: 2px solid var(--accent-1);
+  outline-offset: 2px;
+}
+.menu-action svg{ width: 18px; height: 18px; flex-shrink: 0; color: var(--ink-soft); }
+
+.scrim{
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgba(34,51,58,0.28);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+body.menu-open .scrim{
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Trava a rolagem do fundo com o painel aberto. A calha reservada no html
+   evita que a página escorregue de lado quando a barra de rolagem some. */
+body.menu-open{ overflow: hidden; }
 
 .icons{
   display: flex;
@@ -291,26 +427,6 @@ nav a:focus-visible{
 }
 .icon-btn svg{ width: 18px; height: 18px; }
 
-.theme-toggle{
-  border-color: var(--line-strong);
-  background: var(--card);
-  color: var(--ink);
-}
-.theme-toggle:hover{
-  background: var(--bg-2);
-  border-color: var(--accent);
-}
-.theme-toggle svg{ width: 17px; height: 17px; }
-body.dark-mode .theme-toggle{
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--on-accent);
-}
-body.dark-mode .theme-toggle:hover{
-  background: var(--accent-soft);
-  border-color: var(--accent-soft);
-}
-
 /* ---------- Corpo ---------- */
 
 main{
@@ -333,7 +449,7 @@ main{
   max-width: 68ch;
 }
 .intro h1{
-  font-size: 34px;
+  font-size: var(--fs-3xl);
   line-height: 1.18;
   font-weight: 680;
   letter-spacing: -0.02em;
@@ -342,7 +458,7 @@ main{
 .intro p{
   margin: 0;
   color: var(--ink-soft);
-  font-size: 16px;
+  font-size: var(--fs-base);
   line-height: 1.6;
 }
 
@@ -357,7 +473,7 @@ main{
   border-radius: var(--radius-pill);
   background: var(--bg-2);
   color: var(--ink-soft);
-  font-size: 11.5px;
+  font-size: var(--fs-2xs);
   font-weight: 650;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -433,7 +549,7 @@ main{
 }
 
 .card-eyebrow{
-  font-size: 11.5px;
+  font-size: var(--fs-2xs);
   font-weight: 650;
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -441,13 +557,13 @@ main{
   margin: 0 0 var(--sp-1);
 }
 .card h2{
-  font-size: 19px;
+  font-size: var(--fs-lg);
   font-weight: 650;
   margin: 0 0 8px;
   letter-spacing: -0.01em;
 }
 .card p{
-  font-size: 14px;
+  font-size: var(--fs-sm);
   line-height: 1.55;
   color: var(--ink-soft);
   margin: 0;
@@ -461,7 +577,7 @@ main{
   padding-top: var(--sp-3);
   border-top: 1px solid var(--line);
   color: var(--accent-1);
-  font-size: 13.5px;
+  font-size: var(--fs-xs);
   font-weight: 650;
 }
 .card-cta svg{
@@ -500,14 +616,14 @@ footer{
 .footer-brand .brand-mark{ background: var(--card); }
 .footer-title{
   display: block;
-  font-size: 15px;
+  font-size: var(--fs-base);
   font-weight: 650;
   letter-spacing: -0.01em;
 }
 .footer-sub{
   display: block;
   margin-top: 2px;
-  font-size: 13px;
+  font-size: var(--fs-xs);
   color: var(--ink-soft);
 }
 .footer-nav{
@@ -518,7 +634,7 @@ footer{
 .footer-nav a{
   color: var(--ink-soft);
   text-decoration: none;
-  font-size: 13.5px;
+  font-size: var(--fs-xs);
   font-weight: 550;
   transition: color 0.15s ease;
 }
@@ -534,17 +650,22 @@ footer{
   padding-top: var(--sp-4);
   border-top: 1px solid var(--line-strong);
   color: var(--ink-soft);
-  font-size: 12.5px;
+  font-size: var(--fs-2xs);
 }
 
-/* ---------- Notebook ---------- */
+/* ---------- Notebook ----------
+
+   Daqui para baixo as media queries mexem em espaçamento e arranjo, nunca em
+   font-size: quem cuida do tamanho do texto é a escala fluida do :root, que já
+   acompanha a largura dentro de cada faixa. Repetir font-size aqui traria de
+   volta o degrau no breakpoint. A única exceção é o drawer: lá o link e as
+   ações trocam de papel — viram alvo de toque —, e não só de tamanho. */
 
 @media (max-width: 1100px){
   header{ padding: 14px 24px; }
   main{ padding: var(--sp-6) 24px var(--sp-7); }
   footer{ padding: var(--sp-6) 24px var(--sp-5); }
-  nav{ gap: 20px; }
-  .intro h1{ font-size: 30px; }
+  .top-nav{ gap: 20px; }
 }
 
 /* ---------- Tablet ---------- */
@@ -563,110 +684,12 @@ footer{
   :root{ --card-pad: 22px; }
 
   .intro{ margin-bottom: var(--sp-5); }
-  .intro h1{ font-size: 26px; }
-  .intro p{ font-size: 15px; }
 
+  /* Cabeçalho estreito: a navegação e os ícones secundários saem da barra e
+     passam a existir só dentro do drawer, que já traz os dois. */
+  .top-nav{ display: none; }
   .icons{ gap: 6px; }
-  .menu-toggle{ display: flex; }
   .icon-secondary{ display: none; }
-
-  .menu-panel{
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 0;
-    right: 0;
-    z-index: 30;
-    width: min(320px, 84vw);
-    height: 100dvh;
-    padding: 18px 18px 28px;
-    overflow-y: auto;
-    background: var(--bg);
-    border-left: 1px solid var(--line-strong);
-    box-shadow: -18px 0 40px rgba(34,51,58,0.16);
-    transform: translateX(100%);
-    visibility: hidden;
-    transition: transform 0.25s ease, visibility 0.25s ease;
-  }
-  body.menu-open .menu-panel{
-    transform: translateX(0);
-    visibility: visible;
-  }
-
-  .menu-panel-head{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 14px;
-  }
-  .menu-panel-title{
-    font-size: 11.5px;
-    font-weight: 650;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ink-soft);
-  }
-
-  nav{
-    flex-direction: column;
-    align-items: stretch;
-    gap: 2px;
-  }
-  nav a{
-    padding: 13px 12px;
-    border-radius: var(--radius-xs);
-    font-size: 15.5px;
-    color: var(--ink);
-    transition: background 0.15s ease, color 0.15s ease;
-  }
-  nav a:hover{ background: var(--bg-2); }
-
-  .menu-actions{
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    margin-top: 18px;
-    padding-top: 16px;
-    border-top: 1px solid var(--line);
-  }
-  .menu-action{
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 13px 12px;
-    border: none;
-    border-radius: var(--radius-xs);
-    background: transparent;
-    color: var(--ink);
-    font: inherit;
-    font-size: 15px;
-    text-align: left;
-    cursor: pointer;
-    transition: background 0.15s ease;
-  }
-  .menu-action:hover{ background: var(--bg-2); }
-  .menu-action:focus-visible{
-    outline: 2px solid var(--accent-1);
-    outline-offset: 2px;
-  }
-  .menu-action svg{ width: 18px; height: 18px; flex-shrink: 0; color: var(--ink-soft); }
-
-  .scrim{
-    display: block;
-    position: fixed;
-    inset: 0;
-    z-index: 20;
-    background: rgba(34,51,58,0.28);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.25s ease, visibility 0.25s ease;
-  }
-  body.menu-open .scrim{
-    opacity: 1;
-    visibility: visible;
-  }
-
-  body.menu-open{ overflow: hidden; }
 
   .footer-inner{ gap: var(--sp-4); }
 }
@@ -684,9 +707,6 @@ footer{
   }
   .card{ min-height: 0; }
 
-  .intro h1{ font-size: 23px; }
-  .brand-name{ font-size: 16px; }
-
   .footer-nav{ gap: 8px 20px; }
 }
 
@@ -697,8 +717,56 @@ footer{
   .menu-panel,
   .scrim,
   .icon-btn,
-  nav a,
+  .top-nav a,
+  .menu-panel nav a,
   .menu-action{ transition: none; }
 
   .card:hover{ transform: none; }
+}
+
+/* Optional visual variants. Activate with body.classList in DevTools. */
+body{
+  --bg: #141414;
+  --bg-2: #1C1C1B;
+  --card: #22211F;
+  --card-hover: #2A2926;
+  --tile: #302E2A;
+  --ink: #F2EFE8;
+  --ink-soft: #AAA69E;
+  --line: rgba(242,239,232,.12);
+  --line-strong: rgba(242,239,232,.22);
+  --header-bg: rgba(20,20,20,.90);
+  --accent-1: #D8B98B;
+  --accent: #B99668;
+  --accent-soft: #D0B184;
+  --on-accent: #191713;
+  --stripe: rgba(242,239,232,.035);
+  --glow: rgba(185,150,104,.10);
+  --shadow-card: 0 1px 2px rgba(0,0,0,.30), 0 8px 24px rgba(0,0,0,.18);
+  --shadow-card-lg: 0 1px 2px rgba(0,0,0,.34), 0 16px 36px rgba(0,0,0,.24);
+  --shadow-tile: 0 1px 2px rgba(0,0,0,.24);
+  --shadow-panel: 0 1px 2px rgba(0,0,0,.22), 0 4px 12px rgba(0,0,0,.12);
+  --team-card: var(--card);
+  --team-card-hover: var(--card-hover);
+  --team-ring: var(--accent);
+  --team-chip: var(--tile);
+  --panel: var(--card);
+  --panel-line: var(--line);
+  --chip: var(--tile);
+  background: var(--bg);
+}
+
+body h1,
+body h2,
+body h3,
+body .brand-name{
+  font-family: Syne, "Arial Black", sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+body .top-nav a,
+body .card-eyebrow,
+body .team-tag,
+body .page-eyebrow{
+  letter-spacing: .14em;
 }

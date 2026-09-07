@@ -36,12 +36,19 @@ $RECYCLE.BIN/
 # .claude/settings.json — se existir — é do time e continua versionado.
 .claude/settings.local.json
 
-# ---------- Ferramentas, caso entrem depois ----------
+# ---------- Ferramentas ----------
+# dist/ é onde o electron-builder deixa o instalador Windows (~90 MB) e o
+# versao.json gerado. Nada disso entra no repositório: o instalador é publicado
+# no servidor, não versionado. Ver md/10-aplicativo-windows.md.
 node_modules/
 dist/
 build/
 *.log
 npm-debug.log*
+
+# A pasta de onde a VM serve o instalador e o versao.json. Existe só na VM;
+# se alguém criar uma cópia local para testar, ela não sobe junto.
+download/
 
 # ---------- Dados pessoais ----------
 # As fotos são de pessoas reais. Descomente a linha abaixo se o repositório

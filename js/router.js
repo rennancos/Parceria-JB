@@ -47,7 +47,10 @@
   // trocou: mandar o foco para o <h1> da página nova resolve.
   function focarTitulo(){
     const titulo = viewPagina.querySelector('h1');
-    if (titulo) titulo.focus();
+    if (titulo) {
+      titulo.focus({ preventScroll: true });
+      titulo.scrollIntoView({ block: 'start' });
+    }
   }
 
   function posicionarScroll(chave, mudou){

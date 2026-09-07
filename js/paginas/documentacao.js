@@ -19,7 +19,7 @@
 PAGINAS['documentacao'] = {
   titulo: 'Documentação',
   eyebrow: 'Central de conteúdo',
-  descricao: 'Processos, políticas, materiais de referência e os manuais das áreas — parte por link, parte em arquivo para baixar.',
+  descricao: 'Processos, políticas, materiais de referência e os manuais das áreas, parte por link e parte em arquivo para baixar.',
 
   secoes: [
     {
@@ -54,7 +54,7 @@ PAGINAS['documentacao'] = {
         },
         {
           titulo: 'Manuais',
-          texto: 'Passo a passo das ferramentas e operações, organizado por área mais abaixo nesta página.',
+          texto: 'Passo a passo das ferramentas e operações, organizado por área, mais abaixo nesta página.',
           meta: 'Passo a passo'
         },
         {
@@ -84,7 +84,7 @@ PAGINAS['documentacao'] = {
           chave: 'padroes-modelos',
           titulo: 'Padrões, modelos e referência',
           itens: [
-            { titulo: 'Padrões técnicos (vídeo, áudio, IP e grafismo)' },
+            { titulo: 'Padrões técnicos', descricao: 'Vídeo, áudio, IP e grafismo' },
             { titulo: 'Modelos e formulários', descricao: 'Documentos-base prontos para preencher' },
             { titulo: 'Glossário da parceria', descricao: 'Termos, siglas e abreviações' }
           ]
@@ -106,7 +106,7 @@ PAGINAS['documentacao'] = {
             },
             {
               titulo: 'Áudio',
-              texto: 'Cadeia de áudio, mesas, embarque e desembarque, e verificação de níveis.',
+              texto: 'Cadeia de áudio, mesas, embarque, desembarque e verificação de níveis.',
               meta: 'Áudio'
             },
             {

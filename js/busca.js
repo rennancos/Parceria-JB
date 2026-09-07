@@ -2,7 +2,12 @@
    a cada abertura e quando a edição confirma alterações no acervo. */
 (function(){
   'use strict';
+  /* Tudo de que este arquivo depende, num lugar só. `window.PAGINAS` fica de
+     fora de propósito: é lido a cada remontagem, porque as páginas registram
+     nele durante a carga e a edição troca os itens depois. */
   const { buscar, destacar, termosDe } = window.Portal.buscaMotor;
+  const { montar: montarIndice } = window.Portal.buscaIndice;
+  const { pessoas } = window.Portal.equipe;
   const escaparHtml = window.Portal.escaparHtml;
   const MAX_RESULTADOS = 30;
   const DEBOUNCE_MS = 120;
@@ -259,12 +264,19 @@
     if (janela.open) janela.close();
   }
 
+  /* O índice é remontado a cada abertura, e não uma vez na carga: a edição
+     troca os itens dos blocos quando o servidor responde, e um índice montado
+     no load ficaria desatualizado sem avisar. */
+  function remontarIndice(){
+    indice = montarIndice(window.PAGINAS, pessoas);
+  }
+
   function abrir(){
     if (aberta()) return;
     if (!janela) construir();
 
     gatilhoAnterior = document.activeElement;
-    indice = window.Portal.buscaIndice.montar(window.PAGINAS, window.Portal.equipe.pessoas);
+    remontarIndice();
     resultados = [];
     ativo = -1;
 
@@ -304,7 +316,7 @@
   // Uma confirmação do acervo também atualiza a busca já aberta.
   document.addEventListener('acervo:alterado', () => {
     if (!aberta()) return;
-    indice = window.Portal.buscaIndice.montar(window.PAGINAS, window.Portal.equipe.pessoas);
+    remontarIndice();
     aoDigitar();
   });
 

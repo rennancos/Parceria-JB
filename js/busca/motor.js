@@ -122,5 +122,8 @@
   }
 
 
-  window.Portal.buscaMotor = { normalizar, normal, termosDe, buscar, destacar };
+  // `normalizar` fica de fora: só este arquivo precisa do mapa de índices que
+  // ela devolve (é o que `destacar` usa para grifar no texto acentuado). Quem
+  // está de fora quer `normal`, que é a versão que devolve só o texto.
+  window.Portal.buscaMotor = { normal, termosDe, buscar, destacar };
 })();

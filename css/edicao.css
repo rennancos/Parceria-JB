@@ -1,12 +1,6 @@
-/* Edição pela própria página: botões nos itens, barra de incluir e a janela de
-   formulário/login. Carregado depois de pagina.css — reaproveita os tokens de
-   styles.css e não redefine nenhum.
-
-   O markup daqui não existe no HTML nem em js/paginas.js: é criado por
-   js/documentos.js, e só para quem entrou com usuário. Sem servidor, nada
-   destas classes chega à página — o portal fica idêntico ao que sempre foi.
-
-   Ao mexer num seletor daqui, confira o arquivo js/documentos.js. */
+/* Edição pela página: botões em documentos.js, formulários em
+   documentos/formularios.js e janela em documentos/dialogo.js.
+   Tokens compartilhados em tokens.css; layout das listas em pagina.css. */
 
 /* ---------- Botões ---------- */
 
@@ -46,15 +40,11 @@
   cursor: default;
 }
 
-/* Excluir só aparece para quem é `dev`. Vermelho porque é destrutivo e mesmo
-   assim passa pelo confirm() do navegador antes de sair.
-   É a única cor fora da paleta no projeto, e de propósito: aviso de ação
-   irreversível não pode se confundir com o azul do resto da interface. O tom é
-   dessaturado para conviver com o bege sem gritar. */
+/* Ações destrutivas usam a cor semântica de perigo. */
 .ed-btn.ed-perigo:hover{
-  border-color: #A85A4E;
+  border-color: var(--danger);
   background: transparent;
-  color: #A85A4E;
+  color: var(--danger);
 }
 .ed-btn.ed-primario{
   border-color: var(--accent);
@@ -144,7 +134,7 @@
   overflow: auto;
 }
 .ed-janela::backdrop{
-  background: rgba(34, 51, 58, 0.45);
+  background: var(--modal-backdrop);
   -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
 }
@@ -320,7 +310,7 @@
 .ed-erro{
   margin: 0;
   padding: 11px 14px;
-  border-left: 3px solid #A85A4E;
+  border-left: 3px solid var(--danger);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   background: var(--chip);
   color: var(--ink);

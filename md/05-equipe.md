@@ -4,7 +4,7 @@
 
 A seção "Nossa equipe" (`.team-section`) fica no fim da home. Tem cabeçalho centralizado — tag, título, subtítulo e um chip com a contagem de pessoas, que vem de `equipe.length` e por isso nunca desatualiza — e uma grade de cards de pessoa (3 colunas no desktop), cada um com foto sobreposta ao topo, nome, cargo, chip de área e os botões de e-mail e perfil.
 
-Os dados ficam em `js/equipe.js`, no array `equipe` — separados do layout. Para incluir, remover ou editar alguém, mexa só nesse array; a grade e a contagem se ajustam sozinhas.
+Os dados ficam em `js/equipe-dados.js`, no array `equipe` — separados do layout. Para incluir, remover ou editar alguém, mexa só nesse array; a grade e a contagem se ajustam sozinhas.
 
 ```js
 {

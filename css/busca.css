@@ -1,7 +1,7 @@
 /* Busca (js/busca.js).
 
-   Nenhuma cor literal: tudo passa pelos tokens de css/styles.css, senão o
-   componente some num dos dois temas — ver md/06-estilos-e-tema.md.
+   Aparência baseada nos tokens de css/tokens.css. Estados locais de realce
+   permanecem neste arquivo — ver md/06-estilos-e-tema.md.
 
    A janela é um <dialog> modal, como o da edição: o ::backdrop, o foco preso e
    o Esc são do navegador. Aqui só há aparência. */
@@ -28,8 +28,13 @@
   flex-direction: column;
 }
 
+/* `display: flex` acima sobrescreve o `dialog:not([open]){display:none}` do
+   navegador — sem isto a janela continua na tela depois de fechada. */
+.busca-janela:not([open]){ display: none; }
+
 .busca-janela::backdrop{
-  background: rgba(34, 51, 58, 0.45);
+  background: var(--modal-backdrop);
+  -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
 }
 
@@ -190,6 +195,7 @@
      inteiro, e um resultado não pode empurrar os outros para fora da tela. */
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

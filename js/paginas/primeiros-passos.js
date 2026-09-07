@@ -22,7 +22,8 @@ PAGINAS['primeiros-passos'] = {
             {
               titulo: 'Abra um chamado na categoria correta',
               texto: 'A categoria a ser usada é:',
-              destaque: 'Finanças, Jurídico e Infraestrutura > Acessos a Áreas e Ambientes'
+              destaque: 'Finanças, Jurídico e Infraestrutura > Acessos a Áreas e Ambientes', 
+              href: 'https://globoservice.service-now.com/gse?id=sc_cat_item&table=sc_cat_item&sys_id=5e7309411b031c1097c0dca0f54bcbeb'
             },
             {
               titulo: 'Preencha as informações solicitadas',

@@ -1,40 +1,4 @@
-/* Páginas internas (Primeiros passos, Documentação, Manuais, Acessos, Sharepoint).
-   Carregado depois de styles.css — reaproveita os tokens de lá e define só o
-   que é específico do conteúdo interno.
-
-   O markup destas classes não existe no HTML: é gerado por js/paginas.js a
-   partir dos dados de js/paginas/*.js. Ao mudar um seletor daqui, confira o
-   renderizador correspondente lá. */
-
-/* A troca de views depende disso: sem o !important, qualquer regra de display
-   futura em .view venceria o [hidden] e as duas apareceriam juntas. */
-[hidden]{ display: none !important; }
-
-:root{
-  --panel: #FAF9F4;        /* mesma superfície dos cards da home */
-  --panel-line: #E5E1DA;
-  --chip: #E5E1DA;
-}
-
-/* Marca o item correspondente à página aberta, nos dois menus. */
-.top-nav a[aria-current="page"],
-.menu-panel nav a[aria-current="page"]{
-  color: var(--ink);
-  font-weight: 650;
-}
-/* No drawer o link é um bloco: o sublinhado ficaria solto no meio do padding,
-   então lá o item ativo é marcado pelo fundo. */
-.menu-panel nav a[aria-current="page"]{ background: var(--bg-2); }
-.top-nav a[aria-current="page"]::after{
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -7px;
-  height: 2px;
-  border-radius: 2px;
-  background: var(--accent);
-}
+/* Renderizadores de páginas internas. Tokens em tokens.css; navegação no CSS base. */
 
 .back-link{
   display: inline-flex;

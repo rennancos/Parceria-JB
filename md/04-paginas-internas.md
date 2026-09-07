@@ -22,15 +22,17 @@
 Ordem de carregamento no fim do `index.html` — **importa**:
 
 ```html
+<script src="js/compartilhado/html.js"></script>
+<script src="js/compartilhado/paginas-modelo.js"></script>
 <script src="js/paginas.js"></script>          <!-- cria PAGINAS e o renderizador -->
 <script src="js/paginas/primeiros-passos.js"></script>   <!-- cada um se registra -->
 <!-- ...demais páginas... -->
 <script src="js/router.js"></script>           <!-- só então lê o hash e desenha -->
 ```
 
-- **`js/paginas.js`** — cria `PAGINAS`, guarda os ícones e converte os dados em markup. Roda dentro de um IIFE porque `equipe.js` já declara `escapar` e `iniciais` no escopo global, e dois `const` de mesmo nome quebram a página inteira. Só `PAGINAS` e `renderizarPagina` saem de lá.
+- **`js/paginas.js`** — cria `PAGINAS`, guarda os ícones e converte os dados em markup. Roda dentro de uma IIFE e reutiliza o escape HTML e o contrato de seções em `js/compartilhado/`. Só `PAGINAS` e `renderizarPagina` saem de lá.
 - **`js/paginas/*.js`** — só dados. Um objeto por arquivo, nenhuma linha de HTML.
-- **`js/router.js`** — lê `location.hash`, troca as views, marca o item ativo com `aria-current="page"`, atualiza o título da aba e joga o foco no `<h1>` da página nova (sem recarregar o documento, o leitor de tela não perceberia a troca). Hash desconhecido cai na home, sem tela de erro.
+- **`js/router.js`** — lê `location.hash`, troca as views, marca o item ativo com `aria-current="page"`, atualiza o título da aba e joga o foco no `<h1>` da página nova (sem recarregar o documento, o leitor de tela não perceberia a troca). Hash desconhecido ou malformado cai na home, sem interromper a navegação.
 
 ## Como editar uma página
 

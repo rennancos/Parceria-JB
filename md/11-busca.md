@@ -4,7 +4,7 @@
 
 O botão "Buscar" existia no header e no drawer sem fazer nada. Agora ele abre uma busca que varre **todo** o conteúdo do portal: páginas, seções, passos, links, sistemas, fabricantes, notas e as pessoas da equipe.
 
-Dois arquivos, e nenhuma dependência nova: [js/busca.js](../js/busca.js) e [css/busca.css](../css/busca.css).
+A interface fica em [js/busca.js](../js/busca.js), o algoritmo em [js/busca/motor.js](../js/busca/motor.js), a adaptação dos dados em [js/busca/indice.js](../js/busca/indice.js) e os estilos em [css/busca.css](../css/busca.css). Nenhuma biblioteca foi adicionada.
 
 ## Como se usa
 
@@ -21,7 +21,7 @@ Vários termos funcionam como **E**, não como OU: `vizrt portal` só traz o que
 
 ## Por que não há índice, backend nem biblioteca
 
-A arquitetura do projeto já entregava a busca quase pronta. `PAGINAS` e `equipe` são objetos estruturados que já estão na memória do navegador quando a página abre — não há o que consultar, baixar ou indexar previamente. O trabalho do `busca.js` é percorrer, pontuar e desenhar.
+A arquitetura do projeto já entregava a busca quase pronta. `PAGINAS` e `Portal.equipe.pessoas` são objetos estruturados que já estão na memória do navegador quando a página abre — não há o que consultar, baixar ou indexar previamente. O índice adapta o conteúdo, o motor pontua e a interface desenha os resultados.
 
 É por isso que a busca continua funcionando com o portal aberto por duplo clique, sem servidor: ela nunca precisou de um.
 
@@ -31,9 +31,11 @@ De propósito. [js/documentos.js](../js/documentos.js) troca os itens dos blocos
 
 Remontar custa poucos milissegundos para as algumas centenas de entradas do portal.
 
+O evento `acervo:alterado` também reconstrói o índice quando a busca já está aberta. O motor e o índice recebem testes sem depender da interface.
+
 ## O que entra no índice
 
-Cada tipo de bloco guarda o texto em campos diferentes, e `ITEM_POR_TIPO` em `js/busca.js` diz como cada um vira uma entrada:
+Cada tipo de bloco guarda o texto em campos diferentes, e `ITEM_POR_TIPO` em `js/busca/indice.js` diz como cada um vira uma entrada:
 
 | Bloco | Vira resultado com |
 |---|---|
@@ -57,7 +59,7 @@ Um termo vale mais quanto mais importante for o campo onde caiu (título 10, sub
 - **Item com `href` de portal ou arquivo** → abre em outra aba, como o resto do portal.
 - **Pessoa** → a home, rolando até o card, que recebe um anel por 2 segundos. É o que faz achar alguém no meio de 36 cards iguais.
 
-O realce depende de cada card ter `id`, gerado por `idDaPessoa()` em [js/equipe.js](../js/equipe.js). **Esse cálculo é o mesmo `slug()` de `busca.js`, e os dois precisam continuar iguais** — se divergirem, a busca aponta para um id que não existe e o card não é realçado.
+O realce depende de cada card ter `id`. Cards e índice usam a mesma função `Portal.equipe.idDaPessoa()` de [js/equipe-dados.js](../js/equipe-dados.js), sem duplicar o cálculo.
 
 ## Acessibilidade
 

@@ -1,118 +1,23 @@
-/* Base do portal: tokens, cabeçalho, home e rodapé.
-   É o primeiro arquivo carregado — equipe.css, pagina.css e edicao.css
-   reaproveitam os tokens daqui e não redefinem nenhum deles.
+/* Base e layout do portal. Os valores do tema estão em tokens.css. */
 
-   PALETA (única fonte de cor do projeto):
-     #89A8B2  azul acinzentado    — preenchimentos e destaques
-     #B3C8CF  azul claro          — bordas, chips, elementos secundários
-     #E5E1DA  bege                — seções secundárias e superfícies de apoio
-     #F1F0E8  off-white           — fundo principal
+/* Regra global: hidden prevalece sobre os layouts flex e grid. */
+[hidden]{ display: none !important; }
 
-   Os tons de tinta (--ink, --ink-soft) e o creme das superfícies são
-   variações das cores acima, escurecidas ou clareadas só o necessário para
-   o texto passar em contraste. Nenhuma cor fora dessa família entra aqui. */
-
-:root{
-  /* Paleta crua — referência; use os tokens semânticos abaixo. */
-  --pal-azul: #89A8B2;
-  --pal-azul-claro: #B3C8CF;
-  --pal-bege: #E5E1DA;
-  --pal-creme: #F1F0E8;
-
-  /* Superfícies */
-  --bg: #F1F0E8;          /* fundo da página */
-  --bg-2: #E5E1DA;        /* seções secundárias, hover discreto */
-  --card: #FAF9F4;        /* cards: um passo acima do fundo */
-  --card-hover: #FFFFFE;
-  --tile: #E5E1DA;        /* quadradinho do ícone dentro do card */
-
-  /* Texto */
-  --ink: #22333A;         /* #89A8B2 escurecido: 12.9:1 sobre o fundo */
-  --ink-soft: #3D4E55;    /* secundário, 7.6:1 sobre o fundo */
-
-  /* Traços */
-  --line: #E5E1DA;
-  --line-strong: #B3C8CF;
-
-  --header-bg: rgba(241,240,232,0.82);
-
-  /* Acentos.
-     --accent-1 é o token histórico (usado nos quatro arquivos) e vale para
-     TEXTO: é o azul da paleta escurecido até 4.8:1 sobre o fundo.
-     --accent é o azul da paleta puro, para PREENCHIMENTO — e sobre ele o
-     texto vai em --on-accent, porque branco sobre #89A8B2 dá só 2.5:1. */
-  --accent-1: #4C6E79;
-  --accent: #89A8B2;
-  --accent-soft: #B3C8CF;
-  --on-accent: #1B2A30;
-
-  /* Elementos decorativos do fundo */
-  --stripe: rgba(137,168,178,0.10);
-  --glow: rgba(179,200,207,0.32);
-
-  /* Sombras: sempre tingidas de azul-ardósia, nunca preto puro. */
-  --shadow-card: 0 8px 24px rgba(34,51,58,0.08);
-  --shadow-card-lg: 0 16px 36px rgba(34,51,58,0.12);
-  --shadow-tile: 0 1px 2px rgba(34,51,58,0.07);
-  --shadow-panel: 0 4px 14px rgba(34,51,58,0.05);
-
-  --radius: 18px;
-  --radius-sm: 12px;
-  --radius-xs: 10px;
-  --radius-pill: 999px;
-
-  /* Ritmo de espaçamento — usado nas margens de seção e no padding dos cards
-     para que blocos diferentes respirem igual. */
-  --sp-1: 6px;
-  --sp-2: 10px;
-  --sp-3: 16px;
-  --sp-4: 24px;
-  --sp-5: 32px;
-  --sp-6: 48px;
-  --sp-7: 72px;
-  --sp-8: 96px;
-
-  --card-pad: 28px;
-
-  /* ---------- Escala de texto fluida ----------
-     Cada passo cresce junto com a largura da tela em vez de trocar de valor
-     de repente no breakpoint: clamp(mínimo, base + inclinação, máximo).
-
-     Os pares min → max abaixo valem entre 360px e 1180px de viewport (1180px é
-     a largura máxima do <main>): abaixo de 360px trava no mínimo, acima de
-     1180px trava no máximo, e no meio interpola sozinho. Por isso os arquivos
-     não repetem font-size dentro de media query — mudar um tamanho aqui muda
-     em todas as larguras de uma vez.
-
-     Mínimo e máximo em rem de propósito: acompanham o tamanho de fonte que a
-     pessoa configurou no navegador. Só a inclinação usa vw, que ignora essa
-     configuração — se a escala inteira fosse em vw, aumentar a fonte do
-     navegador não teria efeito nenhum na página. */
-  --fs-2xs:  clamp(0.6875rem, 0.6463rem + 0.183vw, 0.7813rem);  /* 11   → 12.5 */
-  --fs-xs:   clamp(0.75rem,   0.7088rem + 0.183vw, 0.8438rem);  /* 12   → 13.5 */
-  --fs-sm:   clamp(0.8125rem, 0.7713rem + 0.183vw, 0.9063rem);  /* 13   → 14.5 */
-  --fs-base: clamp(0.875rem,  0.8201rem + 0.244vw, 1rem);       /* 14   → 16   */
-  --fs-md:   clamp(0.9375rem, 0.8826rem + 0.244vw, 1.0625rem);  /* 15   → 17   */
-  --fs-lg:   clamp(1.0313rem, 0.9489rem + 0.366vw, 1.2188rem);  /* 16.5 → 19.5 */
-  --fs-xl:   clamp(1.1875rem, 1.1052rem + 0.366vw, 1.375rem);   /* 19   → 22   */
-  --fs-2xl:  clamp(1.3125rem, 1.0656rem + 1.098vw, 1.875rem);   /* 21   → 30   */
-  --fs-3xl:  clamp(1.5rem,    1.2256rem + 1.22vw,  2.125rem);   /* 24   → 34   */
-
-  /* Medida de leitura: onde toda linha de texto corrido para, nas páginas
-     internas. 44rem ≈ 704px ≈ 75 caracteres — abaixo do limite em que o olho
-     começa a errar a volta para a linha seguinte.
-
-     Em rem, e não em ch, de propósito. `ch` é calculado sobre o tamanho de
-     fonte do PRÓPRIO elemento: a mesma trava de `78ch` valia 673px na
-     descrição (16px) e 610px no texto de seção (14,5px), então blocos que o
-     CSS declarava iguais paravam a 63px um do outro e o texto ficava com a
-     margem direita serrilhada. Em rem todos param no mesmo x, qualquer que
-     seja o tamanho da fonte deles. */
-  --medida: 44rem;
+body h1,
+body h2,
+body h3,
+body .brand-name{
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+body .top-nav a,
+body .card-eyebrow,
+body .team-tag,
+body .page-eyebrow{
+  letter-spacing: .14em;
 }
 
-/* Black mode: a mesma paleta, invertida de papel — o azul e o bege viram
-   tinta sobre um ardósia escuro derivado do próprio #22333A. */
 *{ box-sizing: border-box; }
 
 h1, h2, h3, h4{ text-wrap: balance; }
@@ -127,7 +32,7 @@ html, body{
   padding: 0;
   min-height: 100%;
   color: var(--ink);
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -681,7 +586,6 @@ footer{
   main{ padding: var(--sp-5) 20px var(--sp-6); }
   footer{ padding: var(--sp-5) 20px var(--sp-4); }
 
-  :root{ --card-pad: 22px; }
 
   .intro{ margin-bottom: var(--sp-5); }
 
@@ -724,49 +628,24 @@ footer{
   .card:hover{ transform: none; }
 }
 
-/* Optional visual variants. Activate with body.classList in DevTools. */
-body{
-  --bg: #141414;
-  --bg-2: #1C1C1B;
-  --card: #22211F;
-  --card-hover: #2A2926;
-  --tile: #302E2A;
-  --ink: #F2EFE8;
-  --ink-soft: #AAA69E;
-  --line: rgba(242,239,232,.12);
-  --line-strong: rgba(242,239,232,.22);
-  --header-bg: rgba(20,20,20,.90);
-  --accent-1: #D8B98B;
-  --accent: #B99668;
-  --accent-soft: #D0B184;
-  --on-accent: #191713;
-  --stripe: rgba(242,239,232,.035);
-  --glow: rgba(185,150,104,.10);
-  --shadow-card: 0 1px 2px rgba(0,0,0,.30), 0 8px 24px rgba(0,0,0,.18);
-  --shadow-card-lg: 0 1px 2px rgba(0,0,0,.34), 0 16px 36px rgba(0,0,0,.24);
-  --shadow-tile: 0 1px 2px rgba(0,0,0,.24);
-  --shadow-panel: 0 1px 2px rgba(0,0,0,.22), 0 4px 12px rgba(0,0,0,.12);
-  --team-card: var(--card);
-  --team-card-hover: var(--card-hover);
-  --team-ring: var(--accent);
-  --team-chip: var(--tile);
-  --panel: var(--card);
-  --panel-line: var(--line);
-  --chip: var(--tile);
-  background: var(--bg);
+
+/* Marca o item correspondente à página aberta, nos dois menus. */
+.top-nav a[aria-current="page"],
+.menu-panel nav a[aria-current="page"]{
+  color: var(--ink);
+  font-weight: 650;
+}
+/* No drawer o link é um bloco: o sublinhado ficaria solto no meio do padding,
+   então lá o item ativo é marcado pelo fundo. */
+.menu-panel nav a[aria-current="page"]{ background: var(--bg-2); }
+.top-nav a[aria-current="page"]::after{
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -7px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent);
 }
 
-body h1,
-body h2,
-body h3,
-body .brand-name{
-  font-family: Syne, "Arial Black", sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.035em;
-}
-body .top-nav a,
-body .card-eyebrow,
-body .team-tag,
-body .page-eyebrow{
-  letter-spacing: .14em;
-}

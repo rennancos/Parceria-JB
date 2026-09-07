@@ -10,9 +10,8 @@
    Por que dados e não HTML: mesmo motivo do equipe.js — editar conteúdo não
    deve exigir mexer em markup, e um `<h3>` esquecido não pode quebrar a página.
 
-   Por que IIFE: equipe.js já declara `escapar`, `iniciais` e `preencher` no
-   escopo global. Em scripts clássicos, dois `const` de mesmo nome derrubam a
-   página inteira com erro de sintaxe. Só PAGINAS e renderizarPagina saem daqui.
+   Scripts clássicos encapsulados preservam file://. O registro PAGINAS e o
+   renderizador são os pontos de integração com navegação e edição.
 
    ---------------------------------------------------------------------------
    FORMATO DE UMA PÁGINA
@@ -86,13 +85,8 @@ window.PAGINAS = {};
 (function(){
   'use strict';
 
-  // O conteúdo é editado à mão e entra via innerHTML: escapa antes, para que
-  // um "&" num título não quebre o markup.
-  function esc(texto){
-    return String(texto ?? '').replace(/[&<>"']/g, (c) => ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-    })[c]);
-  }
+  const esc = window.Portal.escaparHtml;
+  const { blocosDaSecao } = window.Portal.paginasModelo;
 
   /* ---------- Ícones ---------- */
   // Mesmo estilo do resto do projeto (Feather: stroke currentColor, sem fill).
@@ -251,17 +245,10 @@ window.PAGINAS = {};
 
   // O título do bloco é um <p>, não um heading: entre o <h2> da seção e os <h3>
   // dos itens não sobra nível, e ele é mais rótulo do que subdivisão.
-  function bloco(dados){
+  function bloco(dados, exibirTitulo = true){
     const layout = LAYOUTS[dados.tipo] || LAYOUTS.paineis;
-    return (dados.titulo ? `<p class="block-title">${esc(dados.titulo)}</p>` : '')
+    return (exibirTitulo && dados.titulo ? `<p class="block-title">${esc(dados.titulo)}</p>` : '')
       + layout(dados.itens || [], dados);
-  }
-
-  // Uma seção pode declarar `blocos: [...]` ou, no caso comum de um bloco só,
-  // `tipo`/`itens` direto. As duas formas convergem aqui.
-  function blocosDa(dados){
-    if (Array.isArray(dados.blocos)) return dados.blocos;
-    return [{ tipo: dados.tipo, itens: dados.itens }];
   }
 
   function secao(dados, indice){
@@ -271,7 +258,7 @@ window.PAGINAS = {};
       <section class="page-section" aria-labelledby="${id}">
         <h2 id="${id}">${esc(dados.titulo)}</h2>
         ${dados.texto ? `<p>${esc(dados.texto)}</p>` : ''}
-        ${blocosDa(dados).map(bloco).join('')}
+        ${blocosDaSecao(dados).map((b) => bloco(b, b !== dados)).join('')}
       </section>`;
   }
 

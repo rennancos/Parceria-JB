@@ -4,7 +4,7 @@ Portal interno da Parceria JB: ponto único de entrada para primeiros passos, do
 
 Sem build e sem framework — HTML, CSS e JavaScript em arquivos separados, lidos direto pelo navegador. A página abre até por duplo clique em `index.html`.
 
-> **Repositório privado, e precisa continuar assim.** O código carrega nomes e e-mails reais da equipe (`js/equipe.js`), fotos de pessoas (`Fotos/EQUIPE/`) e marca corporativa. Leia [md/02-seguranca.md](md/02-seguranca.md) antes de publicar isto em qualquer lugar.
+> **Repositório privado, e precisa continuar assim.** O código carrega nomes e e-mails reais da equipe (`js/equipe-dados.js`), fotos de pessoas (`Fotos/EQUIPE/`) e marca corporativa. Leia [md/02-seguranca.md](md/02-seguranca.md) antes de publicar isto em qualquer lugar.
 
 ## Como rodar
 
@@ -49,13 +49,18 @@ npm run app:build   # gera dist/Parceria-JB-Setup-<versão>.exe
 ```
 PA_JB/
 ├── index.html      # ÚNICO html: header, home e o container das páginas
-├── css/            # styles, equipe, pagina, edicao
+├── css/            # tokens, styles, equipe, pagina, edicao, busca
 ├── js/
-│   ├── script.js   # tema (black mode) + menu mobile
-│   ├── equipe.js   # array `equipe` + cards de pessoa
+│   ├── script.js   # menu lateral
+│   ├── equipe-dados.js # dados e identidade das pessoas
+│   ├── equipe.js   # cards de pessoa
 │   ├── paginas.js  # registro PAGINAS + renderizador
 │   ├── router.js   # escolhe a página pelo hash da URL
-│   ├── documentos.js  # edição pela página (inerte sem servidor)
+│   ├── documentos.js  # integração da edição (inerte sem servidor)
+│   ├── documentos/ # API, acervo, formulários e janela
+│   ├── busca.js    # interface da busca
+│   ├── busca/     # motor e adaptação do conteúdo
+│   ├── compartilhado/ # escape HTML e contrato das seções
 │   └── paginas/    # um arquivo por item do menu — só dados
 ├── docs/           # documentos e manuais em arquivo (DOC/PDF)
 ├── servidor/       # OPCIONAL: site + API de edição, sem dependências
@@ -65,6 +70,17 @@ PA_JB/
 ```
 
 Os caminhos em `index.html` são relativos, então a estrutura de pastas precisa ser preservada ao mover ou publicar o projeto.
+
+## Testes do frontend
+
+```bash
+npm test              # lógica e contratos; Node 18+
+npm run test:browser  # Chrome/Edge headless; Node 22+
+```
+
+O teste de navegador usa uma API simulada em memória e não modifica usuários, arquivos publicados ou o acervo real. Requer Chrome/Edge instalado; para outro caminho, defina `CHROME_PATH`. Perfis temporários e uma captura são criados na pasta temporária do sistema.
+
+As verificações cobrem `file://`, HTTP sem API, submissões pendentes, sessão expirada, busca e layout responsivo. O resultado da refatoração está em [Auditoria do frontend](md/auditoria-estrutura-frontend.md).
 
 ## Documentação
 
@@ -77,7 +93,7 @@ Os caminhos em `index.html` são relativos, então a estrutura de pastas precisa
 | [03-home.md](md/03-home.md) | A página inicial: header, grade de cards, as duas *views* |
 | [04-paginas-internas.md](md/04-paginas-internas.md) | Como as páginas do menu funcionam e como editar o conteúdo delas |
 | [05-equipe.md](md/05-equipe.md) | A seção "Nossa equipe": array, fotos, destaques |
-| [06-estilos-e-tema.md](md/06-estilos-e-tema.md) | Tokens de cor, black mode, responsivo, drawer, acessibilidade |
+| [06-estilos-e-tema.md](md/06-estilos-e-tema.md) | Tokens do tema atual, responsivo, drawer, acessibilidade |
 | [07-pendencias.md](md/07-pendencias.md) | O que está inacabado ou merece atenção |
 | [08-futuros-passos.md](md/08-futuros-passos.md) | Roteiro: subir na VM, conteúdo real, busca — e o que **não** fazer |
 | [09-edicao-pela-pagina.md](md/09-edicao-pela-pagina.md) | A equipe editando documentos pela própria página: uso, administração e o servidor por trás |

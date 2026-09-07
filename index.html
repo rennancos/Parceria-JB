@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Parceria JB</title>
+<link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/styles.css">
 <link rel="stylesheet" href="css/equipe.css">
 <link rel="stylesheet" href="css/pagina.css">
@@ -208,6 +209,9 @@
   </footer>
 </div>
 
+<script src="js/compartilhado/html.js"></script>
+<script src="js/compartilhado/paginas-modelo.js"></script>
+<script src="js/equipe-dados.js"></script>
 <script src="js/equipe.js"></script>
 
 <!-- A ORDEM IMPORTA: paginas.js cria PAGINAS, cada arquivo de js/paginas/ se
@@ -219,11 +223,17 @@
 <script src="js/paginas/acessos-parceria.js"></script>
 <script src="js/paginas/sharepoint.js"></script>
 <script src="js/router.js"></script>
+<script src="js/busca/motor.js"></script>
+<script src="js/busca/indice.js"></script>
 <script src="js/busca.js"></script>
 
 <!-- Edição pela própria página. Depois do router de propósito: depende do
      renderizador e do router já existirem. Sem o servidor Node no ar (file://
      ou `pnpm start`), este arquivo não faz nada e a página fica como está. -->
+<script src="js/documentos/api.js"></script>
+<script src="js/documentos/acervo.js"></script>
+<script src="js/documentos/dialogo.js"></script>
+<script src="js/documentos/formularios.js"></script>
 <script src="js/documentos.js"></script>
 
 <script src="js/script.js"></script>

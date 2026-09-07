@@ -106,7 +106,11 @@ O preço, assumido: o portal deixa de ser uma pasta de arquivos estáticos e pas
 
 | Arquivo | O que faz |
 |---|---|
-| `js/documentos.js` | Troca os itens de semente pelos do servidor, cuida do login e desenha os botões. **Não faz nada sem API.** |
+| `js/documentos.js` | Inicializa o recurso, sincroniza sessão e desenha as ações. **Não faz nada sem API.** |
+| `js/documentos/api.js` | Transporte JSON, credenciais, erros e invalidação em `401`. |
+| `js/documentos/acervo.js` | Carregamento, validação, projeção dos dados e operações de escrita. |
+| `js/documentos/dialogo.js` | DOM e ciclo de submissão de cada abertura da janela. |
+| `js/documentos/formularios.js` | Campos de login, perfil e documento; captura dos valores antes de enviar. |
 | `css/edicao.css` | Botões, barra de incluir e a janela de formulário/login. |
 
 E dois ganchos pequenos no que já existia:
@@ -173,7 +177,15 @@ Estão comentadas no código; ficam aqui para não serem revisitadas por engano.
 
 ---
 
-## O que foi testado
+## Regressões automatizadas do frontend
+
+`npm test` verifica contratos e operações com respostas simuladas. `npm run test:browser` exercita a interface em Chrome/Edge headless com API descartável.
+
+Cada abertura do editor tem sua própria janela. Todos os campos são capturados antes do upload; fechar a janela não cancela uma gravação já enviada e uma resposta antiga não altera outra janela. Submissões duplas na mesma janela são ignoradas enquanto houver envio.
+
+Após salvar, o item confirmado pela API atualiza a projeção local. Após excluir, o ID confirmado sai da projeção. A confirmação não depende de outro GET que poderia falhar depois da gravação; novas leituras continuam disponíveis em `acervo.carregar()`. Leituras anteriores a uma confirmação são descartadas. Um `401` remove o estado visual autenticado e permite entrar novamente pelo perfil.
+
+## O que foi testado anteriormente
 
 Rodado em 12/08/2026, com o serviço na porta 8123 e dois usuários de teste, dirigindo a própria interface num navegador headless:
 

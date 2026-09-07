@@ -5,6 +5,8 @@
   "description": "Portal interno da Parceria JB. O site é estático e abre sem build; servidor/ é um processo Node opcional que serve a mesma pasta e responde à API de edição pela própria página.",
   "main": "app/principal.js",
   "scripts": {
+    "test": "node --test tests/unit/*.test.cjs",
+    "test:browser": "node --test tests/browser.cjs",
     "dev": "serve --listen 8000 .",
     "start": "serve --listen 8000 .",
     "servidor": "node servidor/servidor.js",

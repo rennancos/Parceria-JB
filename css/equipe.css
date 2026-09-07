@@ -1,13 +1,4 @@
-/* Seção "Nossa equipe".
-   Carregado depois de styles.css — reaproveita os tokens de lá e define
-   só os que são específicos do card de pessoa (fundo claro tipo "ficha"). */
-
-:root{
-  --team-card: #FAF9F4;
-  --team-card-hover: #FFFFFE;
-  --team-ring: #E5E1DA;        /* anel em volta da foto */
-  --team-chip: #E5E1DA;        /* chip de área e botões de contato */
-}
+/* Cards da equipe. Cores e dimensões compartilhadas vêm de tokens.css. */
 
 .team-section{
   position: relative;

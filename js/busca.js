@@ -1,300 +1,13 @@
-/* Busca do portal.
-
-   O botão "Buscar" existia no header e no drawer sem fazer nada. Isto o liga a
-   uma busca que varre TODO o conteúdo do portal — páginas, seções, passos,
-   links, sistemas, fabricantes, notas e pessoas da equipe.
-
-   Por que não há backend, índice persistido nem biblioteca: a arquitetura já
-   entregava isso de graça. `PAGINAS` e `equipe` são objetos estruturados que já
-   estão em memória quando esta busca abre. O trabalho aqui é percorrer,
-   pontuar e desenhar — não buscar em lugar nenhum.
-
-   Carrega DEPOIS de js/router.js: depende de PAGINAS já registrado (por
-   paginas.js + js/paginas/*.js) e de `equipe`, que js/equipe.js declara.
-
-   O índice é montado A CADA ABERTURA, de propósito. js/documentos.js troca os
-   itens dos blocos pelos do acervo quando o servidor responde, e volta a mexer
-   a cada item salvo; um índice montado no load ficaria desatualizado sem
-   avisar. Montar custa poucos milissegundos para algumas centenas de entradas.
-
-   ---------------------------------------------------------------------------
-   ACESSIBILIDADE
-
-   A janela é um <dialog> aberto com showModal(), como o modal da edição
-   (css/edicao.css): o navegador prende o foco, torna o resto da página inerte,
-   desenha o ::backdrop e fecha no Esc — nada disso precisa ser reimplementado.
-
-   Dentro dela, o padrão é o combobox do WAI-ARIA: o campo é `role="combobox"`
-   apontando por `aria-controls` para uma `role="listbox"`, e o item ativo é
-   apontado por `aria-activedescendant`. O foco do DOM nunca sai do campo, que
-   é o que permite continuar digitando enquanto as setas andam pela lista.
-
-   Consequência: os itens NÃO são <a> nem focáveis. Quem usa leitor de tela
-   recebe o item ativo pelo aria-activedescendant; quem usa mouse clica; Enter
-   abre o ativo.
-   --------------------------------------------------------------------------- */
-
+/* Interface da busca: diálogo, teclado e navegação. O índice é reconstruído
+   a cada abertura e quando a edição confirma alterações no acervo. */
 (function(){
   'use strict';
-
+  const { buscar, destacar, termosDe } = window.Portal.buscaMotor;
+  const escaparHtml = window.Portal.escaparHtml;
   const MAX_RESULTADOS = 30;
   const DEBOUNCE_MS = 120;
   const MIN_CARACTERES = 2;
   const REALCE_MS = 2000;
-
-  /* ---------- Normalização ----------
-
-     Comparar "captação" com "captacao" exige tirar o acento dos dois lados. O
-     mapa de índices existe porque tirar acento MUDA O COMPRIMENTO da string:
-     'ã' em NFD vira 'a' + til combinante, e remover o til devolve 1 caractere
-     onde havia 2. Sem o mapa, o destaque grifaria a letra errada em qualquer
-     palavra acentuada — que aqui é quase toda palavra. */
-  function normalizar(texto){
-    const origem = String(texto ?? '');
-    let saida = '';
-    const mapa = [];
-
-    for (let i = 0; i < origem.length; i += 1){
-      const limpo = origem[i].normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
-      for (let j = 0; j < limpo.length; j += 1){
-        saida += limpo[j];
-        mapa.push(i);   // cada caractere normalizado aponta para sua origem
-      }
-    }
-
-    return { texto: saida, mapa };
-  }
-
-  function normal(texto){
-    return normalizar(texto).texto;
-  }
-
-  function escaparHtml(texto){
-    return String(texto ?? '').replace(/[&<>"']/g, (c) => ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-    })[c]);
-  }
-
-  function slug(texto){
-    return normal(texto).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  }
-
-  function termosDe(consulta){
-    return normal(consulta).split(/\s+/).filter(Boolean);
-  }
-
-  /* ---------- Índice ----------
-
-     Cada entrada é uma coisa que a pessoa pode querer achar. `titulo` e
-     `subtitulo` são o que o resultado mostra; `contexto` é a trilha
-     ("Acessos Parceria › Sistemas"); `corpo` casa mas não aparece. */
-
-  function entrada(dados){
-    return {
-      tipo: dados.tipo,
-      titulo: dados.titulo || '',
-      subtitulo: dados.subtitulo || '',
-      contexto: dados.contexto || '',
-      href: dados.href || '',
-      alvoId: dados.alvoId || '',
-      // Pré-normalizado: a comparação roda a cada tecla, a normalização não.
-      nTitulo: normal(dados.titulo),
-      nSubtitulo: normal(dados.subtitulo),
-      nContexto: normal(dados.contexto),
-      nCorpo: normal(dados.corpo),
-    };
-  }
-
-  /* Cada tipo de bloco guarda o texto em campos diferentes. Um lugar só decide
-     como cada um vira entrada — acrescentar um tipo de bloco em paginas.js
-     significa acrescentar uma linha aqui, e nada mais. Tipo desconhecido é
-     ignorado em silêncio: a busca perde aquele conteúdo, mas não quebra. */
-  const ITEM_POR_TIPO = {
-    paineis:     (i) => ({ titulo: i.titulo, subtitulo: i.texto, corpo: i.meta, href: i.href }),
-    passos:      (i) => ({ titulo: i.titulo, subtitulo: i.texto, corpo: i.destaque, href: i.href }),
-    links:       (i) => ({ titulo: i.titulo, subtitulo: i.descricao, corpo: i.formato, href: i.href }),
-    sistemas:    (i) => ({ titulo: i.sistema, subtitulo: i.perfil ? `Perfil: ${i.perfil}` : '' }),
-    fabricantes: (i) => ({ titulo: i.nome, subtitulo: i.portal || i.email || '',
-                           corpo: [i.email, i.telefone, i.horario].filter(Boolean).join(' ') }),
-    notas:       (i) => ({ titulo: typeof i === 'string' ? i : '' }),
-  };
-
-  // Uma seção declara `blocos: [...]` ou, no caso comum de um bloco só,
-  // `tipo`/`itens` direto. As duas formas convergem aqui, como em paginas.js.
-  function blocosDaSecao(secao){
-    if (Array.isArray(secao.blocos)) return secao.blocos;
-    return [{ tipo: secao.tipo, itens: secao.itens }];
-  }
-
-  function indexarPaginas(indice){
-    const paginas = window.PAGINAS || {};
-
-    Object.keys(paginas).forEach((chave) => {
-      const pagina = paginas[chave] || {};
-      const hrefPagina = `#${chave}`;
-
-      indice.push(entrada({
-        tipo: 'pagina',
-        titulo: pagina.titulo,
-        subtitulo: pagina.descricao,
-        contexto: pagina.eyebrow,
-        href: hrefPagina,
-      }));
-
-      (pagina.secoes || []).forEach((secao) => {
-        const trilha = [pagina.titulo, secao.titulo].filter(Boolean).join(' › ');
-
-        indice.push(entrada({
-          tipo: 'secao',
-          titulo: secao.titulo,
-          subtitulo: secao.texto,
-          contexto: pagina.titulo,
-          href: hrefPagina,
-        }));
-
-        blocosDaSecao(secao).forEach((bloco) => {
-          const comoItem = ITEM_POR_TIPO[bloco.tipo];
-          if (!comoItem) return;
-
-          (bloco.itens || []).forEach((item) => {
-            const dados = comoItem(item);
-            if (!dados.titulo) return;   // item sem rótulo não é achável
-
-            indice.push(entrada({
-              tipo: bloco.tipo,
-              titulo: dados.titulo,
-              subtitulo: dados.subtitulo,
-              corpo: dados.corpo,
-              contexto: bloco.titulo ? `${trilha} › ${bloco.titulo}` : trilha,
-              // Item com destino próprio (portal, PDF) leva até ele; sem
-              // destino, leva até a página onde ele está.
-              href: dados.href || hrefPagina,
-            }));
-          });
-        });
-      });
-    });
-  }
-
-  function indexarEquipe(indice){
-    // `equipe` é const de topo em js/equipe.js: binding global, mas NÃO
-    // propriedade de window. Daí o typeof em vez de window.equipe.
-    if (typeof equipe === 'undefined' || !Array.isArray(equipe)) return;
-
-    equipe.forEach((pessoa) => {
-      indice.push(entrada({
-        tipo: 'pessoa',
-        titulo: pessoa.nome,
-        subtitulo: pessoa.cargo,
-        contexto: pessoa.area ? `Equipe › ${pessoa.area}` : 'Equipe',
-        corpo: [pessoa.email, pessoa.destaque].filter(Boolean).join(' '),
-        href: '#',
-        alvoId: `pessoa-${slug(pessoa.nome)}`,
-      }));
-    });
-  }
-
-  function montarIndice(){
-    const indice = [];
-    indexarPaginas(indice);
-    indexarEquipe(indice);
-    return indice;
-  }
-
-  /* ---------- Pontuação ----------
-
-     Todo termo digitado precisa aparecer em algum campo (E, não OU): quem
-     digita "vizrt portal" quer o que tem os dois, não a união. O peso do campo
-     decide a ordem, e casar no começo de uma palavra vale o dobro de casar no
-     meio — quem digita "mam" quer a área MAM antes de "Ca[mam]bu". */
-  const PESOS = { nTitulo: 10, nSubtitulo: 4, nContexto: 2, nCorpo: 1 };
-  const CAMPOS = ['nTitulo', 'nSubtitulo', 'nContexto', 'nCorpo'];
-
-  function pontuarTermo(item, termo){
-    let melhor = 0;
-
-    for (const campo of CAMPOS){
-      const alvo = item[campo];
-      if (!alvo) continue;
-
-      const posicao = alvo.indexOf(termo);
-      if (posicao === -1) continue;
-
-      let pontos = PESOS[campo];
-      if (posicao === 0 || /[\s›\-/(.,]/.test(alvo[posicao - 1])) pontos *= 2;  // início de palavra
-      if (alvo === termo) pontos *= 2;                                          // campo inteiro
-
-      if (pontos > melhor) melhor = pontos;
-    }
-
-    return melhor;
-  }
-
-  function buscar(indice, consulta){
-    const termos = termosDe(consulta);
-    if (!termos.length) return [];
-
-    const achados = [];
-
-    for (const item of indice){
-      let total = 0;
-      let todos = true;
-
-      for (const termo of termos){
-        const pontos = pontuarTermo(item, termo);
-        if (!pontos){ todos = false; break; }
-        total += pontos;
-      }
-
-      if (todos) achados.push({ item, pontos: total });
-    }
-
-    // Empate resolvido pelo título mais curto: o mais específico costuma ser o
-    // mais curto, e a ordem fica estável entre digitações.
-    achados.sort((a, b) => b.pontos - a.pontos || a.item.titulo.length - b.item.titulo.length);
-    return achados.slice(0, MAX_RESULTADOS);
-  }
-
-  /* ---------- Destaque ----------
-
-     Grifa no texto ORIGINAL (com acento e maiúscula) os trechos que casaram no
-     texto normalizado, voltando pelo mapa de índices. */
-  function destacar(texto, termos){
-    const original = String(texto ?? '');
-    if (!original) return '';
-
-    const { texto: alvo, mapa } = normalizar(original);
-    const faixas = [];
-
-    for (const termo of termos){
-      let de = alvo.indexOf(termo);
-      while (de !== -1){
-        const fim = de + termo.length;
-        faixas.push([mapa[de], fim < mapa.length ? mapa[fim] : original.length]);
-        de = alvo.indexOf(termo, fim);
-      }
-    }
-
-    if (!faixas.length) return escaparHtml(original);
-
-    // Termos que se sobrepõem ("mam" e "mamute") produziriam <mark> aninhado.
-    faixas.sort((a, b) => a[0] - b[0]);
-    const unidas = [faixas[0]];
-    for (const faixa of faixas.slice(1)){
-      const ultima = unidas[unidas.length - 1];
-      if (faixa[0] <= ultima[1]) ultima[1] = Math.max(ultima[1], faixa[1]);
-      else unidas.push(faixa);
-    }
-
-    let saida = '';
-    let cursor = 0;
-    for (const [inicio, fim] of unidas){
-      saida += escaparHtml(original.slice(cursor, inicio));
-      saida += `<mark>${escaparHtml(original.slice(inicio, fim))}</mark>`;
-      cursor = fim;
-    }
-    return saida + escaparHtml(original.slice(cursor));
-  }
 
   const ROTULOS = {
     pagina: 'Página', secao: 'Seção', pessoa: 'Pessoa', links: 'Link',
@@ -379,6 +92,7 @@
     janela.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape') return;
       e.preventDefault();
+      e.stopPropagation();
       fechar();
     });
 
@@ -550,7 +264,7 @@
     if (!janela) construir();
 
     gatilhoAnterior = document.activeElement;
-    indice = montarIndice();
+    indice = window.Portal.buscaIndice.montar(window.PAGINAS, window.Portal.equipe.pessoas);
     resultados = [];
     ativo = -1;
 
@@ -585,6 +299,13 @@
       evento.preventDefault();
       abrir();
     }
+  });
+
+  // Uma confirmação do acervo também atualiza a busca já aberta.
+  document.addEventListener('acervo:alterado', () => {
+    if (!aberta()) return;
+    indice = window.Portal.buscaIndice.montar(window.PAGINAS, window.Portal.equipe.pessoas);
+    aoDigitar();
   });
 
   // Para quem quiser abrir a busca de outro lugar (um atalho na home, por

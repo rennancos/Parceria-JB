@@ -1,3 +1,5 @@
+(function(){
+  'use strict';
 /* Menu lateral (drawer). Vale em qualquer largura: o mesmo botão
    hambúrguer abre o painel no celular e no desktop. */
 const menuToggle = document.querySelector('.menu-toggle');
@@ -46,7 +48,7 @@ menuPanel?.querySelectorAll('a').forEach((link) => {
 });
 
 document.addEventListener('keydown', (event) => {
-  if (!isMenuOpen()) return;
+  if (!isMenuOpen() || document.querySelector('dialog[open]')) return;
 
   if (event.key === 'Escape'){
     closeMenu();
@@ -69,3 +71,5 @@ document.addEventListener('keydown', (event) => {
     }
   }
 });
+
+})();

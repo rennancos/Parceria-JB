@@ -31,7 +31,9 @@
   // Hash desconhecido (ou âncora da própria home, tipo #team-title) devolve ""
   // e cai na home — nada de tela de erro para um link antigo.
   function chaveAtual(){
-    const bruta = decodeURIComponent(location.hash.replace(/^#/, '')).trim();
+    let bruta;
+    try { bruta = decodeURIComponent(location.hash.replace(/^#/, '')).trim(); }
+    catch (erro) { return ''; } // Hash externo malformado mantém o fallback para home.
     const chave = APELIDOS[bruta] || bruta;
     return Object.prototype.hasOwnProperty.call(window.PAGINAS, chave) ? chave : '';
   }

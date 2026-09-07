@@ -44,28 +44,51 @@ PAGINAS['primeiros-passos'] = {
     },
 
     {
-      titulo: '2. Solicitação de acesso a sistemas',
-      texto: 'Para utilizar os sistemas corporativos, é necessário solicitar os perfis de acesso adequados.',
+      titulo: '2. Acesso a sistemas',
+      texto: 'Neste guia, você encontrará informações sobre como solicitar e utilizar o Globo Service.',
       blocos: [
         {
-          titulo: 'Como solicitar',
+          titulo: 'Como acessar',
           tipo: 'passos',
           itens: [
             {
-              titulo: 'Acesse o portal de atendimento',
-              texto: 'Entre no Acesso Globo.'
+              titulo: 'Solicite os perfis da usuário',
+              texto: 'Solicitar alteração do perfil de um usuário no Globo Service ou alterar os grupos.',
+              href: 'https://globoservice.service-now.com/gse?id=sc_cat_item&sys_id=dd8dda0e1beb109094962170f54bcba8&table=sc_cat_item&searchTerm=perfil%20de%20usuario'
             },
             {
-              titulo: 'Solicite os perfis da equipe',
-              texto: 'Peça os acessos aos sistemas utilizados pela equipe. A lista abaixo cobre os mais frequentes.'
-            }
+              titulo: 'Solicitação de Usuários e Acessos ',
+              texto: 'Administração de usuários e acessos',
+              href: 'https://globoservice.service-now.com/gse?id=sc_cat_item&sys_id=fa0873521b1ed01094962170f54bcbd1&table=sc_cat_item&searchTerm=perfil%20de%20usuario'
+            },
+            {
+              titulo: 'Acesse ao Guia do Globo Service',
+              texto: 'Entre no KB.',
+              href: 'https://globoservice.service-now.com/gse?id=kb_article&sysparm_article=KB0106301&table=kb_knowledge&searchTerm=globoservice'
+            },
+            {
+              titulo: 'Configurando VPN',
+              texto: 'Acesse o KB.',
+              href: 'https://globoservice.service-now.com/gse?id=kb_article_view&sys_kb_id=9b6e61103bcb4bd05c740237f4e45a0a'
+
+            },
+            {
+              titulo: 'Como Solicitar acesso a Sistemas',
+              texto: 'Acesse o KB.',
+              href: 'https://globoservice.service-now.com/gse?id=kb_article_view&sys_kb_id=103a25903b474bd05c740237f4e45a6f'
+            },
+            {
+              titulo: 'Como Solicitar uma CHG',
+              texto: 'Acesse o KB.',
+              href: 'https://globoservice.service-now.com/gse?id=kb_article&sysparm_article=KB0112927&topic_id=da7e2f7e87d31a509ad332a70cbb3579'
+            },
           ]
         },
         {
           titulo: 'Sistemas mais utilizados',
           tipo: 'sistemas',
           itens: [
-            { sistema: 'COLABORATIVO', perfil: 'UPLOADER – TECNOLOGIA' },
+            { sistema: 'COLABORATIVO', href: '' },
             { sistema: 'CONFLUENCE',   perfil: 'PLATAFORMAS DE PRODUÇÃO' },
             { sistema: 'CRAWL-G1',     perfil: 'ADMINISTRADOR – IT' },
             { sistema: 'CRAWL-GE',     perfil: 'ADMINISTRADOR' },

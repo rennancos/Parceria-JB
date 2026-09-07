@@ -128,12 +128,41 @@ window.PAGINAS = {};
       : `<div class="panel">${corpo}</div>`;
   }
 
+  /* Só hash é navegação interna; arquivo e portal abrem em outra aba para não
+     tirar a pessoa do portal. Usado por `link` e por `passo`. */
+  function alvoDe(href){
+    return String(href).startsWith('#') ? '' : ' target="_blank" rel="noopener noreferrer"';
+  }
+
+  /* `href` num passo precisa virar link em algum lugar visível, e o lugar
+     depende de haver `destaque`:
+
+       com destaque  — o destaque vira o link, porque é ele que nomeia o
+                       destino ("Finanças… > Acessos a Áreas e Ambientes");
+       sem destaque  — quem vira link é o próprio título.
+
+     A segunda regra existe porque a alternativa (repetir o título dentro de um
+     destaque criado na hora) desenha o mesmo texto duas vezes seguidas na
+     tela. E ignorar o `href` quando não há destaque seria pior: some sem erro
+     nenhum, que foi exatamente como este campo se comportava antes. */
   function passo(item){
+    const comLink = (conteudo, classe) =>
+      `<a class="${classe}" href="${esc(item.href)}"${alvoDe(item.href)}>${conteudo}${ICONE_SETA}</a>`;
+
+    const titulo = item.href && !item.destaque
+      ? comLink(`<span>${esc(item.titulo)}</span>`, 'step-link')
+      : esc(item.titulo);
+
+    const destaque = !item.destaque ? ''
+      : item.href
+        ? comLink(`<span>${esc(item.destaque)}</span>`, 'callout')
+        : `<p class="callout">${esc(item.destaque)}</p>`;
+
     return `
       <li>
-        <h3>${esc(item.titulo)}</h3>
+        <h3>${titulo}</h3>
         ${item.texto ? `<p>${esc(item.texto)}</p>` : ''}
-        ${item.destaque ? `<p class="callout">${esc(item.destaque)}</p>` : ''}
+        ${destaque}
       </li>`;
   }
 
@@ -223,12 +252,7 @@ window.PAGINAS = {};
     // a home. Fica visível como pendência, no mesmo lugar da lista.
     if (!item.href) return `<li${marca}><div class="link-pendente">${corpo}<span class="field-vazio">a definir</span></div></li>`;
 
-    // Só hash é navegação interna; arquivo e portal abrem em outra aba para não
-    // tirar a pessoa do portal.
-    const interno = item.href.startsWith('#');
-    const alvo = interno ? '' : ' target="_blank" rel="noopener noreferrer"';
-
-    return `<li${marca}><a href="${esc(item.href)}"${alvo}>${corpo}${ICONE_SETA}</a></li>`;
+    return `<li${marca}><a href="${esc(item.href)}"${alvoDe(item.href)}>${corpo}${ICONE_SETA}</a></li>`;
   }
 
   /* O segundo argumento é o bloco inteiro; só 'links' usa, para carimbar a

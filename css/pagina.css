@@ -180,6 +180,71 @@ a.panel:focus-visible{
   line-height: 1.5;
 }
 
+/* O mesmo destaque, quando o passo tem `href` (ver `passo` em js/paginas.js).
+   `color: inherit` e `text-decoration: none` são necessários: sem eles o link
+   puxa a cor global de link e o destaque deixa de parecer o que é. A seta vai
+   para a direita e diz que aquilo abre alguma coisa. */
+a.callout{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s ease, border-left-color 0.15s ease;
+}
+
+a.callout:hover{
+  background: var(--card-hover);
+  border-left-color: var(--accent-1);
+}
+
+a.callout:focus-visible{
+  outline: 2px solid var(--accent-1);
+  outline-offset: 2px;
+}
+
+/* O svg() de js/paginas.js sai sem width/height — quem dimensiona é o CSS, e a
+   regra que faz isso está escopada em `.link-list`. Fora dali o SVG estica até
+   o tamanho do container, então a medida precisa vir junto aqui. */
+a.callout .link-arrow{
+  width: 18px;
+  height: 18px;
+  flex: none;
+  margin-left: auto;
+  color: var(--ink-soft);
+}
+
+/* Passo com destino e SEM destaque: o link é o próprio título (ver `passo` em
+   js/paginas.js). `inline-flex` para a seta ficar colada no fim do texto, e
+   não empurrada para a borda do card como no destaque. */
+.steps h3 .step-link{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.steps h3 .step-link:hover{ color: var(--accent-1); }
+.steps h3 .step-link:hover .link-arrow{ color: var(--accent-1); }
+
+.steps h3 .step-link:focus-visible{
+  outline: 2px solid var(--accent-1);
+  outline-offset: 3px;
+  border-radius: var(--radius-xs);
+}
+
+.steps h3 .step-link .link-arrow{
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--ink-soft);
+}
+
+@media (prefers-reduced-motion: reduce){
+  a.callout{ transition: none; }
+}
+
 /* Grade de sistema + perfil de acesso (tipo 'sistemas'). */
 .sys-list{
   list-style: none;
@@ -210,17 +275,25 @@ a.panel:focus-visible{
 }
 
 /* Ficha de contato de fabricante (tipo 'fabricantes'). */
+/* O grid das duas colunas fica na ficha inteira, e não em cada linha: assim
+   todos os valores começam no mesmo x. A coluna do rótulo acompanha o rótulo
+   mais largo — com os 96px fixos que havia aqui, "ATENDIMENTO" não cabia, e
+   como o body declara `overflow-wrap: break-word` ele quebrava no meio da
+   palavra ("ATENDIMENT / O") em vez de só vazar.
+
+   `display: contents` nas linhas faz o <div> sumir da caixa e entregar <dt> e
+   <dd> direto ao grid da <dl>. É o que permite as colunas serem compartilhadas
+   por todas as linhas; sem isso cada linha vira um grid próprio e as larguras
+   divergem. */
 .field-list{
   margin: 16px 0 0;
   display: grid;
-  gap: 9px;
-}
-.field-list > div{
-  display: grid;
-  grid-template-columns: 96px 1fr;
-  gap: 12px;
+  grid-template-columns: max-content 1fr;
+  gap: 9px 12px;
   align-items: baseline;
 }
+
+.field-list > div{ display: contents; }
 .field-list dt{
   font-size: var(--fs-2xs);
   font-weight: 650;

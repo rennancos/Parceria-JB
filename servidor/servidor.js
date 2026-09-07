@@ -211,25 +211,26 @@ async function tratarApi(req, res, url){
 
 // Só entrega o que está dentro da pasta do projeto. `path.resolve` + prefixo é
 // o que barra `GET /../../.env` e amigos.
-function caminhoSeguro(pathname){
-  const relativo = decodeURIComponent(pathname).replace(/^\/+/, '');
-  const alvo = path.resolve(RAIZ, relativo || 'index.html');
-  if (alvo !== RAIZ && !alvo.startsWith(RAIZ + path.sep)) return null;
-  return alvo;
-}
-
 // Nada aqui é secreto para quem acessa o portal, mas também não precisa ser
 // servido: dados do servidor, configuração e o histórico do git ficam de fora.
 const BLOQUEADOS = ['servidor', 'node_modules', '.git', '.env', '.claude'];
 
+function caminhoSeguro(pathname){
+  const relativo = decodeURIComponent(pathname).replace(/^\/+/, '');
+  const alvo = path.resolve(RAIZ, relativo || 'index.html');
+  if (alvo !== RAIZ && !alvo.startsWith(RAIZ + path.sep)) return null;
+
+  // A lista vale sobre o caminho JÁ RESOLVIDO: o primeiro segmento da URL
+  // mente quando ela traz %2F (ou qualquer outra forma de ../ codificada).
+  const [primeiro = ''] = alvo.slice(RAIZ.length + 1).split(path.sep);
+  if (BLOQUEADOS.includes(primeiro) || primeiro.startsWith('.env')) return null;
+
+  return alvo;
+}
+
 function tratarEstatico(req, res, url){
   if (req.method !== 'GET' && req.method !== 'HEAD'){
     return responderJson(res, 405, { erro: 'Método não permitido.' });
-  }
-
-  const primeiro = decodeURIComponent(url.pathname).split('/').filter(Boolean)[0] || '';
-  if (BLOQUEADOS.some((nome) => primeiro === nome || primeiro.startsWith('.env'))){
-    return responderJson(res, 403, { erro: 'Acesso negado.' });
   }
 
   let alvo = caminhoSeguro(url.pathname);

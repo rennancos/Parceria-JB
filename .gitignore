@@ -19,6 +19,15 @@ secrets*
 # Backup deste diretório é obrigatório — ver md/09-edicao-pela-pagina.md.
 servidor/dados/
 
+# ---------- Documentos enviados pela equipe ----------
+# `POST /api/arquivos` grava os DOC/PDF em docs/ (servidor/servidor.js). São
+# conteúdo de produção, pelo mesmo motivo de servidor/dados/: versionar faria
+# um `git pull` no deploy passar por cima do que a equipe subiu, e colocaria
+# documento interno no histórico do repositório. Só o LEIA-ME é código.
+# Backup de docs/ é obrigatório junto com o de servidor/dados/.
+docs/*
+!docs/LEIA-ME.md
+
 # ---------- Sistema operacional ----------
 # desktop.ini e Thumbs.db são gerados pelo Windows/OneDrive nesta pasta.
 Thumbs.db
@@ -33,8 +42,27 @@ $RECYCLE.BIN/
 *.swp
 
 # Permissões locais do Claude Code (por máquina, não do projeto).
-# .claude/settings.json — se existir — é do time e continua versionado.
+# .claude/settings.json — se existir — é do time e continua versionado, assim
+# como .claude/skills/, que é ferramenta do projeto (ver a skill run-pa-jb-portal).
 .claude/settings.local.json
+
+# Screenshots que o driver da skill run-pa-jb-portal gera a cada execução.
+# São saída de ferramenta, não fonte — a pasta se refaz sozinha.
+.claude/skills/*/telas/
+
+# Codex (OpenAI), mesma divisão do bloco acima: estado e credencial de máquina
+# ficam de fora; instrução e ferramenta do time entram. Regras preventivas — o
+# Codex ainda não gravou nada neste repositório, mas a instalação em
+# ~/.codex/ mostra o que ele costuma criar (auth.json, sessions/, *.sqlite,
+# history.jsonl, logs), e nenhum desses pertence ao histórico do projeto.
+# AGENTS.md e .codex/skills/ continuam versionados, como o .claude/skills/.
+.codex/auth.json
+.codex/sessions/
+.codex/cache/
+.codex/tmp/
+.codex/logs/
+.codex/*.sqlite*
+.codex/*.jsonl
 
 # ---------- Ferramentas ----------
 # dist/ é onde o electron-builder deixa o instalador Windows (~90 MB) e o

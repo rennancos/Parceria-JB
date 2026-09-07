@@ -233,7 +233,7 @@ function cookieDeSessao(token){
 }
 
 module.exports = {
-  PAPEIS, ErroDeUso,
+  ErroDeUso,
   criarUsuario, trocarSenha, removerUsuario, listarUsuarios,
   entrar, sair, sessaoDe, exigir,
   lerCookie, cookieDeSessao

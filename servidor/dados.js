@@ -205,8 +205,15 @@ function nomeSeguro(nomeOriginal){
   return `${apelido || 'documento'}.${extensao}`;
 }
 
+/* EXTENSOES e LIMITES são exportados sem consumidor hoje, de propósito: são o
+   contrato que o formulário de edição precisa espelhar (`accept` e `maxlength`
+   em js/documentos/), e hoje o front repete os valores à mão. O caminho para
+   acabar com essa duplicação é servi-los junto de BLOCOS em
+   `GET /api/documentos`, como já é feito com os blocos — ver a seção
+   "Simplificação da arquitetura do backend" em
+   md/auditoria-estrutura-backend.md. */
 module.exports = {
   BLOCOS, EXTENSOES, LIMITES, ErroDeUso,
   listar, incluir, editar, excluir,
-  nomeSeguro, validarHref
+  nomeSeguro
 };

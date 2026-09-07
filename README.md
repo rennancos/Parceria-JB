@@ -66,21 +66,33 @@ PA_JB/
 ├── servidor/       # OPCIONAL: site + API de edição, sem dependências
 ├── app/            # OPCIONAL: o aplicativo Windows (Electron) — o site não usa
 ├── Fotos/          # logos e fotos da equipe
-└── md/             # a documentação — não é lida pelo site
+├── tests/          # unit/ (lógica e contratos) e browser.cjs (navegador real)
+├── md/             # a documentação — não é lida pelo site
+└── .claude/skills/ # driver que sobe e dirige o portal (ver "Testes")
 ```
 
 Os caminhos em `index.html` são relativos, então a estrutura de pastas precisa ser preservada ao mover ou publicar o projeto.
 
-## Testes do frontend
+## Testes
 
 ```bash
-npm test              # lógica e contratos; Node 18+
-npm run test:browser  # Chrome/Edge headless; Node 22+
+pnpm test              # lógica e contratos; Node 18+
+pnpm test:browser      # Chrome/Edge headless; Node 22+
 ```
 
 O teste de navegador usa uma API simulada em memória e não modifica usuários, arquivos publicados ou o acervo real. Requer Chrome/Edge instalado; para outro caminho, defina `CHROME_PATH`. Perfis temporários e uma captura são criados na pasta temporária do sistema.
 
 As verificações cobrem `file://`, HTTP sem API, submissões pendentes, sessão expirada, busca e layout responsivo. O resultado da refatoração está em [Auditoria do frontend](md/auditoria-estrutura-frontend.md).
+
+Para abrir o portal e mexer nele sem ser por teste — conferir uma mudança de CSS, tirar print de uma página, reproduzir um bug —, há um driver em `.claude/skills/run-pa-jb-portal/`:
+
+```bash
+node servidor/servidor.js --porta 8123                                   # em outro terminal
+node .claude/skills/run-pa-jb-portal/driver.mjs --porta 8123 --smoke     # dez checagens
+node .claude/skills/run-pa-jb-portal/driver.mjs --file --smoke           # o mesmo em file://
+```
+
+Sem dependência: fala CDP direto com o Chrome. Aceita comandos avulsos (`ir #documentacao`, `clique`, `digitar`, `foto`) e, com `--anexar <porta>`, dirige o **aplicativo Windows** — que os testes acima não alcançam. Comandos e armadilhas em `.claude/skills/run-pa-jb-portal/SKILL.md`.
 
 ## Documentação
 
@@ -101,6 +113,13 @@ As verificações cobrem `file://`, HTTP sem API, submissões pendentes, sessão
 | [11-busca.md](md/11-busca.md) | A busca do portal: o que indexa, como ordena e as armadilhas do componente |
 
 Para mexer em conteúdo, **04** e **05** bastam. Para aparência, **06**.
+
+Duas auditorias de estrutura, fora da numeração porque são fotografias de um momento e não guias de uso:
+
+| Documento | Para quê |
+|---|---|
+| [auditoria-estrutura-backend.md](md/auditoria-estrutura-backend.md) | `servidor/`: os achados, o plano P0-P3 e **por que a arquitetura não foi refatorada** — leia antes de propor camadas novas |
+| [auditoria-estrutura-frontend.md](md/auditoria-estrutura-frontend.md) | A divisão de `js/` em módulos e o que os testes passaram a cobrir |
 
 ## Status
 

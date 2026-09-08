@@ -39,6 +39,7 @@ uso. Envelhecem — confira contra o código antes de agir sobre elas.
 | [auditoria-estrutura-backend.md](auditoria-estrutura-backend.md) | `servidor/`: achados, plano P0-P3 e **por que a arquitetura não foi refatorada**. Leia antes de propor camadas novas |
 | [auditoria-estrutura-frontend.md](auditoria-estrutura-frontend.md) | A divisão de `js/` em módulos e o que os testes passaram a cobrir |
 | [auditoria-seguranca.md](auditoria-seguranca.md) | Teste de segurança do projeto inteiro: achados, o que foi corrigido e o que segue aberto |
+| [relatorio-preparacao-ia.md](relatorio-preparacao-ia.md) | O que foi feito para o portal receber a IA, e **o que foi deliberadamente não criado**. Para *usar*, o guia é o [12](12-arquitetura-integracao-ia.md) |
 
 ## Fora daqui
 

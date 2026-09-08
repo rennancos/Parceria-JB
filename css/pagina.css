@@ -417,7 +417,7 @@ a.callout .link-arrow{
 .link-list .link-text{
   flex: 1;
   min-width: 0;          /* item de flex não encolhe abaixo do conteúdo sem isto */
-  text-wrap: pretty;
+  overflow-wrap: anywhere;
 }
 .link-list .link-desc{
   display: block;

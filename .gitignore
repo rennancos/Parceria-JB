@@ -43,21 +43,18 @@ $RECYCLE.BIN/
 .idea/
 *.swp
 
-# Permissões locais do Claude Code (por máquina, não do projeto).
-# .claude/settings.json — se existir — é do time e continua versionado, assim
-# como .claude/skills/, que é ferramenta do projeto (ver a skill run-pa-jb-portal).
-.claude/settings.local.json
-
-# Screenshots que o driver da skill run-pa-jb-portal gera a cada execução.
-# São saída de ferramenta, não fonte — a pasta se refaz sozinha.
-.claude/skills/*/telas/
+# Configuração do Claude Code, inteira. Ferramenta de quem desenvolve, não
+# código do portal: nada dela entra no repositório — nem settings.json, nem
+# .claude/skills/ (a skill run-pa-jb-portal continua no disco de quem a usa,
+# e quem precisar dela copia à mão).
+.claude/
 
 # Codex (OpenAI), mesma divisão do bloco acima: estado e credencial de máquina
 # ficam de fora; instrução e ferramenta do time entram. Regras preventivas — o
 # Codex ainda não gravou nada neste repositório, mas a instalação em
 # ~/.codex/ mostra o que ele costuma criar (auth.json, sessions/, *.sqlite,
 # history.jsonl, logs), e nenhum desses pertence ao histórico do projeto.
-# AGENTS.md e .codex/skills/ continuam versionados, como o .claude/skills/.
+# AGENTS.md e .codex/skills/ continuam versionados.
 .codex/auth.json
 .codex/sessions/
 .codex/cache/
@@ -72,6 +69,13 @@ $RECYCLE.BIN/
 # no servidor, não versionado. Ver md/10-aplicativo-windows.md.
 node_modules/
 dist/
+
+# O lockfile do pnpm fica fora do repositório por decisão de quem mantém.
+# CONSEQUÊNCIA: as versões exatas não viajam junto. Quem clonar resolve as
+# suas, e o que garante os pins de segurança passa a ser só o `pnpm.overrides`
+# do package.json (fast-uri, @xmldom/xmldom — ver md/auditoria-seguranca.md).
+# Confira `pnpm why` depois de um install novo antes de gerar instalador.
+pnpm-lock.yaml
 build/
 *.log
 npm-debug.log*

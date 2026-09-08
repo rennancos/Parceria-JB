@@ -1,0 +1,15 @@
+# Configuração do markdownlint para a documentação em md/.
+# Fica na raiz, e não em .vscode/, porque .vscode/ está no .gitignore: aqui a
+# regra vale para todo mundo que abrir o projeto, não só para uma máquina.
+
+# MD041 (primeira linha do arquivo tem que ser um título de nível 1).
+# Aqui a primeira linha é `[← Índice](README.md)` em 13 dos 16 arquivos de md/:
+# é a volta para o índice, e ela precisa vir ANTES do título para ficar no topo
+# da página renderizada. O título de nível 1 vem logo na sequência.
+MD041: false
+
+# MD060 (espaço em volta dos pipes da tabela). Passou a ser padrão no
+# markdownlint 0.41 e reprova `|---|---|`, que é o separador usado nas 34
+# tabelas do repositório — consistentes entre si, e renderizadas igual ao
+# formato que a regra pede. Trocar todas seria churn sem leitor beneficiado.
+MD060: false

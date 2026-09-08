@@ -104,3 +104,7 @@ md/auditoria-estrutura-frontend.md
 md/auditoria-seguranca.md
 md/jotbird-document.md
 md/relatorio-preparacao-ia.md
+
+# Config do markdownlint: preferência de editor de quem escreve os .md,
+# não regra do projeto. Vale em qualquer pasta.
+.markdownlint.yaml

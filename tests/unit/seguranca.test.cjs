@@ -47,6 +47,22 @@ test('segurança HTTP com dados descartáveis', async t => {
   const headers = { 'X-Portal-Request': '1', 'Content-Type': 'application/json', Cookie: `pajb_sessao=${token}`, Origin: origemHttp };
   const item = JSON.stringify({ bloco: 'manuais', titulo: 'Fixture', href: 'docs/manual.pdf' });
 
+  /* O assistente desligado (PAJB_IA_URL vazia, o estado de hoje) responde 503 e
+     NÃO contamina o resto: o portal e as outras rotas seguem respondendo na
+     mesma requisição seguinte. É a garantia de "IA fora ≠ portal fora". */
+  await t.test('IA desligada responde 503 sem derrubar o resto do portal', async () => {
+    const semSessao = await pedir('/api/ia/consulta', { metodo: 'POST', corpo: JSON.stringify({ pergunta: 'oi' }), headers: { ...headers, Cookie: '' } });
+    assert.equal(semSessao.status, 401);   // identidade antes de qualquer coisa
+
+    const desligada = await pedir('/api/ia/consulta', { metodo: 'POST', headers, corpo: JSON.stringify({ pergunta: 'como abro um chamado?' }) });
+    assert.equal(desligada.status, 503);
+    assert.match(JSON.parse(desligada.corpo).erro, /nao esta configurado/);
+
+    assert.match((await pedir('/', { headers })).corpo, /fixture/);
+    assert.equal((await pedir('/api/documentos', { headers })).status, 200);
+    assert.equal((await pedir('/api/sessao', { headers })).status, 200);
+  });
+
   await t.test('CSRF: escrita cross-origin e formulário simples são recusados', async () => {
     const ataque = await pedir('/api/documentos', { metodo: 'POST', corpo: item, headers: { ...headers, Origin: 'https://outro.example' } });
     assert.equal(ataque.status, 403);

@@ -24,7 +24,13 @@
      DELETE /api/documentos/:id    excluir           SÓ dev
      POST   /api/arquivos?nome=…   subir DOC/PDF     equipe, dev
 
-   A regra de papel é aplicada aqui, não no navegador — ver servidor/auth.js. */
+     POST   /api/ia/consulta      perguntar ao assistente     equipe, dev
+
+   A regra de papel é aplicada aqui, não no navegador — ver servidor/auth.js.
+
+   A rota da IA existe e responde 503 enquanto PAJB_IA_URL estiver vazia — que
+   é hoje. Ela não segura nenhuma outra rota: um assistente fora do ar não tira
+   o portal do ar. Ver servidor/ia.js e md/12-arquitetura-integracao-ia.md. */
 'use strict';
 
 const http = require('http');
@@ -33,6 +39,7 @@ const path = require('path');
 
 const dados = require('./dados');
 const auth = require('./auth');
+const ia = require('./ia');
 const { ErroDeUso } = require('./erros');
 const seguranca = require('./seguranca');
 
@@ -216,6 +223,20 @@ async function tratarApi(req, res, url){
     if (!seguranca.semLinks(RAIZ, destino)) throw new ErroDeUso('Destino de arquivo não permitido.', 403);
     fs.writeFileSync(destino, conteudo, { flag: substituir ? 'w' : 'wx' });
     return responderJson(res, 201, { href: `docs/${final}`, nome: final });
+  }
+
+  /* Assistente. Exige sessão porque a IA precisa saber EM NOME DE QUEM está
+     respondendo — o que a pessoa pode ver depende do papel dela. O papel sai da
+     sessão, nunca do corpo: quem manda a pergunta não escolhe quem é.
+     ia.js decide o resto, inclusive o 503 de quando não há serviço configurado. */
+  if (rota === '/api/ia/consulta' && metodo === 'POST'){
+    auth.exigir(sessao, ['equipe', 'dev']);
+    const corpo = await lerJson(req);
+    return responderJson(res, 200, await ia.consultar({
+      pergunta: corpo.pergunta,
+      contexto: corpo.contexto,
+      usuario: sessao
+    }));
   }
 
   responderJson(res, 404, { erro: 'Rota não encontrada.' });

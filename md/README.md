@@ -25,6 +25,7 @@ e desde que o servidor passou a usar lista de permitidos, esta pasta também
 | [09-edicao-pela-pagina.md](09-edicao-pela-pagina.md) | A equipe editando documentos pela própria página: uso, administração e o servidor por trás |
 | [10-aplicativo-windows.md](10-aplicativo-windows.md) | O portal como `.exe`: gerar o instalador, versionar, publicar atualização |
 | [11-busca.md](11-busca.md) | A busca do portal: o que indexa, como ordena e as armadilhas do componente |
+| [12-arquitetura-integracao-ia.md](12-arquitetura-integracao-ia.md) | Onde a futura IA se encaixa: contrato, rota, variáveis e o passo a passo de quem for integrá-la |
 
 Para mexer em conteúdo, **04** e **05** bastam. Para aparência, **06**.
 

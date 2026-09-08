@@ -30,11 +30,11 @@ atualização sobe um servidor HTTP local e nunca chama `instalar()`.
 
 | # | Achado | Severidade | Situação |
 |---|---|---|---|
-| 1 | Download da atualização sempre falhava, com a causa disfarçada de erro de rede | **Alta** | Corrigido |
-| 2 | Instalador em cache reaproveitado sem reconferir o SHA-256 | **Alta** | Corrigido |
-| 3 | Endereço do instalador validado *depois* do cache | Média | Corrigido |
-| 4 | Electron 38.8.6 com 12 vulnerabilidades conhecidas, 3 altas | **Alta** | Corrigido |
-| 5 | Dependências de compilação com CVE (`fast-uri`, `@xmldom/xmldom`) | Baixa | Corrigido |
+| 1 | Download da atualização falhava e disfarçava o erro como rede | **Alta** | Corrigido |
+| 2 | Cache do instalador reaproveitado sem refazer o SHA-256 | **Alta** | Corrigido |
+| 3 | Endereço da URL validado após o cache | Média | Corrigido |
+| 4 | Electron 38.8.6 com 12 vulns conhecidas (3 altas) | **Alta** | Corrigido |
+| 5 | CVE em dependências de build (`fast-uri`, `@xmldom/xmldom`) | Baixa | Corrigido |
 | 6 | `PAJB_ORIGEM_PUBLICA` sem documentação | Baixa | Corrigido |
 
 `pnpm audit`: **25 vulnerabilidades → 1**, e a que sobrou não tem correção

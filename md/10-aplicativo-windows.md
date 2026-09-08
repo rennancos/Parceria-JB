@@ -33,7 +33,7 @@ Foram consideradas quatro saídas:
 | Caminho | Por que não foi escolhido |
 |---|---|
 | **Node SEA** (executável único, nativo do Node) | Empacota o *servidor*, não uma janela. A pessoa continuaria abrindo `localhost` no navegador — não é um aplicativo, é um serviço com um ícone. E o .exe já sai com ~110 MB, porque é uma cópia do `node.exe`. |
-| **Tauri** (janela nativa usando o WebView2 do Windows) | É o mais leve de todos: um `.exe` de 5 a 10 MB. Mas exige a cadeia de compilação do **Rust** na máquina de quem gera — uma tecnologia a mais para o projeto manter, e a única aqui que ninguém já usa. |
+| **Tauri** (janela nativa usando o WebView2 do Windows) | É o mais leve de todos: um `.exe` de 5 a 10 MB. Mas exige a cadeia de compilação do **Rust** na máquina de quem gera — uma tecnologia a mais para o projeto manter, e a única aqui que ninguém já usa. Revisto com o aplicativo pronto: [A troca por Tauri](#a-troca-por-tauri-revisto-em-2026-09-08). |
 | **.NET + WebView2** | Mesmo ganho de tamanho do Tauri, mesmo custo: passa a existir um projeto C# ao lado do portal. |
 | **`pkg`** | Descontinuado pela Vercel. Não entra em projeto novo. |
 
@@ -44,6 +44,48 @@ A razão principal não é popularidade, é que **o código atual roda sem nenhu
 O custo é tamanho, e ele é grande — o próximo tópico é sobre isso.
 
 **Nada disso entra em produção do site.** `electron` e `electron-builder` são `devDependencies`: existem só na máquina de quem gera o instalador. A VM continua rodando `node servidor/servidor.js` sem `npm install`, como sempre.
+
+### A troca por Tauri (revisto em 2026-09-08)
+
+A pergunta voltou depois de o aplicativo estar pronto, agora com o código na
+mão para medir. **A decisão se manteve: fica o Electron.** O registro existe
+para ninguém refazer a conta do zero.
+
+O que se ganharia:
+
+- instalador de 104 MB → ~8 MB; instalado 340 MB → ~25 MB (dos quais 15 são
+  `Fotos/`, que pesam igual nas duas tecnologias);
+- o motor se atualiza sozinho pelo Windows Update, em vez de cada CVE do
+  Chromium virar um release do portal só para subir a versão do Electron;
+- `tauri-plugin-updater` traz manifesto, download e **assinatura criptográfica**
+  prontos — fecharia o buraco do HTTP interno descrito em [Sobre HTTP](#sobre-http).
+
+O que se pagaria:
+
+- **Rust vira dependência permanente do projeto**, e ninguém aqui usa;
+- **`file://` deixa de existir.** O Tauri serve por `http://tauri.localhost`, e
+  a primeira linha de `js/documentos.js` (`if (location.protocol === 'file:')
+  return;`) para de disparar: a edição sobe dentro do aplicativo e passa a
+  chamar `/api` contra o próprio webview. Ou se mexe no site — perdendo a
+  propriedade que sustenta a escolha atual — ou o aplicativo ganha botão
+  quebrado;
+- **~1.090 linhas reescritas**: `principal.js` (319), `atualizacao.js` (427) e
+  `barra-atualizacao.js` (345), mais os 32 testes de `teste-atualizacao.js`;
+- **some o preload.** A barra viraria `initialization_script`, que roda no mesmo
+  mundo da página — o isolamento registrado em [O que não mudou](#o-que-não-mudou-e-por-quê)
+  teria de ser reconstruído com as capabilities do Tauri;
+- **a renderização vira variável.** Hoje o Chromium é fixo e a página sai
+  idêntica em toda máquina; com WebView2 ela segue a versão do Edge de cada PC.
+
+**Gatilho para reabrir — os dois juntos, nunca um só:** alguém na equipe já
+usar Rust **e** as atualizações ficarem frequentes o bastante para os 104 MB
+por release incomodarem de verdade.
+
+Se o que incomodar for só a segurança do canal HTTP, o meio-termo é muito mais
+barato: assinar o manifesto com uma chave própria dentro do
+`app/atualizacao.js` que já existe (`crypto.verify`, ~20 linhas) mata o mesmo
+cenário que o updater do Tauri mataria. E se o que incomodar for o tamanho, o
+que paga mais rápido continua sendo otimizar `Fotos/` — ver [Tamanho](#tamanho).
 
 ---
 
@@ -315,7 +357,7 @@ Cinco passos, na ordem.
     "Conteúdo real da página Acessos Parceria.",
     "Correção do menu em telas estreitas."
   ],
-  "pagina": "http://portal-pajb/app/"
+  "pagina": "http://portal-pajb/download/"
 }
 ```
 

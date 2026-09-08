@@ -219,6 +219,7 @@ Essas decisões não representam pendências de correção.
 
 ### Complemento de melhorias e testes — 07/09/2026
 
+- **Nota de contagem:** os números desta auditoria são do dia em que ela foi feita. Hoje o projeto está em **24 testes de lógica e 12 cenários de navegador**, com a suíte de fronteiras do backend (`tests/unit/backend.test.cjs`) e o cenário do `mailto:` somados aos que estão listados acima.
 - **Arquivo:** `js/documentos.js`. **Problema:** a exclusão não controlava requisições pendentes por documento. **Impacto:** cliques repetidos podiam enviar exclusões concorrentes e apresentar erros após uma exclusão já confirmada. **Severidade:** média. **Status:** corrigido com estado local por ID, botões desabilitados durante a operação e liberação em `finally`, inclusive após redesenho ou erro. Não foi necessária divisão de arquivos.
 - `tests/browser.cjs` agora simula PUT e DELETE e verifica edição sem duplicação, preservação do arquivo existente, bloqueio de exclusões repetidas após redesenho, manutenção do item após erro e nova tentativa bem-sucedida.
 - Validação desta rodada: **16 testes de lógica e 10 cenários de navegador aprovados**, com API simulada e dados descartáveis. O executor de navegador contabiliza 11 testes ao incluir o teste pai. A checagem responsiva passou em 360, 900 e 1280 px; a comparação histórica de CSS não foi executada nesta rodada.

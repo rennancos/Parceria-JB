@@ -10,7 +10,7 @@ Nada abaixo está decidido. É material para conversa, com o custo e a dependên
 
 ## 1. O que destrava o uso real
 
-Enquanto estes quatro pontos não fecharem, o portal não substitui o que a equipe usa hoje. **Nenhum deles é problema técnico** — todos dependem de conteúdo que só a equipe tem.
+Enquanto estes pontos não fecharem, o portal não substitui o que a equipe usa hoje. **Nenhum deles é problema técnico** — todos dependem de conteúdo que só a equipe tem. Eram quatro; o dos dados da equipe já fechou.
 
 ### Conteúdo das três páginas restantes
 
@@ -30,11 +30,11 @@ Na planilha, separe o que é **endereço** do que é **arquivo**: endereço vira
 
 Vizrt sem portal/e-mail/telefone, e dois fabricantes ainda chamados "Fabricante 2" e "Fabricante 3". Aparecem como "a definir" na página de propósito. **Não preencha por aproximação** — ver [02-seguranca.md](02-seguranca.md).
 
-### Dados reais da equipe
+### ~~Dados reais da equipe~~ — feito
 
-`js/equipe.js` tem 37 registros, dos quais 34 são "Pessoa NN" com e-mail `@empresa.com` e `perfil: "#"`. As fotos de `Fotos/EQUIPE/` também faltam quase todas — por isso quase tudo aparece com iniciais.
+**Saiu do roteiro.** `js/equipe-dados.js` tem 36 pessoas com nome, cargo, área, e-mail corporativo e foto — nenhum "Pessoa NN", nenhum `@empresa.com`, nenhuma foto faltando. A previsão se confirmou: a página não precisou de mudança nenhuma para absorver, o array mandou e a grade e a contagem se ajustaram sozinhas.
 
-Isso é levantamento de RH mais coleta de foto. A página não precisa de nenhuma mudança para absorver: o array manda, a grade e a contagem se ajustam sozinhas.
+**O que ainda é `"#"` ali é o `perfil`** — o link de Teams/intranet de cada pessoa. Some do card quando não existe, então não é buraco visível; é campo por preencher.
 
 ---
 
@@ -140,9 +140,9 @@ Itens que não aparecem para o usuário, mas evitam retrabalho.
 1. ~~**Corrigir o lançamento do build.**~~ **Feito** — `app/empacotar.js` chama o CLI pelo `process.execPath`, sem shell; `npm run app:build` volta a gerar instalador.
 2. ~~**Revogar sessões entre processos.**~~ **Feito** — `sessaoDe` compara o salt do disco com o do login, então trocar a senha ou remover o usuário pela CLI derruba a sessão na requisição seguinte.
 3. ~~**Ampliar os testes reais do backend.**~~ **Feito** — `tests/unit/backend.test.cjs`, 7 cenários contra uma raiz falsa em `%TEMP%`. Fica de fora o upload/edição/exclusão pela API e a CLI `usuarios.js`.
-4. **Revisar proteção de arquivos e atualizações.** Estático, `ORIGEM` do verificador e arquivo órfão em `docs/`. Casa com a subida da VM (seção 2), não com a sustentação do dia a dia.
+4. **Revisar proteção de arquivos e atualizações.** ~~Estático~~ (virou lista de permitidos) e ~~arquivo órfão em `docs/`~~ (já documentado) fechados. **Falta o `ORIGEM`**, que casa com a subida da VM (seção 2) porque depende de decidir HTTPS ou assinatura.
 
-**Restou o 4**, que anda junto da subida da VM (seção 2) porque depende de decidir HTTPS ou assinatura.
+**Restou uma decisão sua, não uma tarefa:** HTTPS ou assinatura de código, para o `ORIGEM` poder ser preenchido.
 
 ### Um `pnpm check`
 

@@ -24,11 +24,9 @@
    3. O arquivo só recebe o nome final depois de conferido: enquanto baixa,
       ele é `.parcial`. Nunca existe um .exe pela metade com nome de bom.
 
-   O QUE NÃO PROTEGE: o manifesto vindo por HTTP simples pode ser trocado por
-   quem esteja no meio da rede — e aí os dois, manifesto e instalador, seriam
-   do atacante. É a mesma aposta já feita no cookie sem `Secure` de
-   servidor/auth.js: rede interna. Publicando em HTTPS, o problema some.
-   Ver md/10-aplicativo-windows.md. */
+   SEGURANÇA: atualizações exigem HTTPS e recusam redirects. HTTP é aceito
+   somente em loopback no desenvolvimento para os testes locais. O hash não
+   substitui proteção do servidor de publicação nem assinatura do instalador. */
 'use strict';
 
 const { app, net } = require('electron');
@@ -43,7 +41,10 @@ const { spawn } = require('child_process');
    ORIGEM é o endereço da PASTA onde ficam publicados o `versao.json` e os
    instaladores. Precisa terminar em barra.
 
-     const ORIGEM_PADRAO = 'http://portal-pajb/app/';
+     const ORIGEM_PADRAO = 'https://portal-pajb/download/';
+
+   `download/` e NÃO `app/`: `app/` é esta pasta do repositório, chega à VM
+   pelo `git pull` e nem sequer é servida (ver PERMITIDOS em servidor.js).
 
    Vazio (como está) DESLIGA a verificação: o aplicativo nunca vai à rede e a
    barra de atualização nunca aparece. É o padrão de propósito — o nome da VM
@@ -104,19 +105,29 @@ function versaoAtual(){
 /* `net` do Electron, não o `https` do Node: ele passa pela pilha do Chromium e
    com isso herda o proxy configurado no Windows. Numa rede corporativa é a
    diferença entre funcionar e dar timeout sem explicação. */
-// ATENÇÃO: o timer termina quando net.fetch retorna a resposta; não cobre a
-// leitura posterior de res.text()/body. Revisar esse limite ao tratar servidor
-// que entrega cabeçalhos e mantém o corpo parado (teste atual não simula isso).
-async function buscar(url, limiteMs){
+function exigirTransporte(url){
+  const destino = new URL(url);
+  const local = !app.isPackaged && ['127.0.0.1', '[::1]', 'localhost'].includes(destino.hostname);
+  if (destino.username || destino.password || (destino.protocol !== 'https:' && !(local && destino.protocol === 'http:')))
+    throw new ErroDeAtualizacao('Atualizações exigem HTTPS; HTTP é permitido apenas em testes locais.');
+  return destino;
+}
+
+// O consumidor fica dentro do prazo, incluindo todos os bytes do corpo.
+async function buscar(url, limiteMs, consumir){
+  exigirTransporte(url);
   const controle = new AbortController();
   const relogio = setTimeout(() => controle.abort(), limiteMs);
 
   try {
-    return await net.fetch(url, { signal: controle.signal, cache: 'no-store' });
+    const res = await net.fetch(url, { signal: controle.signal, cache: 'no-store', redirect: 'error' });
+    try { return await consumir(res); }
+    finally { if (res.body && !res.body.locked) await res.body.cancel().catch(() => {}); }
   } catch (erro) {
     if (controle.signal.aborted){
       throw new ErroDeAtualizacao('O servidor de atualizações demorou demais para responder.');
     }
+    if (erro instanceof ErroDeAtualizacao) throw erro;
     // net.fetch joga TypeError para DNS que não resolve, conexão recusada,
     // cabo fora — tudo o que, para quem usa, é "sem internet".
     throw new ErroDeAtualizacao('Não foi possível falar com o servidor de atualizações. Verifique sua conexão e tente de novo.');
@@ -144,7 +155,7 @@ function validarManifesto(bruto, urlManifesto){
     throw new ErroDeAtualizacao('O arquivo de atualização veio com uma versão inválida.');
   }
 
-  const sha256 = texto(bruto.sha256, 64).toLowerCase();
+  const sha256 = String(bruto.sha256 || '').trim().toLowerCase();
   if (!/^[a-f0-9]{64}$/.test(sha256)){
     throw new ErroDeAtualizacao('O arquivo de atualização veio sem uma soma de verificação válida.');
   }
@@ -161,12 +172,13 @@ function validarManifesto(bruto, urlManifesto){
   if (arquivo.origin !== urlManifesto.origin){
     throw new ErroDeAtualizacao('O instalador apontado não está no mesmo servidor da atualização.');
   }
+  exigirTransporte(arquivo.href);
   if (!/\.exe$/i.test(arquivo.pathname)){
     throw new ErroDeAtualizacao('O arquivo de atualização não aponta para um instalador.');
   }
 
-  const tamanho = Number(bruto.tamanho) || 0;
-  if (tamanho < 0 || tamanho > TAMANHO_MAXIMO){
+  const tamanho = bruto.tamanho == null ? 0 : Number(bruto.tamanho);
+  if (!Number.isSafeInteger(tamanho) || tamanho < 0 || tamanho > TAMANHO_MAXIMO){
     throw new ErroDeAtualizacao('O instalador anunciado tem um tamanho fora do esperado.');
   }
 
@@ -204,18 +216,24 @@ async function verificar(){
   }
 
   const urlManifesto = new URL('versao.json', ORIGEM);
-  const res = await buscar(urlManifesto.href, ESPERA_MANIFESTO);
-
-  if (!res.ok){
-    throw new ErroDeAtualizacao(`O servidor de atualizações respondeu ${res.status}.`);
-  }
-
-  let bruto;
-  try {
-    bruto = JSON.parse(await res.text());
-  } catch (e) {
-    throw new ErroDeAtualizacao('O arquivo de atualização veio ilegível — avise quem cuida do portal.');
-  }
+  const bruto = await buscar(urlManifesto.href, ESPERA_MANIFESTO, async res => {
+    if (!res.ok) throw new ErroDeAtualizacao(`O servidor de atualizações respondeu ${res.status}.`);
+    if (!res.body) throw new ErroDeAtualizacao('O arquivo de atualização veio ilegível.');
+    const leitor = res.body.getReader();
+    const partes = [];
+    let tamanho = 0;
+    try {
+      for (;;){
+        const { done, value } = await leitor.read();
+        if (done) break;
+        tamanho += value.byteLength;
+        if (tamanho > 64 * 1024) throw new ErroDeAtualizacao('Manifesto maior que o limite de 64 KiB.');
+        partes.push(Buffer.from(value));
+      }
+    } finally { await leitor.cancel().catch(() => {}); leitor.releaseLock(); }
+    try { return JSON.parse(Buffer.concat(partes).toString('utf8')); }
+    catch { throw new ErroDeAtualizacao('O arquivo de atualização veio ilegível — avise quem cuida do portal.'); }
+  });
 
   const manifesto = validarManifesto(bruto, urlManifesto);
 
@@ -259,62 +277,89 @@ function escrever(saida, pedaco){
   });
 }
 
+/* Confere um instalador que já está no disco contra o manifesto. Vale para o
+   cache: tamanho primeiro, porque é barato e pega o caso comum. */
+function confereNoDisco(caminho, info){
+  try {
+    const bytes = fs.readFileSync(caminho);
+    if (info.tamanho && bytes.length !== info.tamanho) return false;
+    return crypto.createHash('sha256').update(bytes).digest('hex') === info.sha256;
+  } catch (e) {
+    return false;
+  }
+}
+
 /* Baixa, confere o SHA-256 e devolve o caminho do instalador pronto.
    `aoProgresso` recebe 0..100, ou -1 quando o servidor não informou o
    tamanho (aí a barra fica indeterminada em vez de mentir uma porcentagem). */
 async function baixar(info, aoProgresso){
+  // Antes de qualquer coisa, inclusive do cache: um endereço que não passa
+  // aqui é recusado mesmo que já exista um arquivo com o nome da versão.
+  exigirTransporte(info.arquivo);
+
   fs.mkdirSync(PASTA_TEMP, { recursive: true });
 
   const destino = path.join(PASTA_TEMP, `Parceria-JB-${info.versao}.exe`);
   const parcial = `${destino}.parcial`;
 
-  // CONTRATO: cache nomeado apenas pela versão. Este atalho não recalcula o
-  // hash do arquivo existente; não republicar bytes diferentes com a mesma
-  // versão. Revisar também manifesto.js e a política de cache se isso mudar.
-  if (fs.existsSync(destino)) return destino;
+  /* O cache mora numa pasta gravável pelo usuário (e por qualquer processo que
+     rode como ele). Reaproveitar pelo nome do arquivo entregaria a execução a
+     quem trocasse os bytes ali — o hash é conferido de novo antes de o
+     instalador ser reusado, e o que não bate é apagado e baixado outra vez. */
+  if (fs.existsSync(destino)){
+    if (confereNoDisco(destino, info)) return destino;
+    try { fs.rmSync(destino, { force: true }); } catch (e) { /* segue */ }
+  }
 
   try { fs.rmSync(parcial, { force: true }); } catch (e) { /* segue */ }
 
-  const res = await buscar(info.arquivo, ESPERA_DOWNLOAD);
-  if (!res.ok || !res.body){
-    throw new ErroDeAtualizacao(`Não foi possível baixar o instalador (o servidor respondeu ${res.status}).`);
-  }
-
-  const total = info.tamanho || Number(res.headers.get('content-length')) || 0;
+  /* O corpo é consumido DENTRO do `buscar`, e não depois dele: o prazo de
+     `buscar` cobre todos os bytes, e é ele quem cancela um corpo que ninguém
+     leu. Chamar `buscar` sem este callback quebrava o download inteiro — o
+     `consumir(res)` virava `undefined(res)`, e o TypeError saía disfarçado de
+     "não foi possível falar com o servidor". */
   const hash = crypto.createHash('sha256');
-  const saida = fs.createWriteStream(parcial);
-  const leitor = res.body.getReader();
   let recebido = 0;
 
-  try {
-    for (;;){
-      const { done, value } = await leitor.read();
-      if (done) break;
-
-      recebido += value.byteLength;
-      if (recebido > TAMANHO_MAXIMO){
-        throw new ErroDeAtualizacao('O instalador é maior do que o esperado — download interrompido por segurança.');
-      }
-
-      const pedaco = Buffer.from(value.buffer, value.byteOffset, value.byteLength);
-      hash.update(pedaco);
-      await escrever(saida, pedaco);
-
-      if (aoProgresso) aoProgresso(total ? Math.min(99, Math.floor((recebido / total) * 100)) : -1);
+  await buscar(info.arquivo, ESPERA_DOWNLOAD, async (res) => {
+    if (!res.ok || !res.body){
+      throw new ErroDeAtualizacao(`Não foi possível baixar o instalador (o servidor respondeu ${res.status}).`);
     }
 
-    await new Promise((resolve, reject) => {
-      saida.once('finish', resolve);
-      saida.once('error', reject);
-      saida.end();
-    });
-  } catch (erro) {
-    saida.destroy();
-    try { fs.rmSync(parcial, { force: true }); } catch (e) { /* segue */ }
+    const total = info.tamanho || Number(res.headers.get('content-length')) || 0;
+    const saida = fs.createWriteStream(parcial);
+    const leitor = res.body.getReader();
 
-    if (erro instanceof ErroDeAtualizacao) throw erro;
-    throw new ErroDeAtualizacao('O download foi interrompido antes do fim. Tente de novo.');
-  }
+    try {
+      for (;;){
+        const { done, value } = await leitor.read();
+        if (done) break;
+
+        recebido += value.byteLength;
+        if (recebido > TAMANHO_MAXIMO){
+          throw new ErroDeAtualizacao('O instalador é maior do que o esperado — download interrompido por segurança.');
+        }
+
+        const pedaco = Buffer.from(value.buffer, value.byteOffset, value.byteLength);
+        hash.update(pedaco);
+        await escrever(saida, pedaco);
+
+        if (aoProgresso) aoProgresso(total ? Math.min(99, Math.floor((recebido / total) * 100)) : -1);
+      }
+
+      await new Promise((resolve, reject) => {
+        saida.once('finish', resolve);
+        saida.once('error', reject);
+        saida.end();
+      });
+    } catch (erro) {
+      saida.destroy();
+      try { fs.rmSync(parcial, { force: true }); } catch (e) { /* segue */ }
+
+      if (erro instanceof ErroDeAtualizacao) throw erro;
+      throw new ErroDeAtualizacao('O download foi interrompido antes do fim. Tente de novo.');
+    }
+  });
 
   // As duas conferências, nesta ordem: tamanho é barato e pega o caso comum
   // (proxy devolveu uma página de erro HTML no lugar do .exe).

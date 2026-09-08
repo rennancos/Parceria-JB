@@ -12,7 +12,7 @@ Os dados ficam em `js/equipe-dados.js`, no array `equipe` — separados do layou
   cargo: "Analista de Soluções de Mídia",
   area: "Captação",                       // ver a lista fechada abaixo
   foto: "Fotos/EQUIPE/rennan-silva.webp",
-  email: "rennan@empresa.com",
+  email: "rennan.silva@g.globo",   // endereço corporativo real
   perfil: "#"                             // link do Teams/intranet
 }
 ```

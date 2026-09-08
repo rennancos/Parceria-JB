@@ -12,7 +12,10 @@
    * @returns {Promise<object>}
    */
   async function pedir(caminho, opcoes){
-    const res = await fetch('/api' + caminho, { credentials: 'same-origin', ...opcoes });
+    // Header não simples: uma página externa precisa de preflight, que o
+    // servidor não autoriza. seguranca.js também confere Origin/Fetch Metadata.
+    const res = await fetch('/api' + caminho, { credentials: 'same-origin', ...opcoes,
+      headers: { ...opcoes?.headers, 'X-Portal-Request': '1' } });
     if (res.status === 401){
       document.dispatchEvent(new CustomEvent('sessao:expirada'));
     }

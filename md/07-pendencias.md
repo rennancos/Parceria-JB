@@ -8,7 +8,7 @@
 - **A pasta `docs/` está vazia.** Nenhum DOC/PDF foi publicado ainda; ver [docs/LEIA-ME.md](../docs/LEIA-ME.md) para a convenção de nome e como vincular.
 - **Os contatos dos fabricantes estão vazios no guia de origem.** Portal, e-mail e telefone da Vizrt e dos outros dois fabricantes aparecem como "a definir"; dois deles seguem sem nome ("Fabricante 2", "Fabricante 3"). Ver [04-paginas-internas.md](04-paginas-internas.md).
 - **Três das quatro páginas têm conteúdo de rascunho.** Só "Primeiros passos" tem material real; as outras foram escritas a partir das descrições dos cards. O bloco tracejado (`aviso`) no fim de cada uma marca isso — remova ao preencher.
-- **A equipe está com dados de exemplo** ("Pessoa 01", "Pessoa 02"…, e-mails `@empresa.com`, `perfil: "#"`) e `Fotos/EQUIPE/` está quase vazia — por isso quase todos os cards aparecem com iniciais.
+- **Falta o `perfil` de cada pessoa da equipe.** Nome, cargo, área, e-mail e foto já são reais; o link de Teams/intranet ainda é `"#"` para todo mundo. O botão some do card quando não há link, então não aparece como buraco — ver [05-equipe.md](05-equipe.md).
 
 ## Estrutura
 
@@ -26,14 +26,16 @@
 
 ## Backend e aplicativo
 
-Da [auditoria do backend](auditoria-estrutura-backend.md#recomendações-futuras). Três das quatro já foram fechadas e estão em "O que já foi resolvido"; segue aberta:
+Da [auditoria do backend](auditoria-estrutura-backend.md#recomendações-futuras). As quatro foram tratadas; o que sobrou está abaixo, o resto em "O que já foi resolvido":
 
-- **Proteção de arquivos e atualizações a revisar.** Lista de pastas bloqueadas do estático, `ORIGEM` do verificador de atualização (exige HTTPS ou assinatura antes) e arquivo órfão em `docs/`.
+- **`ORIGEM` do verificador de atualização segue vazio,** e por isso o app nunca procura versão nova. Preencher depende de decidir **HTTPS ou assinatura de código** — em HTTP puro, manifesto e instalador viajam pelo mesmo canal e o SHA-256 não protege contra quem controla os dois. É decisão de infraestrutura, não de código. Ver [10-aplicativo-windows.md](10-aplicativo-windows.md).
 
 ## O que já foi resolvido
 
 Registrado para não ser reintroduzido por engano:
 
+- Os dados da equipe eram de exemplo ("Pessoa NN", `@empresa.com`) e quase nenhuma foto existia. Hoje são 36 pessoas reais, com foto — a grade e a contagem sempre se ajustaram sozinhas, então nada no código precisou mudar.
+- **O estático virou lista de permitidos** (`PERMITIDOS` em `servidor/servidor.js`): `index.html` mais `css`, `js`, `Fotos`, `docs` e `download`. A lista de bloqueio anterior deixava pasta nova nascer servida — era assim que `md/`, `app/`, `tests/`, `ferramentas/`, `publicacao/` e `dist/` (o instalador de 90 MB) saíam pela porta 80. **Pasta nova nasce fechada:** para servir, acrescente à lista. `.gitignore` não restringe HTTP.
 - **A revogação de sessão passou a depender do salt.** `sessaoDe` compara o salt do disco com o guardado no login, e é por isso que trocar a senha ou remover o usuário — inclusive pela CLI, em outro processo — derruba quem está logado. **Não guarde o salt em nada que vá para o cliente** e não mude `trocarSenha` para reaproveitar o salt antigo: os dois desfazem a revogação em silêncio. Coberto por `tests/unit/backend.test.cjs`.
 - `npm run app:build` morria antes do build começar: o `.bin/electron-builder.cmd` só roda com `shell: true` no Windows, e o cmd quebrava o caminho do workspace (`DEV PAJB`, com espaço). **Não volte a chamar o `.cmd`** — `app/empacotar.js` invoca `node_modules/electron-builder/cli.js` pelo `process.execPath`, sem shell.
 - As fotos da equipe eram servidas no tamanho de origem — 15 MB para desenhar avatares de 132 px, sendo um único PNG de 4,4 MB (6720×4480). O peso ia junto em cada instalador Windows. Agora os masters ficam em `Fotos/EQUIPE/originais/` (fora da lista de `files` do electron-builder) e o portal carrega `.webp` de 264×264 gerados por `npm run fotos`: ~400 KB no total. **Não volte a apontar `foto` para o original** — ver [05-equipe.md](05-equipe.md).

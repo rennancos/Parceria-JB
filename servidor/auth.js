@@ -24,6 +24,9 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
+const { ErroDeUso } = require('./erros');
+const { ORIGEM_PUBLICA } = require('./seguranca');
+
 const ARQUIVO = path.join(__dirname, 'dados', 'usuarios.json');
 
 const PAPEIS = ['equipe', 'dev'];
@@ -36,14 +39,6 @@ const DURACAO_SESSAO = 12 * 60 * 60 * 1000;   // 12 h: um dia de trabalho
 // isto é rede interna, o objetivo é atrapalhar script, não bloquear pessoa.
 const MAX_TENTATIVAS = 5;
 const CASTIGO = 5 * 60 * 1000;
-
-class ErroDeUso extends Error {
-  constructor(mensagem, status = 400){
-    super(mensagem);
-    this.name = 'ErroDeUso';
-    this.status = status;
-  }
-}
 
 /* ---------- Arquivo de usuários ---------- */
 
@@ -158,11 +153,31 @@ function encerrarSessoesDe(login){
 }
 
 function entrar(login, senha){
+  if (typeof login !== 'string' || !/^[a-z0-9._-]{3,32}$/i.test(login.trim())
+    || typeof senha !== 'string' || senha.length > 1024)
+    throw new ErroDeUso('Login ou senha inválidos.', 400);
   const chave = normalizarLogin(login);
-  const freio = tentativas.get(chave);
 
-  if (freio && freio.bloqueadoAte > Date.now()){
-    const minutos = Math.ceil((freio.bloqueadoAte - Date.now()) / 60000);
+  const agora = Date.now();
+
+  /* A varredura acontece em TODA tentativa, não só na que dá certo: a chave do
+     Map é o login que veio na requisição, então quem só erra nunca chegaria ao
+     caminho de sucesso e o Map cresceria para sempre.
+
+     O critério é INATIVIDADE, não `bloqueadoAte`: quem tem 3 erros e ainda não
+     foi bloqueado carrega `bloqueadoAte: 0`, e apagar por aí zeraria a
+     contagem de um login sempre que outro tentasse — bastaria alternar dois
+     logins para nunca chegar aos 5. Parado por CASTIGO, a contagem some; é a
+     mesma janela do bloqueio. */
+  for (const [quem, freio] of tentativas){
+    if (freio.visto <= agora - CASTIGO) tentativas.delete(quem);
+  }
+
+  const freio = tentativas.get(chave);
+  if (!freio && tentativas.size >= 10000) throw new ErroDeUso('Muitas tentativas. Tente mais tarde.', 429);
+
+  if (freio && freio.bloqueadoAte > agora){
+    const minutos = Math.ceil((freio.bloqueadoAte - agora) / 60000);
     throw new ErroDeUso(`Muitas tentativas. Tente de novo em ${minutos} min.`, 429);
   }
 
@@ -170,11 +185,15 @@ function entrar(login, senha){
 
   // Mesma mensagem para login inexistente e senha errada: não confirma para
   // quem está tentando que aquele login existe.
-  if (!usuario || !senhaConfere(usuario, senha)){
+  // Faz a derivação também para login inexistente para reduzir a diferença
+  // de tempo; o limite HTTP por IP contém o custo de alternar nomes.
+  const confere = senhaConfere(usuario || { salt: '0'.repeat(32), hash: '0'.repeat(128) }, senha);
+  if (!usuario || !confere){
     const erros = (freio?.erros ?? 0) + 1;
     tentativas.set(chave, {
       erros,
-      bloqueadoAte: erros >= MAX_TENTATIVAS ? Date.now() + CASTIGO : 0
+      visto: agora,
+      bloqueadoAte: erros >= MAX_TENTATIVAS ? agora + CASTIGO : 0
     });
     throw new ErroDeUso('Usuário ou senha incorretos.', 401);
   }
@@ -219,7 +238,7 @@ function sessaoDe(token){
      uma leitura de poucos KB por requisição autenticada — a mesma ordem de
      grandeza do listar() do acervo. */
   const usuario = lerUsuarios().find((u) => u.login === sessao.login);
-  if (!usuario || usuario.salt !== sessao.credencial){
+  if (!usuario || usuario.salt !== sessao.credencial || usuario.papel !== sessao.papel){
     sessoes.delete(token);
     return null;
   }
@@ -239,21 +258,22 @@ function lerCookie(cabecalho){
   const bruto = String(cabecalho ?? '');
   for (const parte of bruto.split(';')){
     const [nome, ...resto] = parte.trim().split('=');
-    if (nome === COOKIE) return decodeURIComponent(resto.join('='));
+    if (nome === COOKIE){
+      try { return decodeURIComponent(resto.join('=')); }
+      catch { throw new ErroDeUso('Cookie malformado.', 400); }
+    }
   }
   return '';
 }
 
 /* SEGURANÇA: HttpOnly impede leitura do cookie por JavaScript, mas não impede
    um script injetado de fazer requisições autenticadas. SameSite=Strict limita
-   o envio cross-site; não há token CSRF nem verificação de Origin na API.
-   Ausência de CORS não equivale a bloquear toda escrita cross-origin. Revisar
-   essas fronteiras ao mudar hospedagem, subdomínios ou atributos do cookie.
-   Sem `Secure` de propósito: a VM serve em HTTP na rede interna, e `Secure`
-   faria o navegador descartar o cookie. Se um dia entrar HTTPS, acrescente. */
+   o envio cross-site. seguranca.js exige header próprio e valida Origin nas
+   escritas; não liberar CORS sem revisar essa proteção. PAJB_ORIGEM_PUBLICA
+   com HTTPS adiciona Secure; HTTP local continua compatível. */
 function cookieDeSessao(token){
-  const base = `${COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Strict`;
-  return token ? `${base}; Max-Age=${DURACAO_SESSAO / 1000}` : `${COOKIE}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0`;
+  const base = `${COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Strict${ORIGEM_PUBLICA.startsWith('https:') ? '; Secure' : ''}`;
+  return `${base}; Max-Age=${token ? DURACAO_SESSAO / 1000 : 0}`;
 }
 
 module.exports = {

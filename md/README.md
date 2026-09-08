@@ -6,7 +6,9 @@ Comece pelo [Guia de Manutenção](../docs/manutencao.md) para localizar contrat
 documento. Para subir o projeto e ver a estrutura de pastas, o ponto de
 partida é o [README da raiz](../README.md).
 
-Nada aqui é lido pelo site: `md/` é documentação para quem mexe no código.
+Nada aqui é lido pelo site: `md/` é documentação para quem mexe no código —
+e desde que o servidor passou a usar lista de permitidos, esta pasta também
+**não é servida por HTTP**. Não aponte link do portal para cá.
 
 ## Um documento por parte
 
@@ -35,6 +37,7 @@ uso. Envelhecem — confira contra o código antes de agir sobre elas.
 |---|---|
 | [auditoria-estrutura-backend.md](auditoria-estrutura-backend.md) | `servidor/`: achados, plano P0-P3 e **por que a arquitetura não foi refatorada**. Leia antes de propor camadas novas |
 | [auditoria-estrutura-frontend.md](auditoria-estrutura-frontend.md) | A divisão de `js/` em módulos e o que os testes passaram a cobrir |
+| [auditoria-seguranca.md](auditoria-seguranca.md) | Teste de segurança do projeto inteiro: achados, o que foi corrigido e o que segue aberto |
 
 ## Fora daqui
 

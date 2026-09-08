@@ -20,6 +20,8 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
+const { ErroDeUso } = require('./erros');
+
 const PASTA_DADOS = path.join(__dirname, 'dados');
 const ARQUIVO = path.join(PASTA_DADOS, 'documentos.json');
 
@@ -37,16 +39,6 @@ const BLOCOS = [
 const EXTENSOES = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'];
 
 const LIMITES = { titulo: 120, descricao: 200, href: 500 };
-
-/* Erro de uso vira 4xx na API; qualquer outro vira 500. Ter um tipo próprio
-   evita devolver mensagem de erro interno para a tela de quem está editando. */
-class ErroDeUso extends Error {
-  constructor(mensagem, status = 400){
-    super(mensagem);
-    this.name = 'ErroDeUso';
-    this.status = status;
-  }
-}
 
 /* ---------- Leitura e escrita ---------- */
 
@@ -124,22 +116,33 @@ function proximaOrdem(itens, bloco){
   return doBloco.reduce((maior, item) => Math.max(maior, item.ordem ?? 0), 0) + 1;
 }
 
-function incluir(dados, autor){
+/* Os cinco campos que a pessoa preenche. `incluir` e `editar` gravam
+   exatamente os mesmos, com as mesmas regras — a diferença entre os dois é o
+   que vem em volta (id e autoria na inclusão, `ordem` preservada na edição),
+   não a validação. */
+function camposValidados(entrada){
+  return {
+    bloco: validarBloco(entrada.bloco),
+    titulo: texto(entrada.titulo, 'Título', { obrigatorio: true, limite: LIMITES.titulo }),
+    descricao: texto(entrada.descricao, 'Descrição', { limite: LIMITES.descricao }),
+    href: validarHref(entrada.href),
+    formato: validarFormato(entrada.formato)
+  };
+}
+
+function incluir(entrada, autor){
   const itens = ler();
-  const bloco = validarBloco(dados.bloco);
+  const campos = camposValidados(entrada);
+  const agora = new Date().toISOString();
 
   const item = {
     id: crypto.randomUUID(),
-    bloco,
-    titulo: texto(dados.titulo, 'Título', { obrigatorio: true, limite: LIMITES.titulo }),
-    descricao: texto(dados.descricao, 'Descrição', { limite: LIMITES.descricao }),
-    href: validarHref(dados.href),
-    formato: validarFormato(dados.formato),
-    ordem: proximaOrdem(itens, bloco),
+    ...campos,
+    ordem: proximaOrdem(itens, campos.bloco),
     criadoPor: autor,
-    criadoEm: new Date().toISOString(),
+    criadoEm: agora,
     atualizadoPor: autor,
-    atualizadoEm: new Date().toISOString()
+    atualizadoEm: agora
   };
 
   itens.push(item);
@@ -147,30 +150,19 @@ function incluir(dados, autor){
   return item;
 }
 
-/**
- * Substitui campos editáveis após validar o payload completo (PUT, não PATCH).
- * Preserva id e auditoria de criação; mover de bloco atribui ordem ao final
- * do destino. Frontend depende do retorno completo para atualizar seu acervo.
- * @param {string} id UUID persistido, usado também nas rotas e data-item-id.
- * @param {object} dados Campos enviados por js/documentos/acervo.js.
- * @param {string} autor Login da sessão, definido pelo servidor, não pelo body.
- * @returns {object} Registro gravado com metadados de auditoria.
- * @throws {ErroDeUso} Payload inválido ou id inexistente; erros de IO propagam.
- */
-function editar(id, dados, autor){
+/* PUT, não PATCH: os campos editáveis são substituídos em bloco. `id` e a
+   autoria de criação ficam; mover de bloco joga o item para o fim do destino.
+   O retorno é o registro inteiro — é dele que js/documentos/acervo.js
+   atualiza a lista sem pedir outro GET. */
+function editar(id, entrada, autor){
   const itens = ler();
   const alvo = itens.find((item) => item.id === id);
   if (!alvo) throw new ErroDeUso('Este item não existe mais — recarregue a página.', 404);
 
-  const bloco = validarBloco(dados.bloco);
+  const campos = camposValidados(entrada);
 
-  Object.assign(alvo, {
-    bloco,
-    titulo: texto(dados.titulo, 'Título', { obrigatorio: true, limite: LIMITES.titulo }),
-    descricao: texto(dados.descricao, 'Descrição', { limite: LIMITES.descricao }),
-    href: validarHref(dados.href),
-    formato: validarFormato(dados.formato),
-    ordem: alvo.bloco === bloco ? alvo.ordem : proximaOrdem(itens, bloco),
+  Object.assign(alvo, campos, {
+    ordem: alvo.bloco === campos.bloco ? alvo.ordem : proximaOrdem(itens, campos.bloco),
     atualizadoPor: autor,
     atualizadoEm: new Date().toISOString()
   });

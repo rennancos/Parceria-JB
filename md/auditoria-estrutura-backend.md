@@ -229,6 +229,10 @@ acumular arquivo sem dono, e que a limpeza é manual na VM.
 
 ### 5 — O backend não tem nenhum teste
 
+> **Situação: corrigido.** `tests/unit/backend.test.cjs` cobre as quatro
+> funções desta seção. O texto abaixo é o achado como estava — ver
+> Recomendações futuras, item 3, para o que foi feito.
+
 ```text
 Arquivo:    servidor/ (inteiro)
 Severidade: Baixa (Média depois da correção do achado 1)
@@ -323,7 +327,7 @@ Não há banco, e essa decisão está correta para o volume (12 itens,
 
 | # | Item | Severidade | Situação |
 |---|---|---|---|
-| 1 | Travessia por `%2F` expõe `usuarios.json`, `.env`, `.git` | **Crítica** | Corrigida nesta auditoria — achado 1 |
+| 1 | Travessia por `%2F` expõe `usuarios.json`, `.env`, `.git` | **Crítica** | Corrigida — e o estático virou lista de permitidos; ver Recomendações futuras, item 4 |
 | 2 | Troca de senha não encerra sessões | Média | Corrigida — ver Recomendações futuras, item 2 |
 | 3 | Hash da atualização pelo mesmo canal HTTP | Média | Inerte (`ORIGEM` vazio) — achado 3 |
 | 4 | Cookie sem `Secure` | Baixa | Consciente: a VM serve HTTP interno; documentado em [auth.js:224-229](../servidor/auth.js#L224-L229). Acrescentar junto com HTTPS |
@@ -361,8 +365,9 @@ não resolveria nenhum dos cinco achados.
 
 ### P1 — antes de subir na VM
 
-4. Rever `.env` e `.git` no que estará servido na VM (a correção do P0 os
-   fecha; vale confirmar que a VM não guarda mais nada dentro da raiz).
+4. ~~Rever `.env` e `.git` no que estará servido na VM.~~ **Feito** — a lista
+   de permitidos resolve a classe inteira: o que a VM guardar na raiz e não
+   estiver na lista não é servido.
 5. HTTPS, ou assinatura do instalador, antes de preencher `ORIGEM` no
    verificador de atualização (achado 3).
 
@@ -370,8 +375,8 @@ não resolveria nenhum dos cinco achados.
 
 6. ~~Testes das quatro funções de fronteira.~~ **Feito** — `tests/unit/backend.test.cjs`;
    ver Recomendações futuras, item 3.
-7. Uma linha em `09-edicao-pela-pagina.md` sobre arquivo órfão em `docs/`
-   (achado 4).
+7. ~~Uma linha em `09-edicao-pela-pagina.md` sobre arquivo órfão em `docs/`~~
+   (achado 4). **Já existia** — ver a seção de regras do servidor lá.
 
 ### P3 — opcional
 
@@ -653,6 +658,29 @@ não dependerem de memória. As mesmas quatro aparecem resumidas em
    pede senha por `readline`, sem modo não interativo).
 
 4. **Revisar a proteção de arquivos e as atualizações** (achados 1, 3 e 4).
-   Reler a lista de pastas bloqueadas do estático agora que a travessia está
-   fechada, decidir HTTPS ou assinatura antes de preencher `ORIGEM` no
-   verificador de atualização, e resolver o arquivo órfão em `docs/`.
+   **Parcialmente feito.**
+
+   - ~~Reler a lista do estático.~~ **Feito, e ela mudou de sinal.** Era lista
+     de bloqueio (`BLOQUEADOS`), e por isso errava para o lado perigoso: pasta
+     nova nascia servida. Sem ninguém decidir, o portal já entregava `md/`
+     (as auditorias e o que elas descrevem), `app/`, `tests/`, `ferramentas/`,
+     `publicacao/` e `dist/` — o instalador de 90 MB. Virou lista de
+     permitidos: `index.html` mais `css`, `js`, `Fotos`, `docs` e `download`.
+     Pasta nova nasce fechada.
+   - **Efeito colateral pego na revisão:** o exemplo de `ORIGEM_PADRAO` em
+     `app/atualizacao.js` apontava para `http://portal-pajb/app/`, que
+     contradiz [10-aplicativo-windows.md](10-aplicativo-windows.md) ("não use
+     `app/` para isso") e agora nem é servido. Corrigido para `download/`,
+     nos dois lugares.
+   - ~~Arquivo órfão em `docs/`.~~ **Já estava documentado** em
+     [09-edicao-pela-pagina.md](09-edicao-pela-pagina.md): excluir apaga a
+     linha do acervo, nunca o arquivo, e a limpeza é manual na VM.
+   - **Segue aberto:** preencher `ORIGEM`. Depende de decidir **HTTPS ou
+     assinatura de código** (achado 3) — é decisão de quem toca a
+     infraestrutura, não do código. Enquanto `ORIGEM` estiver vazio, o
+     verificador não vai à rede e o risco é inerte.
+
+   **Nota sobre `docs/`:** continua servido, e é o desenho certo — é de lá que
+   saem os DOC/PDF do portal. `docs/email equipe.txt` mora lá e é baixável por
+   quem souber o nome, mas não acrescenta exposição: os mesmos endereços já
+   vão no `js/equipe-dados.js`, que o navegador de todo mundo baixa.

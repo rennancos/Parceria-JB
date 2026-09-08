@@ -1,5 +1,7 @@
 # Parceria JB — Portal
 
+Para alterar o código, consulte o [Guia de Manutenção](docs/manutencao.md): arquitetura, contratos, dependências, riscos e validações.
+
 Portal interno da Parceria JB: ponto único de entrada para primeiros passos, documentação, manuais, acessos e SharePoint da operação.
 
 Sem build e sem framework — HTML, CSS e JavaScript em arquivos separados, lidos direto pelo navegador. A página abre até por duplo clique em `index.html`.

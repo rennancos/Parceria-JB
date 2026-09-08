@@ -8,7 +8,7 @@
 
    Este script resolve isso de uma vez e é repetível:
 
-       Fotos/EQUIPE/originais/<nome>.<ext>   ← masters, versionados, nunca servidos
+       Fotos/EQUIPE/originais/<nome>.<ext>   ← masters, não usados pelos cards
        Fotos/EQUIPE/<nome>.webp             ← o que o site carrega
 
    Rode depois de acrescentar qualquer foto nova:
@@ -65,6 +65,9 @@ function exigirFfmpeg(){
    para originais/ antes de converter, para que a pasta servida passe a conter
    só os .webp. Idempotente — na segunda execução não há o que mover. */
 function migrarMasters(){
+  // ATENÇÃO: move também .webp quando não existe destino de mesmo nome em
+  // originais/. Não é uma verificação de hash ou de qualidade do master.
+  // Revisar os arquivos de origem antes de executar sobre uma coleção nova.
   if (!fs.existsSync(DIR_SERVIDO)) erro(`Pasta não encontrada: ${DIR_SERVIDO}`);
   fs.mkdirSync(DIR_ORIGINAIS, { recursive: true });
 

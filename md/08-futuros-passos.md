@@ -133,6 +133,17 @@ Na primeira visita o portal sempre abre claro, mesmo para quem usa o Windows em 
 
 Itens que não aparecem para o usuário, mas evitam retrabalho.
 
+### Backend e empacotamento — quatro itens da auditoria
+
+**Registrados, sem implementação.** Detalhe e linha de código em [auditoria-estrutura-backend.md](auditoria-estrutura-backend.md#recomendações-futuras); o resumo em uma linha está em [07-pendencias.md](07-pendencias.md).
+
+1. ~~**Corrigir o lançamento do build.**~~ **Feito** — `app/empacotar.js` chama o CLI pelo `process.execPath`, sem shell; `npm run app:build` volta a gerar instalador.
+2. ~~**Revogar sessões entre processos.**~~ **Feito** — `sessaoDe` compara o salt do disco com o do login, então trocar a senha ou remover o usuário pela CLI derruba a sessão na requisição seguinte.
+3. ~~**Ampliar os testes reais do backend.**~~ **Feito** — `tests/unit/backend.test.cjs`, 7 cenários contra uma raiz falsa em `%TEMP%`. Fica de fora o upload/edição/exclusão pela API e a CLI `usuarios.js`.
+4. **Revisar proteção de arquivos e atualizações.** Estático, `ORIGEM` do verificador e arquivo órfão em `docs/`. Casa com a subida da VM (seção 2), não com a sustentação do dia a dia.
+
+**Restou o 4**, que anda junto da subida da VM (seção 2) porque depende de decidir HTTPS ou assinatura.
+
 ### Um `pnpm check`
 
 Duas fragilidades conhecidas não dão erro no console quando quebram:

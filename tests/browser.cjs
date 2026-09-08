@@ -7,8 +7,12 @@ const { pathToFileURL } = require('node:url');
 const { navegador } = require('./helpers/navegador.cjs');
 const { raiz, adiado } = require('./helpers/portal.cjs');
 
+// A API abaixo é simulada: esta suíte cobre consumidores e concorrência no
+// frontend, mas não valida auth.js, persistência real nem autorização HTTP.
+// Mudança em servidor/ exige validação específica além deste teste.
 test('portal no navegador real, com API simulada e dados descartáveis', { timeout: 120000 }, async t => {
   let modo = 'normal', autenticado = true, upload = null;
+  let exclusao = null, pedidosExclusao = 0;
   const gravacoes = [], itens = [];
   const blocos = ['processos-politicas', 'padroes-modelos', 'manuais'].map(chave => ({ chave, rotulo: chave }));
   const servidor = http.createServer(async (req, res) => {
@@ -30,10 +34,24 @@ test('portal no navegador real, com API simulada e dados descartáveis', { timeo
           if (modo === 'falha-upload'){ json(500, { erro: 'Upload recusado no teste.' }); return; }
           json(201, { href: 'docs/teste.pdf' }); return;
         }
+        const id = decodeURIComponent(url.pathname.split('/')[3] || '');
+        const indice = itens.findIndex(item => item.id === id);
+        if (req.method === 'DELETE'){
+          pedidosExclusao++;
+          if (exclusao) await exclusao.promise;
+          if (modo === 'falha-exclusao'){ json(500, { erro: 'Exclusão recusada no teste.' }); return; }
+          if (indice < 0){ json(404, { erro: 'Documento não encontrado.' }); return; }
+          itens.splice(indice, 1); json(200, { ok: true }); return;
+        }
         const pedacos = [];
         for await (const parte of req) pedacos.push(parte);
         const corpo = JSON.parse(Buffer.concat(pedacos).toString());
         gravacoes.push(corpo);
+        if (req.method === 'PUT'){
+          if (indice < 0){ json(404, { erro: 'Documento não encontrado.' }); return; }
+          itens[indice] = { ...itens[indice], ...corpo };
+          json(200, { item: itens[indice] }); return;
+        }
         const item = { ...corpo, id: String(gravacoes.length), ordem: gravacoes.length };
         itens.push(item); json(201, { item }); return;
       }
@@ -142,6 +160,57 @@ test('portal no navegador real, com API simulada e dados descartáveis', { timeo
     await esperar("document.querySelector('.busca-lista').textContent.includes('Encontravel')");
     assert.equal(await avaliar("document.querySelector('.busca-janela').open"), true);
     await click('.busca-fechar');
+  });
+
+  await t.test('edição preserva o arquivo existente e não duplica o documento', async () => {
+    const antes = itens.length, original = { ...itens[0] };
+    await click('li[data-item-id] .ed-neutro');
+    await titulo('Documento revisado'); await submeter();
+    await esperar("!document.querySelector('.ed-janela[open]')");
+    assert.equal(itens.length, antes);
+    assert.equal(itens[0].id, original.id);
+    assert.equal(itens[0].href, original.href);
+    assert.equal(itens[0].titulo, 'Documento revisado');
+    assert.ok(await avaliar("document.querySelector('.link-list').textContent.includes('Documento revisado')"));
+  });
+
+  await t.test('exclusão pendente bloqueia repetição mesmo após redesenho e permite retry após erro', async () => {
+    const antes = itens.length, pedidosAntes = pedidosExclusao;
+    await avaliar("window.confirm = () => true; window.alert = mensagem => { window.ultimoAlerta = mensagem; }");
+    exclusao = adiado(); modo = 'falha-exclusao';
+    await click('li[data-item-id] .ed-perigo');
+    await avaliar("window.redesenharPagina()");
+    assert.equal(await avaliar("document.querySelector('li[data-item-id] .ed-perigo').disabled"), true);
+    await click('li[data-item-id] .ed-perigo');
+    exclusao.resolve(); exclusao = null;
+    await esperar("window.ultimoAlerta === 'Exclusão recusada no teste.'");
+    assert.equal(pedidosExclusao, pedidosAntes + 1);
+    assert.equal(itens.length, antes);
+    assert.equal(await avaliar("document.querySelector('li[data-item-id] .ed-perigo').disabled"), false);
+    modo = 'normal'; await click('li[data-item-id] .ed-perigo');
+    await esperar(`document.querySelectorAll('li[data-item-id]').length === ${antes - 1}`);
+    assert.equal(itens.length, antes - 1);
+    assert.equal(pedidosExclusao, pedidosAntes + 2);
+    assert.equal(await avaliar("document.querySelector('.link-list').textContent.includes('Documento revisado')"), false);
+  });
+
+  await t.test('mailto sem cliente de e-mail avisa; com cliente assumindo, cala', async () => {
+    const alvo = '.team-card a[href^="mailto:"]';
+    modo = 'normal'; await browser.navegar(origem);
+    await esperar(`document.querySelectorAll('${alvo}').length > 0`);
+    const email = await avaliar(`document.querySelector('${alvo}').dataset.email`);
+
+    // Ninguém assume o mailto: a aba fica com foco e o aviso aparece.
+    await click(alvo);
+    await esperar("!!document.querySelector('.team-aviso')");
+    assert.ok((await avaliar("document.querySelector('.team-aviso').textContent")).includes(email));
+    await avaliar("document.querySelector('.team-aviso').remove()");
+
+    // Um cliente assumiu: a aba perde o foco e nada é dito.
+    await click(alvo);
+    await avaliar("window.dispatchEvent(new Event('blur'))");
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    assert.equal(await avaliar("!!document.querySelector('.team-aviso')"), false);
   });
 
   await t.test('layout responsivo e comparação de estilos com a referência opcional', async () => {

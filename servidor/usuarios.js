@@ -37,6 +37,9 @@ function perguntar(rl, pergunta, { secreto = false } = {}){
 }
 
 function abrirTerminal(){
+  // WORKAROUND: _writeToOutput é API privada do readline. Ao mudar a versão
+  // de Node, verificar ocultação da senha em terminal real; testes HTTP não
+  // exercitam este caminho. Não registrar respostas para depuração.
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout, terminal: true });
   const escrever = rl._writeToOutput.bind(rl);
   rl._writeToOutput = (texto) => {

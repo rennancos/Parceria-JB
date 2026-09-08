@@ -8,7 +8,8 @@
    index.html               →  chave ""              →  home
 
    Precisa carregar DEPOIS de paginas.js e dos arquivos de js/paginas/ — é o
-   último a rodar porque depende de tudo já estar registrado.
+   responsável pela primeira renderização depois de todos os registros.
+   Busca e edição carregam em seguida, conforme index.html.
 
    Por que hash e não History API: o site é aberto direto do disco (file://) e
    também não tem servidor para responder a /documentacao. Com hash, o link é

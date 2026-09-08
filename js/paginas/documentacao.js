@@ -5,9 +5,11 @@
    "como se faz" e quem procura "qual é a regra" chega pelo mesmo lugar.
 
    Os três blocos `tipo: 'links'` têm uma `chave`. Ela existe para a edição pela
-   própria página (servidor/ — em construção, ver md/09-edicao-pela-pagina.md):
-   é o que vai ligar um item ao bloco onde ele aparece. Enquanto isso não estiver
-   ligado, os itens são editados aqui mesmo, à mão.
+   própria página: servidor/dados.js valida o mesmo conjunto em BLOCOS, e
+   js/documentos/acervo.js associa documento.bloco a esta chave. Alterar a chave
+   exige revisar também os registros persistidos, ou eles deixam de aparecer.
+   Os itens daqui são a semente para file:// e HTTP sem API. Quando a API
+   responde, suas listas substituem a semente, inclusive quando estão vazias.
 
    Formato de um item de lista:
 

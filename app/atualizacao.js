@@ -104,6 +104,9 @@ function versaoAtual(){
 /* `net` do Electron, não o `https` do Node: ele passa pela pilha do Chromium e
    com isso herda o proxy configurado no Windows. Numa rede corporativa é a
    diferença entre funcionar e dar timeout sem explicação. */
+// ATENÇÃO: o timer termina quando net.fetch retorna a resposta; não cobre a
+// leitura posterior de res.text()/body. Revisar esse limite ao tratar servidor
+// que entrega cabeçalhos e mantém o corpo parado (teste atual não simula isso).
 async function buscar(url, limiteMs){
   const controle = new AbortController();
   const relogio = setTimeout(() => controle.abort(), limiteMs);
@@ -265,7 +268,9 @@ async function baixar(info, aoProgresso){
   const destino = path.join(PASTA_TEMP, `Parceria-JB-${info.versao}.exe`);
   const parcial = `${destino}.parcial`;
 
-  // Um instalador já conferido de download anterior: não baixa de novo.
+  // CONTRATO: cache nomeado apenas pela versão. Este atalho não recalcula o
+  // hash do arquivo existente; não republicar bytes diferentes com a mesma
+  // versão. Revisar também manifesto.js e a política de cache se isso mudar.
   if (fs.existsSync(destino)) return destino;
 
   try { fs.rmSync(parcial, { force: true }); } catch (e) { /* segue */ }

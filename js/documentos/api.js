@@ -2,6 +2,15 @@
 (function(){
   'use strict';
 
+  /**
+   * Transporte na mesma origem de servidor/servidor.js; retorna o objeto JSON.
+   * CONTRATO: erros HTTP usam {erro: string} e são lançados com erro.status.
+   * Um 401 invalida a interface via documentos.js mesmo no login; 403 apenas
+   * recusa a ação. Não converter ambos em logout (tests/unit/documentos.test.cjs).
+   * @param {string} caminho Rota sem o prefixo /api.
+   * @param {RequestInit} [opcoes]
+   * @returns {Promise<object>}
+   */
   async function pedir(caminho, opcoes){
     const res = await fetch('/api' + caminho, { credentials: 'same-origin', ...opcoes });
     if (res.status === 401){

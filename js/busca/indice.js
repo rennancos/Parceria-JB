@@ -22,7 +22,7 @@
 
   /* Cada tipo de bloco guarda o texto em campos diferentes. Um lugar só decide
      como cada um vira entrada — acrescentar um tipo de bloco em paginas.js
-     significa acrescentar uma linha aqui, e nada mais. Tipo desconhecido é
+     exige revisar este mapa e ROTULOS em js/busca.js. Tipo desconhecido é
      ignorado em silêncio: a busca perde aquele conteúdo, mas não quebra. */
   const ITEM_POR_TIPO = {
     paineis:     (i) => ({ titulo: i.titulo, subtitulo: i.texto, corpo: i.meta, href: i.href }),

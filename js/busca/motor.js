@@ -84,6 +84,14 @@
 
      Grifa no texto ORIGINAL (com acento e maiúscula) os trechos que casaram no
      texto normalizado, voltando pelo mapa de índices. */
+  /**
+   * Retorna HTML com apenas as marcas geradas aqui; escapa todo texto recebido.
+   * SEGURANÇA: busca.js insere o resultado via innerHTML. Não substituir os
+   * escapes por interpolação direta, inclusive no ramo sem correspondência.
+   * @param {string} texto Texto original, preservando acentos.
+   * @param {string[]} termos Termos não vazios produzidos por termosDe.
+   * @returns {string} Fragmento HTML; não altera DOM nem o índice.
+   */
   function destacar(texto, termos){
     const original = String(texto ?? '');
     if (!original) return '';

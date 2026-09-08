@@ -15,7 +15,8 @@
    caracteres bateram.
 
    Sessões vivem em memória: reiniciar o serviço desloga todo mundo, e é só
-   entrar de novo. Persistir sessão em disco traria mais problema (token válido
+   entrar de novo. Trocar a senha ou remover o usuário também desloga, mesmo
+   partindo da CLI em outro processo — ver sessaoDe. Persistir sessão em disco traria mais problema (token válido
    depois de o serviço voltar dias depois) do que benefício num portal interno. */
 'use strict';
 
@@ -26,6 +27,8 @@ const crypto = require('crypto');
 const ARQUIVO = path.join(__dirname, 'dados', 'usuarios.json');
 
 const PAPEIS = ['equipe', 'dev'];
+// DEPENDÊNCIA: revisar as listas de tratarApi em servidor.js, validarSessao
+// em js/documentos/api.js e as ações de js/documentos.js ao criar um papel.
 const COOKIE = 'pajb_sessao';
 const DURACAO_SESSAO = 12 * 60 * 60 * 1000;   // 12 h: um dia de trabalho
 
@@ -108,6 +111,8 @@ function criarUsuario({ login, nome, papel, senha }){
   return { login: usuario.login, nome: usuario.nome, papel: usuario.papel };
 }
 
+// Regravar o salt é o que revoga as sessões abertas, inclusive as de outro
+// processo: sessaoDe compara o salt do disco com o guardado no login.
 function trocarSenha(login, senha){
   const usuarios = lerUsuarios();
   const usuario = usuarios.find((u) => u.login === normalizarLogin(login));
@@ -120,6 +125,9 @@ function trocarSenha(login, senha){
 }
 
 function removerUsuario(login){
+  // encerrarSessoesDe limpa o Map deste processo; o servidor HTTP, que roda
+  // separado da CLI, derruba a sessão na requisição seguinte porque o usuário
+  // deixou de existir no arquivo (ver sessaoDe).
   const usuarios = lerUsuarios();
   const restantes = usuarios.filter((u) => u.login !== normalizarLogin(login));
   if (restantes.length === usuarios.length) throw new ErroDeUso('Usuário não encontrado.', 404);
@@ -133,7 +141,7 @@ function listarUsuarios(){
 
 /* ---------- Sessões ---------- */
 
-const sessoes = new Map();      // token -> { login, nome, papel, expiraEm }
+const sessoes = new Map();      // token -> { login, nome, papel, credencial, expiraEm }
 const tentativas = new Map();   // login -> { erros, bloqueadoAte }
 
 function limparVencidas(){
@@ -179,6 +187,9 @@ function entrar(login, senha){
     login: usuario.login,
     nome: usuario.nome,
     papel: usuario.papel,
+    // Marca da credencial no momento do login (ver sessaoDe). Fica só em
+    // memória: servidor.js escolhe campo a campo o que vai para o cliente.
+    credencial: usuario.salt,
     expiraEm: Date.now() + DURACAO_SESSAO
   });
 
@@ -197,6 +208,18 @@ function sessaoDe(token){
   if (!sessao) return null;
 
   if (sessao.expiraEm <= Date.now()){
+    sessoes.delete(token);
+    return null;
+  }
+
+  /* A CLI usuarios.js roda em outro processo, então trocar a senha ou remover
+     o usuário por lá não alcança o Map deste servidor. O salt é regravado nas
+     duas operações: comparar com o disco revoga a sessão na requisição
+     seguinte, sem reiniciar o serviço e sem persistir sessão nenhuma. Custa
+     uma leitura de poucos KB por requisição autenticada — a mesma ordem de
+     grandeza do listar() do acervo. */
+  const usuario = lerUsuarios().find((u) => u.login === sessao.login);
+  if (!usuario || usuario.salt !== sessao.credencial){
     sessoes.delete(token);
     return null;
   }
@@ -221,10 +244,11 @@ function lerCookie(cabecalho){
   return '';
 }
 
-/* HttpOnly: o token não é legível por JavaScript, então um script injetado numa
-   página não consegue roubá-lo. SameSite=Strict: o navegador não manda o cookie
-   em requisição vinda de outro site, o que já cobre CSRF aqui — a API não
-   aceita formulário cross-site nem tem CORS liberado.
+/* SEGURANÇA: HttpOnly impede leitura do cookie por JavaScript, mas não impede
+   um script injetado de fazer requisições autenticadas. SameSite=Strict limita
+   o envio cross-site; não há token CSRF nem verificação de Origin na API.
+   Ausência de CORS não equivale a bloquear toda escrita cross-origin. Revisar
+   essas fronteiras ao mudar hospedagem, subdomínios ou atributos do cookie.
    Sem `Secure` de propósito: a VM serve em HTTP na rede interna, e `Secure`
    faria o navegador descartar o cookie. Se um dia entrar HTTPS, acrescente. */
 function cookieDeSessao(token){

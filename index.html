@@ -209,6 +209,10 @@
   </footer>
 </div>
 
+<!-- ORDEM IMPORTANTE: html.js inicializa Portal; paginas-modelo fornece o
+     contrato usado por renderização, busca e acervo. equipe-dados antecede
+     equipe.js e busca/indice.js. Não adicionar async: há dependências entre
+     esses scripts clássicos, também carregados por file:// no Electron. -->
 <script src="js/compartilhado/html.js"></script>
 <script src="js/compartilhado/paginas-modelo.js"></script>
 <script src="js/equipe-dados.js"></script>

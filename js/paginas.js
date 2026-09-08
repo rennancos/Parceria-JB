@@ -43,10 +43,13 @@
                           Grade de blocos. Com `href` vira card clicável; sem,
                           fica estático. `meta` é o chip cinza no rodapé.
 
-     tipo: 'passos'       itens: { titulo, texto, destaque? }
+     tipo: 'passos'       itens: { titulo, texto, destaque?, href? }
                           Lista numerada — a numeração é do CSS, não digite "1.".
                           `destaque` desenha a faixa azul dentro do passo, para
                           caminho de menu, nome de categoria e afins.
+                          Com `href`, a faixa vira link: o `destaque` quando ele
+                          existe, senão o próprio `texto`. Hash abre na página,
+                          o resto abre em outra aba.
 
      tipo: 'links'        itens: { titulo, descricao?, href?, formato?, icone? }
                           Lista de links com ícone à esquerda e seta à direita.
@@ -135,23 +138,32 @@ window.PAGINAS = {};
   }
 
   /* `href` num passo precisa virar link em algum lugar visível, e o lugar
-     depende de haver `destaque`:
+     depende do que o passo tem:
 
        com destaque  — o destaque vira o link, porque é ele que nomeia o
                        destino ("Finanças… > Acessos a Áreas e Ambientes");
-       sem destaque  — quem vira link é o próprio título.
+       sem destaque  — quem vira link é o texto ("Entre no KB."), que é a ação
+                       do passo; o título apenas nomeia o passo. O texto vira
+                       a mesma faixa do destaque, para os dois casos lerem
+                       igual na página.
 
-     A segunda regra existe porque a alternativa (repetir o título dentro de um
-     destaque criado na hora) desenha o mesmo texto duas vezes seguidas na
-     tela. E ignorar o `href` quando não há destaque seria pior: some sem erro
-     nenhum, que foi exatamente como este campo se comportava antes. */
+     Sem texto nenhum o título assume o link, porque ignorar o `href` seria
+     pior: some sem erro nenhum, que foi exatamente como este campo se
+     comportava antes. */
   function passo(item){
     const comLink = (conteudo, classe) =>
       `<a class="${classe}" href="${esc(item.href)}"${alvoDe(item.href)}>${conteudo}${ICONE_SETA}</a>`;
 
-    const titulo = item.href && !item.destaque
+    const linkSolto = item.href && !item.destaque;
+
+    const titulo = linkSolto && !item.texto
       ? comLink(`<span>${esc(item.titulo)}</span>`, 'step-link')
       : esc(item.titulo);
+
+    const texto = !item.texto ? ''
+      : linkSolto
+        ? comLink(`<span>${esc(item.texto)}</span>`, 'callout')
+        : `<p>${esc(item.texto)}</p>`;
 
     const destaque = !item.destaque ? ''
       : item.href
@@ -161,7 +173,7 @@ window.PAGINAS = {};
     return `
       <li>
         <h3>${titulo}</h3>
-        ${item.texto ? `<p>${esc(item.texto)}</p>` : ''}
+        ${texto}
         ${destaque}
       </li>`;
   }
@@ -232,9 +244,11 @@ window.PAGINAS = {};
     return FORMATOS[extensao] || null;
   }
 
-  /* `data-item-id` só aparece quando o item veio do servidor (js/documentos.js
+  /* CONTRATO: `data-item-id` só aparece quando o item veio do servidor (js/documentos.js
      substitui os itens do bloco pelos do acervo). É o gancho onde os botões de
-     editar/excluir se penduram; item de semente, sem id, sai como sempre saiu. */
+     editar/excluir se penduram; item de semente, sem id, sai como sempre saiu.
+     Preservar o atributo no li e data-bloco na ul: documentos.js procura essa
+     combinação para decorar e bloquear exclusões durante o redesenho. */
   function link(item){
     const formato = formatoDe(item);
     const marca = item.id ? ` data-item-id="${esc(item.id)}"` : '';

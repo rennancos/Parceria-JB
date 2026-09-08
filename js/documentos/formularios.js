@@ -69,6 +69,9 @@
         `<option value="${esc(bloco.chave)}">${esc(bloco.rotulo)}</option>`).join('');
     }
 
+    // DEPENDÊNCIA: os name dos campos são lidos por tela.campo e formam o
+    // Rascunho de acervo.js. maxlength espelha LIMITES de servidor/dados.js;
+    // novalidate no diálogo não dispensa a validação obrigatória do servidor.
     function abrirItem(id, chavePadrao){
       const item = id ? acervo.itemPorId(id) : null;
       if (id && !item) return;

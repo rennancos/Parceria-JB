@@ -32,6 +32,8 @@ Verificações realizadas:
 
 As verificações de navegador usam um servidor de teste com dados fictícios em memória. Não gravam documentos nem usuários reais. Uma captura da página também foi inspecionada durante a revisão.
 
+Após a comparação histórica, ocorreram alterações paralelas no projeto, incluindo estilos de quebra de texto em `pagina.css`. Os 16 testes de lógica e os oito cenários de navegador foram executados novamente sobre esse estado mais recente e passaram. Nessa última rodada foi verificado o layout responsivo, sem exigir igualdade com o CSS antigo. As afirmações de igualdade de HTML e estilos acima se referem à versão da refatoração comparada, antes dessas alterações posteriores.
+
 **Limitações:** não foram executados testes em todos os navegadores, uma auditoria completa de acessibilidade, testes contra o backend real ou o empacotamento Electron. A comparação de estilos não é uma comparação pixel a pixel de todas as telas.
 
 ## 2. Estrutura atual
@@ -214,6 +216,14 @@ Decisões mantidas deliberadamente:
 Essas decisões não representam pendências de correção.
 
 ### Como repetir a validação
+
+### Complemento de melhorias e testes — 07/09/2026
+
+- **Arquivo:** `js/documentos.js`. **Problema:** a exclusão não controlava requisições pendentes por documento. **Impacto:** cliques repetidos podiam enviar exclusões concorrentes e apresentar erros após uma exclusão já confirmada. **Severidade:** média. **Status:** corrigido com estado local por ID, botões desabilitados durante a operação e liberação em `finally`, inclusive após redesenho ou erro. Não foi necessária divisão de arquivos.
+- `tests/browser.cjs` agora simula PUT e DELETE e verifica edição sem duplicação, preservação do arquivo existente, bloqueio de exclusões repetidas após redesenho, manutenção do item após erro e nova tentativa bem-sucedida.
+- Validação desta rodada: **16 testes de lógica e 10 cenários de navegador aprovados**, com API simulada e dados descartáveis. O executor de navegador contabiliza 11 testes ao incluir o teste pai. A checagem responsiva passou em 360, 900 e 1280 px; a comparação histórica de CSS não foi executada nesta rodada.
+
+### Comandos
 
 ```bash
 npm test

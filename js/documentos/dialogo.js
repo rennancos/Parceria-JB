@@ -7,6 +7,17 @@
   function criar(){
     let atual = null;
 
+    /**
+     * Cria uma instância isolada do formulário e fecha a anterior.
+     * CONTRATO: enviar(tela) deve consultar campos desta tela, nunca do diálogo
+     * global. A resposta antiga pode atualizar o acervo, mas só pode fechar ou
+     * mostrar erro em sua própria instância (tests/browser.cjs).
+     * @param {string} titulo
+     * @param {string} rotulo Vazio oculta a submissão.
+     * @param {string} html Template local; valores externos precisam de escape.
+     * @param {function|null} enviar Callback assíncrono; rejeições viram alerta.
+     * @returns {object} Controle da instância com campos, fechar e ativa.
+     */
     function abrir(titulo, rotulo, html, enviar){
       if (atual) atual.fechar();
       const janela = document.createElement('dialog');

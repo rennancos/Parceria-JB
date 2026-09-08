@@ -151,6 +151,14 @@ class Sessao {
     await s.#conectar(pagina.webSocketDebuggerUrl);
     await s.cmd('Page.enable');
     await s.cmd('Runtime.enable');
+
+    /* Sem isto o headless reporta `document.hasFocus() === false` o tempo
+       todo, e qualquer código que dependa de foco — :focus-visible, autofocus,
+       ou uma lógica que pergunta se a aba perdeu o foco — se comporta ao
+       contrário do que um usuário real veria. É o mesmo padrão que o
+       Playwright aplica por padrão. */
+    await s.cmd('Emulation.setFocusEmulationEnabled', { enabled: true }).catch(() => {});
+
     return s;
   }
 

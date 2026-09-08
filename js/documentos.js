@@ -6,7 +6,14 @@
   const api = window.Portal.documentosApi;
   const acervo = window.Portal.documentosAcervo.criar(api, window.PAGINAS);
   const estado = { disponivel: false, sessao: { autenticado: false } };
+  // CONTRATO: o bloqueio acompanha o id, não o botão. pagina:render recria o
+  // DOM durante a requisição; guardar o estado no elemento permitiria DELETE
+  // duplicado. Cobertura: tests/browser.cjs (exclusão após redesenho).
+  const exclusoesPendentes = new Set();
   function redesenhar(){
+    // ORDEM IMPORTANTE: a projeção do acervo já deve estar em PAGINAS.
+    // O router emite pagina:render para decorar; acervo:alterado faz busca.js
+    // reconstruir os resultados de uma busca que esteja aberta.
     window.redesenharPagina();
     document.dispatchEvent(new CustomEvent('acervo:alterado'));
   }
@@ -64,6 +71,7 @@
 
         if (podeExcluir){
           const excluir = botao('ed-perigo', 'Excluir', ICONE_LIXO);
+          excluir.disabled = exclusoesPendentes.has(id);
           excluir.addEventListener('click', () => excluirItem(id));
           acoes.appendChild(excluir);
         }
@@ -104,6 +112,7 @@
   }
 
   async function excluirItem(id){
+    if (exclusoesPendentes.has(id)) return;
     const item = acervo.itemPorId(id);
     if (!item) return;
 
@@ -111,12 +120,25 @@
       'O item sai da página. Um arquivo em docs/, se houver, continua no servidor.';
     if (!window.confirm(aviso)) return;
 
+    exclusoesPendentes.add(id);
+    atualizarBotoesExclusao(id, true);
     try {
       await acervo.excluir(id);
       redesenhar();
     } catch (erro) {
       window.alert(erro.message);
+    } finally {
+      exclusoesPendentes.delete(id);
+      atualizarBotoesExclusao(id, false);
     }
+  }
+
+  function atualizarBotoesExclusao(id, pendente){
+    document.querySelectorAll('li[data-item-id]').forEach(li => {
+      if (li.dataset.itemId !== id) return;
+      const excluir = li.querySelector('.ed-perigo');
+      if (excluir) excluir.disabled = pendente;
+    });
   }
 
   document.addEventListener('pagina:render', decorar);

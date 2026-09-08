@@ -324,7 +324,7 @@ Não há banco, e essa decisão está correta para o volume (12 itens,
 | # | Item | Severidade | Situação |
 |---|---|---|---|
 | 1 | Travessia por `%2F` expõe `usuarios.json`, `.env`, `.git` | **Crítica** | Corrigida nesta auditoria — achado 1 |
-| 2 | Troca de senha não encerra sessões | Média | Aberta — achado 2 |
+| 2 | Troca de senha não encerra sessões | Média | Corrigida — ver Recomendações futuras, item 2 |
 | 3 | Hash da atualização pelo mesmo canal HTTP | Média | Inerte (`ORIGEM` vazio) — achado 3 |
 | 4 | Cookie sem `Secure` | Baixa | Consciente: a VM serve HTTP interno; documentado em [auth.js:224-229](../servidor/auth.js#L224-L229). Acrescentar junto com HTTPS |
 | 5 | Sem limite de requisição fora do login | Baixa | Aceitável em rede interna. O freio de senha (5 tentativas / 5 min) cobre o que importa |
@@ -356,7 +356,8 @@ não resolveria nenhum dos cinco achados.
 2. **Trocar as senhas dos usuários existentes** — os hashes estiveram
    acessíveis a quem tem acesso ao portal, e a correção não desfaz o que já
    possa ter vazado. `node servidor/usuarios.js senha <login>`, para os dois.
-3. **Encerrar sessões ao trocar a senha** (achado 2). Uma linha em `auth.js`.
+3. ~~**Encerrar sessões ao trocar a senha**~~ (achado 2). **Feito** — não era
+   uma linha; ver Recomendações futuras, item 2.
 
 ### P1 — antes de subir na VM
 
@@ -367,9 +368,8 @@ não resolveria nenhum dos cinco achados.
 
 ### P2 — quando houver folga
 
-6. Testes das quatro funções de fronteira: `caminhoSeguro`, `validarHref`,
-   `nomeSeguro`, `exigir`. Com `node:test`, sem framework — a primeira asserção
-   é o `curl` do achado 1 virando teste.
+6. ~~Testes das quatro funções de fronteira.~~ **Feito** — `tests/unit/backend.test.cjs`;
+   ver Recomendações futuras, item 3.
 7. Uma linha em `09-edicao-pela-pagina.md` sobre arquivo órfão em `docs/`
    (achado 4).
 
@@ -611,3 +611,48 @@ TypeScript e o projeto não tem build.
 
 2. Os itens P0-2, P1 e P2 do plano acima continuam valendo — em especial
    **trocar as senhas** e **testar as funções de fronteira**.
+
+---
+
+## Recomendações futuras
+
+**Registradas, sem implementação.** Nenhuma delas foi aplicada; estão aqui para
+não dependerem de memória. As mesmas quatro aparecem resumidas em
+[07-pendencias.md](07-pendencias.md) e no roteiro de
+[08-futuros-passos.md](08-futuros-passos.md).
+
+1. ~~**Corrigir o lançamento do build.**~~ **Feito.** O `.bin/electron-builder.cmd`
+   exigia `shell: true` no Windows, e o cmd quebrava o caminho do workspace
+   (`DEV PAJB`, com espaço) antes do build começar. `app/empacotar.js` agora
+   chama `node_modules/electron-builder/cli.js` pelo próprio `process.execPath`,
+   sem shell — o `argv` vai inteiro. Verificado: `npm run app:build` gerou
+   `dist/Parceria-JB-Setup-1.1.0.exe` (90,3 MB).
+
+2. ~~**Revogar sessões entre processos**~~ (achado 2). **Feito.** Não era a
+   linha em `auth.js` que o P0-3 previa: as sessões são um `Map` em memória e
+   `usuarios.js senha` roda em outro processo, então `encerrarSessoesDe` limpa
+   o Map errado. O sinal que atravessa os dois já existia no arquivo — o
+   **salt**, regravado tanto por `trocarSenha` quanto (por remoção) pelo
+   sumiço do usuário. A sessão passou a guardar o salt do login
+   (`credencial`), e `sessaoDe` o compara com o disco a cada requisição
+   autenticada: senha trocada ou usuário removido derrubam a sessão na
+   requisição seguinte, sem reiniciar o serviço e sem persistir sessão. Custa
+   uma leitura de poucos KB por requisição — a mesma ordem do `listar()`.
+
+3. ~~**Ampliar os testes reais do backend**~~ (P2-6). **Feito** —
+   `tests/unit/backend.test.cjs`, 7 cenários, `node:test` sem framework. Roda
+   contra uma **raiz falsa em `%TEMP%`**: os quatro `.js` de `servidor/` são
+   copiados para lá, e é o `__dirname` deles que manda em `dados/`, `docs/` e
+   no estático — nenhum usuário ou documento real é tocado. Cobre a travessia
+   por `%2F` (achado 1) pelo HTTP de verdade, `nomeSeguro`, o `href` por lista
+   de permitidos, `exigir`, 401 sem sessão, 401 com senha errada e a revogação
+   do item 2 — esta última com um `node` de verdade em outro processo, que é a
+   única forma de provar que a fronteira foi atravessada.
+
+   **Não cobre:** upload, edição e exclusão pela API, e o `usuarios.js` (a CLI
+   pede senha por `readline`, sem modo não interativo).
+
+4. **Revisar a proteção de arquivos e as atualizações** (achados 1, 3 e 4).
+   Reler a lista de pastas bloqueadas do estático agora que a travessia está
+   fechada, decidir HTTPS ou assinatura antes de preencher `ORIGEM` no
+   verificador de atualização, e resolver o arquivo órfão em `docs/`.

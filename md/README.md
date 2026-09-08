@@ -1,5 +1,7 @@
 # Documentação — Parceria JB
 
+Comece pelo [Guia de Manutenção](../docs/manutencao.md) para localizar contratos entre módulos, limitações atuais e testes necessários antes de alterar o código.
+
 Índice desta pasta. É para cá que aponta o `[← Índice]` no topo de cada
 documento. Para subir o projeto e ver a estrutura de pastas, o ponto de
 partida é o [README da raiz](../README.md).

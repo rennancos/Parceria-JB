@@ -10,10 +10,10 @@
    e o backup é um `copy`. Banco entraria se isso virasse milhares de registros
    ou escrita concorrente de verdade — não é o caso.
 
-   IO síncrono de propósito: o Node é single-thread e cada gravação é de poucos
-   KB, então `writeFileSync` funciona como um lock natural — duas pessoas
-   salvando ao mesmo tempo entram em fila, e nenhuma leitura pega o arquivo pela
-   metade. Assíncrono aqui só traria condição de corrida sem ganho nenhum. */
+   IO síncrono serializa leitura/modificação/escrita dentro de um único processo.
+   Não é lock entre processos: cluster, duas instâncias ou edição externa podem
+   perder gravações e disputar o mesmo .tmp. Revisar persistência antes de
+   escalar o serviço ou converter estas operações para IO assíncrono. */
 'use strict';
 
 const fs = require('fs');
@@ -147,6 +147,16 @@ function incluir(dados, autor){
   return item;
 }
 
+/**
+ * Substitui campos editáveis após validar o payload completo (PUT, não PATCH).
+ * Preserva id e auditoria de criação; mover de bloco atribui ordem ao final
+ * do destino. Frontend depende do retorno completo para atualizar seu acervo.
+ * @param {string} id UUID persistido, usado também nas rotas e data-item-id.
+ * @param {object} dados Campos enviados por js/documentos/acervo.js.
+ * @param {string} autor Login da sessão, definido pelo servidor, não pelo body.
+ * @returns {object} Registro gravado com metadados de auditoria.
+ * @throws {ErroDeUso} Payload inválido ou id inexistente; erros de IO propagam.
+ */
 function editar(id, dados, autor){
   const itens = ler();
   const alvo = itens.find((item) => item.id === id);
@@ -205,9 +215,10 @@ function nomeSeguro(nomeOriginal){
   return `${apelido || 'documento'}.${extensao}`;
 }
 
-/* EXTENSOES e LIMITES são exportados sem consumidor hoje, de propósito: são o
+/* EXTENSOES e LIMITES são exportados para explicitar o
    contrato que o formulário de edição precisa espelhar (`accept` e `maxlength`
-   em js/documentos/), e hoje o front repete os valores à mão. O caminho para
+   em js/documentos/), e hoje o front repete os valores à mão. O teste
+   tests/unit/conteudo.test.cjs já compara EXTENSOES com ACEITOS. O caminho para
    acabar com essa duplicação é servi-los junto de BLOCOS em
    `GET /api/documentos`, como já é feito com os blocos — ver a seção
    "Simplificação da arquitetura do backend" em

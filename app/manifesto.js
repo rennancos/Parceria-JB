@@ -75,6 +75,9 @@ function acharInstalador(){
 /* ---------- Conferir se bate com o package.json ---------- */
 
 function versaoDoProjeto(){
+  // CONTRATO: mesmo formato numérico aceito por atualizacao.validarManifesto.
+  // Pré-releases semver exigem revisar ambos e comparar(); não basta mudar
+  // version em package.json. O nome do .exe sozinho não prova sua versão interna.
   const pacote = JSON.parse(fs.readFileSync(path.join(RAIZ, 'package.json'), 'utf8'));
   const versao = String(pacote.version || '');
   if (!/^\d+(\.\d+){0,3}$/.test(versao)){

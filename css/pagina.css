@@ -165,8 +165,8 @@ a.panel:focus-visible{
 .notes li::marker{ color: var(--accent); }
 
 /* Faixa de destaque dentro de um passo: caminho de menu, nome de categoria.
-   É um <p> dentro do .steps li, então a trava de largura vem do `.steps p`
-   acima — a faixa termina no mesmo x do texto do passo, em vez de atravessar
+   Pode ser parágrafo ou link; ambos recebem a mesma trava de largura nos
+   passos — a faixa termina no mesmo x do texto, em vez de atravessar
    o card inteiro com 400px de texto dentro. */
 .callout{
   margin: 12px 0 0;
@@ -214,10 +214,11 @@ a.callout .link-arrow{
   color: var(--ink-soft);
 }
 
-/* Passo com destino e SEM destaque: o link é o próprio título (ver `passo` em
-   js/paginas.js). `inline-flex` para a seta ficar colada no fim do texto, e
-   não empurrada para a borda do card como no destaque. */
-.steps h3 .step-link{
+/* Passo com destino e SEM destaque: o link é o texto do passo — ou o título,
+   quando o passo não tem texto (ver `passo` em js/paginas.js). `inline-flex`
+   para a seta ficar colada no fim do texto, e não empurrada para a borda do
+   card como no destaque. */
+.steps .step-link{
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -225,16 +226,16 @@ a.callout .link-arrow{
   text-decoration: none;
 }
 
-.steps h3 .step-link:hover{ color: var(--accent-1); }
-.steps h3 .step-link:hover .link-arrow{ color: var(--accent-1); }
+.steps .step-link:hover{ color: var(--accent-1); }
+.steps .step-link:hover .link-arrow{ color: var(--accent-1); }
 
-.steps h3 .step-link:focus-visible{
+.steps .step-link:focus-visible{
   outline: 2px solid var(--accent-1);
   outline-offset: 3px;
   border-radius: var(--radius-xs);
 }
 
-.steps h3 .step-link .link-arrow{
+.steps .step-link .link-arrow{
   width: 16px;
   height: 16px;
   flex: none;
@@ -356,7 +357,8 @@ a.callout .link-arrow{
    medida, descontado o recuo do número à esquerda. Sem isto o passo mostrava
    302px de texto numa faixa de 1010px. */
 .steps h3,
-.steps p{
+.steps p,
+.steps .callout{
   max-width: calc(var(--medida) - var(--recuo));
 }
 .steps h3{
@@ -364,7 +366,7 @@ a.callout .link-arrow{
   font-weight: 650;
   margin: 0 0 6px;
 }
-.steps p{
+.steps p:not(.callout){
   font-size: var(--fs-sm);
   line-height: 1.55;
   color: var(--ink-soft);
@@ -469,7 +471,8 @@ a.callout .link-arrow{
   .steps li::before{ left: 18px; top: 18px; }
 
   /* Em telas estreitas a coluna fixa do rótulo aperta demais o valor. */
-  .field-list > div{ grid-template-columns: 1fr; gap: 2px; }
+  .field-list{ grid-template-columns: 1fr; gap: 2px; }
+  .field-list > div + div > dt{ margin-top: 7px; }
 }
 
 @media (max-width: 600px){

@@ -299,3 +299,34 @@ a.team-link:focus-visible{
   .team-card:hover{ transform: none; }
   a.team-link:hover{ transform: none; }
 }
+
+/* Aviso de "não há cliente de e-mail" (ver o fim de js/equipe.js). Aparece
+   sozinho, some sozinho: é resposta a uma ação, não estado da página — por
+   isso flutua no rodapé em vez de empurrar o layout. */
+.team-aviso{
+  position: fixed;
+  left: 50%;
+  bottom: var(--sp-4);
+  z-index: 60;
+  transform: translateX(-50%);
+  max-width: min(520px, calc(100vw - 2 * var(--sp-3)));
+  margin: 0;
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink);
+  font-size: var(--fs-sm);
+  text-align: center;
+  box-shadow: var(--shadow-card-lg);
+  animation: team-aviso-entra 0.18s ease-out;
+}
+
+@keyframes team-aviso-entra{
+  from{ opacity: 0; transform: translate(-50%, 8px); }
+  to  { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .team-aviso{ animation: none; }
+}

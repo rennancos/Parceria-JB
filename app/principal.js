@@ -7,7 +7,7 @@
 
    O QUE ISSO PRESERVA, E O QUE NÃO
 
-   Preserva: home, páginas do menu, equipe, black mode, rodapé, navegação por
+   Preserva: home, páginas do menu, equipe, tema CSS, rodapé, navegação por
    hash — tudo. `js/documentos.js` desiste sozinho em `file://` (é a primeira
    linha dele), então o aplicativo mostra a semente dos `.js`, sem botões de
    edição. É o mesmo comportamento do duplo clique de hoje.
@@ -75,9 +75,8 @@ function criarJanela(){
      e ela ficaria para trás na primeira vez que a paleta mudasse. Então ela é
      perguntada à própria página.
 
-     Trocar o black mode com a janela aberta não a atualiza — só a próxima
-     abertura. É uma faixa de um quadro ao redimensionar; não vale um observador
-     de classe no preload para acertar. */
+     O tema atual é fixo em css/tokens.css. Se houver alternância em runtime
+     no futuro, revisar também esta sincronização, que roda em did-finish-load. */
   janela.webContents.on('did-finish-load', sincronizarFundo);
 
   /* Nenhum link abre DENTRO da janela. Endereço externo vai para o navegador
@@ -255,6 +254,9 @@ ipcMain.handle('atualizacao:pendente', () => disponivel);
    barra teria de desembrulhar a mensagem no grito para mostrar algo legível.
    Aqui a mensagem sai pronta — e erro inesperado vira uma frase em vez de um
    stack trace na tela de quem só queria atualizar. */
+// CONTRATO: canais e {ok, mensagem?} são consumidos por barra-atualizacao.js.
+// O renderer não escolhe caminho/URL: a instalação usa o manifesto guardado
+// no processo principal. Não aceitar destino arbitrário pelo payload do IPC.
 ipcMain.handle('atualizacao:instalar', async (evento) => {
   if (!disponivel) return { ok: false, mensagem: 'Não há atualização para instalar.' };
 

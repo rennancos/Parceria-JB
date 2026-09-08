@@ -13,7 +13,9 @@
 
   /** @param {Bloco & {blocos?: Bloco[]}} secao @returns {Bloco[]} */
   function blocosDaSecao(secao){
-    // Preserva a referência: a edição precisa atualizar a seção simplificada.
+    // DEPENDÊNCIA: paginas.js e busca/indice.js leem os mesmos objetos que
+    // documentos/acervo.js modifica. Clonar aqui faria a projeção da edição
+    // desaparecer ao renderizar a seção simplificada. Teste: conteudo.test.cjs.
     return Array.isArray(secao.blocos) ? secao.blocos : [secao];
   }
 

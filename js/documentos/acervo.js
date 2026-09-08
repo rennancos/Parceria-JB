@@ -4,6 +4,8 @@
 (function(){
   'use strict';
   const { blocosDaSecao } = window.Portal.paginasModelo;
+  // DEPENDÊNCIA: espelha EXTENSOES de servidor/dados.js. Ao ampliar formatos,
+  // revisar também ABRIVEIS em app/principal.js e chips em js/paginas.js.
   const ACEITOS = '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx';
 
   /** @typedef {{id: string, bloco: string, titulo: string, href: string,
@@ -51,7 +53,16 @@
       projetar(); // Inclui lista vazia: não recupera a semente após exclusão.
     }
 
-    /** @param {Rascunho} valores @param {Documento|null} item */
+    /**
+     * Envia o arquivo, se houver, e depois os metadados; projeta a confirmação
+     * em PAGINAS para router e busca. Não depende de um GET posterior.
+     * CONTRATO: upload retorna {href}; POST/PUT retorna {item} completo.
+     * As duas escritas não são transacionais: falha nos metadados pode deixar
+     * arquivo órfão ou uma substituição já aplicada em docs/.
+     * @param {Rascunho} valores Snapshot fornecido por formularios.js.
+     * @param {Documento|null} item Item anterior; null inclui um novo.
+     * @returns {Promise<Documento>} Confirmação validada; rejeita em erro da API.
+     */
     async function salvar(valores, item){
       // Snapshot antes do primeiro await: nem DOM nem objetos mutáveis externos
       // são consultados depois que o upload começou.

@@ -115,6 +115,9 @@ async function lerJson(req){
 /* ---------- API ---------- */
 
 async function tratarApi(req, res, url){
+  // ORDEM IMPORTANTE: operações de escrita exigem sessão antes de ler o corpo
+  // e persistir. dados.js valida mesmo com formulário validado: a API também
+  // recebe chamadas diretas. ErroDeUso mantém o contrato {erro} com status 4xx.
   const sessao = auth.sessaoDe(auth.lerCookie(req.headers.cookie));
   const rota = url.pathname;
   const metodo = req.method;
@@ -213,6 +216,9 @@ async function tratarApi(req, res, url){
 // o que barra `GET /../../.env` e amigos.
 // Nada aqui é secreto para quem acessa o portal, mas também não precisa ser
 // servido: dados do servidor, configuração e o histórico do git ficam de fora.
+// SEGURANÇA: isto é uma lista de bloqueio, não de arquivos públicos permitidos.
+// Pastas novas ficam servíveis por padrão, inclusive docs/manutencao.md.
+// .gitignore não restringe HTTP; revisar esta fronteira a cada nova pasta.
 const BLOQUEADOS = ['servidor', 'node_modules', '.git', '.env', '.claude'];
 
 function caminhoSeguro(pathname){

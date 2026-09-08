@@ -174,8 +174,9 @@
     marcarAtivo();
   }
 
-  /* Esc e Tab não aparecem aqui: o <dialog> modal já fecha no Esc e já prende
-     o foco entre o campo e o botão de fechar. */
+  /* Esc passa pelo listener da janela em construir(), para executar limpar().
+     Tab usa a contenção de foco do dialog modal; script.js ignora o drawer
+     enquanto houver dialog aberto para não disputar o teclado. */
   function aoTeclar(evento){
     switch (evento.key){
       case 'ArrowDown': evento.preventDefault(); mover(1); break;

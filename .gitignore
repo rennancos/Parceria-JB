@@ -23,10 +23,12 @@ servidor/dados/
 # `POST /api/arquivos` grava os DOC/PDF em docs/ (servidor/servidor.js). São
 # conteúdo de produção, pelo mesmo motivo de servidor/dados/: versionar faria
 # um `git pull` no deploy passar por cima do que a equipe subiu, e colocaria
-# documento interno no histórico do repositório. Só o LEIA-ME é código.
+# documento interno no histórico do repositório. Os dois guias abaixo são
+# documentação de código; os demais arquivos continuam sendo dados de produção.
 # Backup de docs/ é obrigatório junto com o de servidor/dados/.
 docs/*
 !docs/LEIA-ME.md
+!docs/manutencao.md
 
 # ---------- Sistema operacional ----------
 # desktop.ini e Thumbs.db são gerados pelo Windows/OneDrive nesta pasta.

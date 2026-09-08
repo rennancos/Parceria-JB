@@ -3,6 +3,9 @@ const path = require('node:path');
 const vm = require('node:vm');
 const raiz = path.resolve(__dirname, '../..');
 
+// CONTRATO DE TESTE: simula apenas o DOM necessário aos módulos puros, sem
+// layout, foco ou dialog real. Esses comportamentos pertencem a browser.cjs.
+// Manter a ordem dos scripts compatível com index.html ao ampliar a simulação.
 function ambiente(extras = {}){
   const eventos = new Map();
   const document = {

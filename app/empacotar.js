@@ -29,10 +29,17 @@ const { spawnSync } = require('child_process');
 const RAIZ = path.join(__dirname, '..');
 const DIST = path.join(RAIZ, 'dist');
 const OFICINA = path.join(os.tmpdir(), 'pajb-build');
+// ATENÇÃO: pasta fixa apagada antes do build. Não executar builds concorrentes
+// nem guardar trabalho manual nela. O override de output mantém a montagem
+// temporária; só os instaladores retornam a dist/ (electron-builder.yml).
 
-const builder = path.join(RAIZ, 'node_modules', '.bin', process.platform === 'win32' ? 'electron-builder.cmd' : 'electron-builder');
+/* O `.bin/electron-builder.cmd` só roda com `shell: true` no Windows, e aí o
+   caminho do workspace (`…\DEV PAJB\…`, com espaço) é quebrado pelo cmd antes
+   do build começar. O pacote traz o mesmo CLI como .js: chamado pelo próprio
+   node, sem shell, o argv vai inteiro e o espaço deixa de importar. */
+const cli = path.join(RAIZ, 'node_modules', 'electron-builder', 'cli.js');
 
-if (!fs.existsSync(builder)){
+if (!fs.existsSync(cli)){
   console.error('\n  Falta instalar as dependências. Rode `pnpm install` (ou `npm install`) primeiro.\n');
   process.exit(1);
 }
@@ -42,9 +49,9 @@ console.log(`\n  Montando em ${OFICINA}\n  (fora do OneDrive — ver o comentár
 fs.rmSync(OFICINA, { recursive: true, force: true });
 
 const resultado = spawnSync(
-  builder,
-  ['--win', `-c.directories.output=${OFICINA}`].concat(process.argv.slice(2)),
-  { cwd: RAIZ, stdio: 'inherit', shell: process.platform === 'win32' }
+  process.execPath,
+  [cli, '--win', `-c.directories.output=${OFICINA}`].concat(process.argv.slice(2)),
+  { cwd: RAIZ, stdio: 'inherit' }
 );
 
 if (resultado.status !== 0){

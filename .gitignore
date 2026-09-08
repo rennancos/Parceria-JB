@@ -94,3 +94,13 @@ download/
 # este arquivo — o site tira o e-mail do array em js/equipe.js. É material de
 # apoio, e material de apoio com dado pessoal não precisa de histórico.
 docs/email equipe.txt
+
+# ---------- Documentos de análise ----------
+# Relatórios e auditorias gerados por IA: material de apoio de quem desenvolve,
+# não documentação do portal. Ficam no disco, fora do histórico.
+md/12-arquitetura-integracao-ia.md
+md/auditoria-estrutura-backend.md
+md/auditoria-estrutura-frontend.md
+md/auditoria-seguranca.md
+md/jotbird-document.md
+md/relatorio-preparacao-ia.md

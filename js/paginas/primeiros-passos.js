@@ -74,6 +74,7 @@ PAGINAS['primeiros-passos'] = {
                 { sistema: '', perfil: '', href: '' },
                 { sistema: '', perfil: '', href: '' },
                 { sistema: '', perfil: '', href: '' },
+                { sistemas: '', perfil: '', href: ''},
                 { sistemas: '', perfil: '', href: ''}
               ]
             },

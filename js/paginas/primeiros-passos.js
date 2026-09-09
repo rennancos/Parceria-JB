@@ -186,6 +186,13 @@ PAGINAS['primeiros-passos'] = {
               email: '',
               telefone: '',
               horario: ''
+            },
+            {
+              nome: 'Fabricante 5',
+              portal: '',
+              email: '',
+              telefone: '',
+              horario: ''
             }
           ]
         }

@@ -15,31 +15,25 @@ PAGINAS['acessos-parceria'] = {
           titulo: 'Portal corporativo',
           descricao: 'Intranet, comunicados e serviços internos',
           icone: 'portal',
-          href: '#'
-        },
-        {
-          titulo: 'Abertura de chamados',
-          descricao: 'Registro e acompanhamento de solicitações',
-          icone: 'chamado',
-          href: '#'
-        },
-        {
-          titulo: 'Escalas e agenda',
-          descricao: 'Programação da equipe e reservas',
-          icone: 'agenda',
-          href: '#'
-        },
-        {
-          titulo: 'Sharepoint da parceria',
-          descricao: 'Documentos e arquivos compartilhados',
-          icone: 'sharepoint',
-          href: '#sharepoint'
+          href: 'https://globoservice.service-now.com/now/nav/ui/classic/params/target/home_splash.do%3Fsysparm_direct%3Dtrue'
         },
         {
           titulo: 'Gestão de acessos',
           descricao: 'Solicitação e revisão de permissões',
           icone: 'pessoas',
-          href: '#'
+          href: 'https://acesso.g.globo'
+        },
+        {
+          titulo: 'Abertura de chamados',
+          descricao: 'Registro e acompanhamento de solicitações',
+          icone: 'chamado',
+          href: 'https://globoservice.service-now.com/gse'
+        },
+        {
+          titulo: 'Sharepoint da parceria',
+          descricao: 'Documentos e arquivos compartilhados',
+          icone: 'sharepoint',
+          href: 'https://tvglobocorp.sharepoint.com/sites/SAEM477/Documentos%20Compartilhados/Forms/AllItems.aspx'
         }
       ]
     },

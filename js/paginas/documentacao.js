@@ -125,11 +125,6 @@ PAGINAS['documentacao'] = {
               titulo: 'Comunicação',
               texto: 'Intercom, canais de contato e procedimentos de comunicação durante a operação.',
               meta: 'Comunicação'
-            },
-            {
-              titulo: 'Tally',
-              texto: 'Instalação, configuração e uso do TallyFlow na operação da parceria.',
-              meta: 'Ferramenta'
             }
           ]
         },
@@ -142,8 +137,7 @@ PAGINAS['documentacao'] = {
             { titulo: 'Manual de Áudio', descricao: 'Cadeia, mesas e verificação de níveis' },
             { titulo: 'Manual de IP', descricao: 'Endereçamento, fluxos e checagens de rede' },
             { titulo: 'Manual de Grafismo', descricao: 'Caracteres, arte e integração com o ar' },
-            { titulo: 'Manual de Comunicação', descricao: 'Intercom e canais de contato' },
-            { titulo: 'TallyFlow', descricao: 'Instalação, configuração e uso' }
+            { titulo: 'Manual de Comunicação', descricao: 'Intercom e canais de contato' }
           ]
         }
       ]

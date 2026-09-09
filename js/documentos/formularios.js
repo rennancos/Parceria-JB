@@ -93,7 +93,7 @@
         '</label>' +
         '<fieldset class="ed-campo ed-tipo">' +
           '<legend>O documento é…</legend>' +
-          '<label><input type="radio" name="tipo" value="link"> um endereço (portal, SharePoint, intranet)</label>' +
+'<label><input type="radio" name="tipo" value="link"> um endereço (portal, ParcerIA, intranet)</label>' +
           '<label><input type="radio" name="tipo" value="arquivo"> um arquivo para baixar (DOC, PDF, planilha)</label>' +
         '</fieldset>' +
         '<label class="ed-campo" data-quando="link">' +

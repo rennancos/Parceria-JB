@@ -53,7 +53,7 @@
 
      tipo: 'links'        itens: { titulo, descricao?, href?, formato?, icone? }
                           Lista de links com ícone à esquerda e seta à direita.
-                          Serve tanto para endereço (portal, SharePoint) quanto
+                           Serve tanto para endereço (portal, ParcerIA) quanto
                           para arquivo baixável (DOC/PDF na pasta docs/).
                           `formato` é 'pdf', 'doc', 'xls', 'ppt' ou 'link' e
                           desenha o chip cinza à direita; omitido, sai da
@@ -101,7 +101,7 @@ window.PAGINAS = {};
     portal:     svg('<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>'),
     chamado:    svg('<path d="M4 4h16v16H4z"/><path d="M4 9h16M9 20V9"/>'),
     agenda:     svg('<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'),
-    sharepoint: svg('<path d="M3 21h18M5 21V10M19 21V10M7 10h10M8 7h8M10 4h4M6 14h12"/>'),
+   parceria: svg('<path d="M3 21h18M5 21V10M19 21V10M7 10h10M8 7h8M10 4h4M6 14h12"/>'),
     pessoas:    svg('<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'),
     pasta:      svg('<path d="M3 7h6l2 2h10v10a2 2 0 0 1-2 2H3z"/><path d="M3 7V5a2 2 0 0 1 2-2h4"/>'),
     arquivo:    svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>'),
@@ -218,7 +218,7 @@ window.PAGINAS = {};
       </div>`;
   }
 
-  /* Um item de 'links' pode ser um endereço (portal, SharePoint, outra página
+   /* Um item de 'links' pode ser um endereço (portal, ParcerIA, outra página
      daqui) ou um arquivo baixável — DOC/PDF na pasta do projeto. O formato dá o
      ícone e o chip cinza à direita; ele vem de `formato` ou, quando ausente, da
      extensão do próprio href, para não obrigar a repetir a informação. */

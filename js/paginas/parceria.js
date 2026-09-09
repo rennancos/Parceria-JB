@@ -1,12 +1,12 @@
-PAGINAS['sharepoint'] = {
-  titulo: 'Sharepoint',
+PAGINAS['parceria'] = {
+  titulo: 'ParcerIA',
   eyebrow: 'Acesso corporativo',
   descricao: 'Documentos, arquivos e materiais compartilhados da parceria disponíveis em um só lugar.',
 
   secoes: [
     {
       titulo: 'Bibliotecas',
-      texto: 'Cada biblioteca abre direto no Sharepoint corporativo e exige login de rede.',
+      texto: 'Cada biblioteca abre direto no ParcerIA corporativo e exige login de rede.',
       tipo: 'links',
       itens: [
         {
@@ -43,7 +43,7 @@ PAGINAS['sharepoint'] = {
     },
     {
       titulo: 'Regras de uso',
-      texto: 'O Sharepoint é ambiente corporativo: o que sai dele continua sob as mesmas regras.',
+      texto: 'O ParcerIA é ambiente corporativo: o que sai dele continua sob as mesmas regras.',
       tipo: 'paineis',
       itens: [
         {
@@ -52,7 +52,7 @@ PAGINAS['sharepoint'] = {
         },
         {
           titulo: 'Versionamento',
-          texto: 'Edite o arquivo no próprio Sharepoint em vez de baixar e reenviar. Cópias locais se desatualizam e viram fonte de divergência.'
+          texto: 'Edite o arquivo no próprio ParcerIA em vez de baixar e reenviar. Cópias locais se desatualizam e viram fonte de divergência.'
         },
         {
           titulo: 'Compartilhamento',
@@ -62,5 +62,5 @@ PAGINAS['sharepoint'] = {
     }
   ],
 
- /* aviso: 'Conteúdo em construção: as bibliotecas acima são a estrutura definida para a página. As URLs reais do Sharepoint ainda serão preenchidas no lugar dos "#".' */
+ /* aviso: 'Conteúdo em construção: as bibliotecas acima são a estrutura definida para a página. As URLs reais do ParcerIA ainda serão preenchidas no lugar dos "#".' */
 };

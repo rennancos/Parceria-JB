@@ -30,9 +30,9 @@ PAGINAS['acessos-parceria'] = {
           href: 'https://globoservice.service-now.com/gse'
         },
         {
-          titulo: 'Sharepoint da parceria',
+          titulo: 'ParcerIA da parceria',
           descricao: 'Documentos e arquivos compartilhados',
-          icone: 'sharepoint',
+          icone: 'parceria',
           href: 'https://tvglobocorp.sharepoint.com/sites/SAEM477/Documentos%20Compartilhados/Forms/AllItems.aspx'
         }
       ]

@@ -72,8 +72,10 @@
      tipo: 'notas'        itens: ['texto', 'texto', ...]
                           Lista com marcador. Para observações e regras curtas.
 
-     tipo: 'sistemas'     itens: { sistema, perfil }
-                          Grade compacta de sistema + perfil de acesso.
+     tipo: 'sistemas'     itens: { sistema, perfil, href? }
+                          Grade compacta de sistema + perfil de acesso. Com
+                          `href` o item inteiro vira link; hash abre na página,
+                          o resto abre em outra aba.
 
      tipo: 'fabricantes'  itens: { nome, portal?, email?, telefone?, horario? }
                           Ficha de contato. Campo vazio aparece como "a definir"
@@ -178,12 +180,23 @@ window.PAGINAS = {};
       </li>`;
   }
 
+  /* Sistema com `href` vira link para o portal (ou formulário de acesso) do
+     próprio sistema — mesma regra de `passo` e `link`: hash navega aqui dentro,
+     o resto abre em outra aba. Sem `href` o item continua estático, como sempre
+     foi; ignorar o campo era pior, porque ele sumia sem erro nenhum.
+
+     A classe é `callout`, a mesma faixa do `destaque` de um passo, e não um
+     estilo próprio: todo destino da página tem um layout só, então mexer nessa
+     aparência é mexer em um lugar. O CSS de `.sys-list` só ajusta o encaixe na
+     grade (ver css/pagina.css). */
   function sistema(item){
-    return `
-      <li>
-        <span class="sys-name">${esc(item.sistema)}</span>
-        ${item.perfil ? `<span class="sys-role">${esc(item.perfil)}</span>` : ''}
-      </li>`;
+    const corpo =
+      `<span class="sys-name">${esc(item.sistema)}</span>` +
+      (item.perfil ? `<span class="sys-role">${esc(item.perfil)}</span>` : '');
+
+    return item.href
+      ? `<li><a class="callout" href="${esc(item.href)}"${alvoDe(item.href)}>${corpo}${ICONE_SETA}</a></li>`
+      : `<li>${corpo}</li>`;
   }
 
   /* Fabricantes: a ficha tem sempre os mesmos quatro campos, na mesma ordem.

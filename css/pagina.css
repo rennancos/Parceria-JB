@@ -252,7 +252,7 @@ a.callout .link-arrow{
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
   gap: 8px;
 }
 .sys-list li{
@@ -265,6 +265,59 @@ a.callout .link-arrow{
   border-radius: var(--radius-sm);
   background: var(--panel);
 }
+
+/* Sistema com destino usa a MESMA faixa dos passos (`a.callout`, acima) — todo
+   href da página tem um layout só. Aqui fica apenas o encaixe na grade: o <li>
+   abre mão de borda, fundo e padding porque quem desenha o card passa a ser a
+   faixa; sem isso sobrariam duas caixas aninhadas, uma dentro da outra. */
+.sys-list li:has(> .callout){
+  padding: 0;
+  border: 0;
+  background: none;
+  align-items: stretch;
+}
+
+/* `margin` porque a faixa nasce com 12px de afastamento do texto do passo, que
+   aqui não existe, e `flex` para ela ocupar o card inteiro — a área clicável é
+   o card, não só o texto.
+
+   O grid substitui o flex de `a.callout` porque aqui o conteúdo é empilhado:
+   nome na primeira linha, perfil na segunda ("SOLICITAR CONFLUENCE | GOVERNANÇA
+   E ESTRATÉGIA DE TECNOLOGIA" é uma frase, não um rótulo curto como "JCORP"),
+   e a seta numa segunda coluna que atravessa as duas linhas — assim ela fica
+   centrada na altura do card em vez de descer junto com o texto.
+   As áreas são explícitas porque o encaixe automático colocaria o perfil ao
+   lado do nome, e não embaixo. */
+.sys-list .callout{
+  margin: 0;
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 3px 12px;
+  /* 14px à esquerda, e não os 15px da faixa do passo: somados aos 3px da barra
+     dourada dão os mesmos 17px do card estático (1px de borda + 16px de
+     padding), então os nomes de sistema começam todos no mesmo x. */
+  padding: 12px 16px 12px 14px;
+}
+
+.sys-list .callout .sys-name{ grid-area: 1 / 1; }
+.sys-list .callout .sys-role{ grid-area: 2 / 1; }
+
+/* `margin: 0` desfaz o `margin-left: auto` de `a.callout`, que no grid não tem
+   o que empurrar — quem posiciona a seta agora é a coluna. */
+.sys-list .callout .link-arrow{
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+  align-self: center;
+}
+
+/* Com perfil, a seta atravessa as duas linhas para ficar centrada na altura do
+   card; sem perfil ela fica na única linha que existe. É `span 2` e não
+   `1 / -1` porque `-1` conta a partir da grade EXPLÍCITA, que aqui não é
+   declarada (as linhas nascem do conteúdo) — ali `-1` virava a linha 1 e a
+   seta subia para o nome. */
+.sys-list .callout:has(.sys-role) .link-arrow{ grid-row: 1 / span 2; }
 .sys-name{
   font-size: var(--fs-sm);
   font-weight: 650;
@@ -273,6 +326,9 @@ a.callout .link-arrow{
 .sys-role{
   font-size: var(--fs-xs);
   color: var(--ink-soft);
+  /* O perfil pode ser uma frase de duas linhas. `pretty` evita a última linha
+     com uma palavra só; onde o navegador não suporta, quebra como antes. */
+  text-wrap: pretty;
 }
 
 /* Ficha de contato de fabricante (tipo 'fabricantes'). */
@@ -314,34 +370,53 @@ a.callout .link-arrow{
 }
 
 /* Lista numerada de etapas (Primeiros passos, Manuais). */
+/* Os três tokens do passo ficam na lista, e não no <li>, porque a largura
+   máxima daqui é calculada a partir deles — variável declarada no filho não é
+   legível no pai. O <li> herda os três.
+
+   A largura fecha o card onde o conteúdo termina: o texto lá dentro para em
+   `--medida - --recuo` e o card acrescenta o recuo à esquerda, a folga à
+   direita e as duas bordas — o --recuo se cancela na soma. Sem esta trava o
+   card ia até a borda da página e sobrava um terço dele vazio à direita, com o
+   texto parando na medida no meio do caminho. */
 .steps{
+  --recuo: 64px;
+  --folga: 24px;
+  --respiro: 20px;
+
   list-style: none;
   counter-reset: etapa;
   margin: 0;
   padding: 0;
+  max-width: calc(var(--medida) + var(--folga) + 2px);
   display: grid;
   gap: 14px;
 }
 .steps li{
   counter-increment: etapa;
   position: relative;
-  /* --recuo é o padding-left, repetido como token porque o texto lá dentro
-     desconta ele da medida para terminar alinhado com o resto da página.
-     Mudou o padding aqui, mude o token junto. */
-  --recuo: 64px;
-  padding: 20px 24px 20px var(--recuo);
+  padding: var(--respiro) var(--folga) var(--respiro) var(--recuo);
   border: 1px solid var(--panel-line);
   border-radius: var(--radius);
   background: var(--panel);
   box-shadow: var(--shadow-panel);
 }
+
+/* Passo sem texto corrido — só o título e a faixa do link ("Acesse o KB.") —
+   pede menos respiro: com o padding cheio, três linhas de conteúdo ocupavam a
+   altura de um card de parágrafo. O seletor é a ausência de <p>: texto de passo
+   sai como <p>, e a faixa com href sai como <a class="callout">. */
+.steps li:not(:has(p)){ --respiro: 15px; }
+.steps li:not(:has(p)) .callout{ margin-top: 9px; }
 /* O número vai em tinta escura sobre o azul da paleta: branco sobre #89A8B2
    ficaria em 2.5:1 e some na leitura. */
 .steps li::before{
   content: counter(etapa);
   position: absolute;
   left: 22px;
-  top: 20px;
+  /* Acompanha o padding: com o respiro reduzido, um top fixo descolaria o
+     número do título. */
+  top: var(--respiro);
   width: 26px;
   height: 26px;
   border-radius: 50%;
@@ -353,9 +428,9 @@ a.callout .link-arrow{
   font-size: var(--fs-xs);
   font-weight: 650;
 }
-/* O card do passo continua com a largura cheia; só o texto dentro dele para na
-   medida, descontado o recuo do número à esquerda. Sem isto o passo mostrava
-   302px de texto numa faixa de 1010px. */
+/* A trava por elemento continua aqui, e não só na lista: ela é o que faz o
+   texto terminar no mesmo x do resto da página, e é dela que sai a conta da
+   largura máxima da lista (acima). */
 .steps h3,
 .steps p,
 .steps .callout{
@@ -467,8 +542,9 @@ a.callout .link-arrow{
 }
 
 @media (max-width: 900px){
-  .steps li{ --recuo: 58px; padding: 18px 20px 18px var(--recuo); }
-  .steps li::before{ left: 18px; top: 18px; }
+  .steps{ --recuo: 58px; --folga: 20px; --respiro: 18px; }
+  .steps li:not(:has(p)){ --respiro: 14px; }
+  .steps li::before{ left: 18px; }
 
   /* Em telas estreitas a coluna fixa do rótulo aperta demais o valor. */
   .field-list{ grid-template-columns: 1fr; gap: 2px; }

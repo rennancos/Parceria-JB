@@ -57,6 +57,21 @@ PAGINAS['primeiros-passos'] = {
               href: 'https://globoservice.service-now.com/gse?id=sc_cat_item&sys_id=dd8dda0e1beb109094962170f54bcba8&table=sc_cat_item&searchTerm=perfil%20de%20usuario'
             },
             {
+              titulo: 'Administração de Conta ADM',
+              texto: 'Gerenciar criação, renovação ou bloqueio de conta ADM.',
+              href: 'https://globoservice.service-now.com/gse?id=sc_cat_item&sys_id=33035b461b379c1094962170f54bcb59&table=sc_cat_item&searchTerm=Administra%C3%A7%C3%A3o%20de%20Conta%20ADM'
+            },
+            {
+              titulo: 'Controle de Acesso de Pasta de Rede e Arquivos',
+              texto: 'Acessar uma pasta de rede, remover.',
+              href: 'https://globoservice.service-now.com/gse?id=sc_cat_item&sys_id=b09c0b5c1bee141094962170f54bcb16&table=sc_cat_item&searchTerm=Controle%20de%20Acesso%20de%20Pasta%20de%20Rede%20e%20Arquivos'
+            },
+            {
+              titulo: 'Administração de AD',
+              texto: 'Gerenciamento de contas',
+              href: 'https://globoservice.service-now.com/gse?id=sc_cat_item&sys_id=33035b461b379c1094962170f54bcb59&table=sc_cat_item&searchTerm=Administra%C3%A7%C3%A3o%20de%20Conta%20ADM'
+            },
+            {
               titulo: 'Solicitação de Usuários e Acessos ',
               texto: 'Administração de usuários e acessos',
               href: 'https://globoservice.service-now.com/gse?id=sc_cat_item&sys_id=fa0873521b1ed01094962170f54bcbd1&table=sc_cat_item&searchTerm=perfil%20de%20usuario'
@@ -88,17 +103,17 @@ PAGINAS['primeiros-passos'] = {
           titulo: 'Sistemas mais utilizados',
           tipo: 'sistemas',
           itens: [
-            { sistema: 'CONFLUENCE',   perfil: 'BASE DE CONHECIMENTO' },
-            { sistema: 'COLABORATIVO',  perfil: 'JCORP'},
-            { sistema: 'UPLOADER', perfil: 'JCORP' },
-            { sistema: 'TELA INTERATIVA', perfil: 'JCORP' },
-            { sistema: 'CRAWL-G1',     perfil: 'JCORP' },
-            { sistema: 'POUPATEMPO',   perfil: 'JCORP' },
-            { sistema: 'SCOUT', perfil: 'JCORP' },
-            { sistema: 'GVORBIT', perfil: 'CAP&CORE' },
-            { sistema: 'LAWO', perfil: 'CAP&CORE' },
-            { sistema: 'AJA BRIDGE',   perfil: 'CAP&CORE' },
-            { sistema: 'VMIX',     perfil: 'CAP&CORE' },
+            { sistema: 'CONFLUENCE',   perfil: 'SOLICITAR CONFLUENCE | GOVERNANÇA E ESTRATÉGIA DE TECNOLOGIA', href: 'https://acesso.g.globo/accessRequest/accessRequest.jsf#/accessRequestSelf/add?quickLink=Request%20Access' },
+            { sistema: 'COLABORATIVO',  perfil: 'SOLICITAR COLABORATIVO | RJO - RIO DE JANEIRO - RCJ', href: 'https://acesso.g.globo/accessRequest/accessRequest.jsf#/accessRequestSelf/add?quickLink=Request%20Access' },
+            { sistema: 'UPLOADER', perfil: 'SOLICITAR COLABORATIVO | UPLOADER - TECNOLOGIA', href: 'https://acesso.g.globo/accessRequest/accessRequest.jsf#/accessRequestSelf/add?quickLink=Request%20Access' },
+            { sistema: 'TELA INTERATIVA', perfil: 'SOLICITAR TELA INTERATIVA ADM PARA TODOS DA GNEWS E A PRAÇA DO RIO', href:'https://acesso.g.globo/accessRequest/accessRequest.jsf#/accessRequestSelf/add?quickLink=Request%20Access' },
+            { sistema: 'CRAWL-G1',     perfil: 'SOLICITAR CRAWL-G1 | ADMINISTRAÇÃO', href: 'https://acesso.g.globo/accessRequest/accessRequest.jsf#/accessRequestSelf/add?quickLink=Request%20Access' },
+            { sistema: 'POUPATEMPO',   perfil: 'SOLICITAR POUPATEMPO | ADMINISTRADOR', href: 'https://acesso.g.globo/accessRequest/accessRequest.jsf#/accessRequestSelf/add?quickLink=Request%20Access' },
+            { sistema: 'SCOUT', perfil: 'SOLICITAR SCOUT | ADMINISTRAÇÃO E SCOUTWEB FUTEBOL | GC', href: 'https://acesso.g.globo/accessRequest/accessRequest.jsf#/accessRequestSelf/add?quickLink=Request%20Access' },
+            { sistema: 'GVORBIT', perfil: 'ACESSA VIA CURRAL', href: '' },
+            { sistema: 'LAWO', perfil: 'ACESSA VIA CURRAL', href: 'https://acesso.g.globo/accessRequest/accessRequest.jsf#/accessRequestSelf/add?quickLink=Request%20Access' },
+            { sistema: 'AJA BRIDGE',   perfil: 'SOLICITAR AJA BRIDGE | CAP&CORE', href: 'https://acesso.g.globo/accessRequest/accessRequest.jsf#/accessRequestSelf/add?quickLink=Request%20Access' },
+            { sistema: 'VMIX',     perfil: 'SOLICITAR VMIX | CAP&CORE', href: 'https://acesso.g.globo/accessRequest/accessRequest.jsf#/accessRequestSelf/add?quickLink=Request%20Access' },
             { sistema: 'DANTE', perfil: 'CAP&CORE' },
             { sistema: 'GLENSOUND', perfil: 'CAP&CORE' },
             { sistema: 'STUDER', perfil: 'CAP&CORE' },

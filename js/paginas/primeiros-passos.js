@@ -69,7 +69,13 @@ PAGINAS['primeiros-passos'] = {
             {
               titulo: 'Administração de AD',
               texto: 'Gerenciamento de contas',
-              href: 'https://globoservice.service-now.com/gse?id=sc_cat_item&sys_id=33035b461b379c1094962170f54bcb59&table=sc_cat_item&searchTerm=Administra%C3%A7%C3%A3o%20de%20Conta%20ADM'
+              href: 'https://globoservice.service-now.com/gse?id=sc_cat_item&sys_id=38bf37511b12d01097c0dca0f54bcb36&table=sc_cat_item&searchTerm=Administra%C3%A7%C3%A3o%20de%20grupo',
+              grupos: [
+                { sistema: '', perfil: '', href: '' },
+                { sistema: '', perfil: '', href: '' },
+                { sistema: '', perfil: '', href: '' },
+                { sistemas: '', perfil: '', href: ''}
+              ]
             },
             {
               titulo: 'Solicitação de Usuários e Acessos ',
@@ -110,27 +116,14 @@ PAGINAS['primeiros-passos'] = {
             { sistema: 'CRAWL-G1',     perfil: 'SOLICITAR CRAWL-G1 | ADMINISTRAÇÃO', href: 'https://acesso.g.globo/accessRequest/accessRequest.jsf#/accessRequestSelf/add?quickLink=Request%20Access' },
             { sistema: 'POUPATEMPO',   perfil: 'SOLICITAR POUPATEMPO | ADMINISTRADOR', href: 'https://acesso.g.globo/accessRequest/accessRequest.jsf#/accessRequestSelf/add?quickLink=Request%20Access' },
             { sistema: 'SCOUT', perfil: 'SOLICITAR SCOUT | ADMINISTRAÇÃO E SCOUTWEB FUTEBOL | GC', href: 'https://acesso.g.globo/accessRequest/accessRequest.jsf#/accessRequestSelf/add?quickLink=Request%20Access' },
-            { sistema: 'GVORBIT', perfil: 'ACESSA VIA CURRAL', href: '' },
-            { sistema: 'LAWO', perfil: 'ACESSA VIA CURRAL', href: 'https://acesso.g.globo/accessRequest/accessRequest.jsf#/accessRequestSelf/add?quickLink=Request%20Access' },
-            { sistema: 'AJA BRIDGE',   perfil: 'SOLICITAR AJA BRIDGE | CAP&CORE', href: 'https://acesso.g.globo/accessRequest/accessRequest.jsf#/accessRequestSelf/add?quickLink=Request%20Access' },
-            { sistema: 'VMIX',     perfil: 'SOLICITAR VMIX | CAP&CORE', href: 'https://acesso.g.globo/accessRequest/accessRequest.jsf#/accessRequestSelf/add?quickLink=Request%20Access' },
-            { sistema: 'DANTE', perfil: 'CAP&CORE' },
-            { sistema: 'GLENSOUND', perfil: 'CAP&CORE' },
-            { sistema: 'STUDER', perfil: 'CAP&CORE' },
-            { sistema: 'TALLY', perfil: 'CAP&CORE' },
-            { sistema: 'ARKONA',   perfil: 'CAP&CORE' },
-            { sistema: 'TRIO VIZRT', perfil: 'COMPGRAFIC' },
-            { sistema: 'ENGINE VIZRT', perfil: 'COMPGRAFIC' },
-            { sistema: 'HUB', perfil: 'COMPGRAFIC' },
-            { sistema: 'NCAM', perfil: 'COMPGRAFIC' },
-            { sistema: 'PIXOTOPE', perfil: 'COMPGRAFIC' },
-            { sistema: 'MEDIA CENTRAL HN',        perfil: 'MAM&PÓS'},
-            { sistema: 'MEDIA CENTRAL MAG',        perfil: 'MAM&PÓS' },
-            { sistema: 'ADOBE',   perfil: 'MAM&PÓS' },
-            { sistema: 'MEDIA SERVICE',     perfil: 'MAM&PÓS' },
-            { sistema: 'MEDIA COMPOSER', perfil: 'MAM&PÓS' },
-            { sistema: 'MEDIA PRODUCER',  perfil: 'MAM&PÓS'},
-            { sistema: 'AVID INTERPLAY', perfil: 'MAM&PÓS' }
+            { sistema: 'DANTE', perfil: 'CAP&CORE', href: '' },
+            { sistema: 'MEDIA CENTRAL HN', perfil: 'MAM&PÓS', href: '' },
+            { sistema: 'MEDIA CENTRAL MAG', perfil: 'MAM&PÓS', href: '' },
+            { sistema: 'ADOBE',   perfil: 'MAM&PÓS', href: '' },
+            { sistema: 'MEDIA SERVICE',     perfil: 'MAM&PÓS', href: '' },
+            { sistema: 'MEDIA COMPOSER', perfil: 'MAM&PÓS', href: '' },
+            { sistema: 'MEDIA PRODUCER',  perfil: 'MAM&PÓS', href: '' },
+            { sistema: 'AVID INTERPLAY', perfil: 'MAM&PÓS', href: '' }
           ]
         },
         {

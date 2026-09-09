@@ -43,13 +43,16 @@
                           Grade de blocos. Com `href` vira card clicável; sem,
                           fica estático. `meta` é o chip cinza no rodapé.
 
-     tipo: 'passos'       itens: { titulo, texto, destaque?, href? }
+     tipo: 'passos'       itens: { titulo, texto, destaque?, href?, grupos? }
                           Lista numerada — a numeração é do CSS, não digite "1.".
                           `destaque` desenha a faixa azul dentro do passo, para
                           caminho de menu, nome de categoria e afins.
                           Com `href`, a faixa vira link: o `destaque` quando ele
                           existe, senão o próprio `texto`. Hash abre na página,
                           o resto abre em outra aba.
+                          `grupos` é uma lista { sistema, perfil, href? } — a
+                          mesma do tipo 'sistemas' — desenhada DENTRO do passo,
+                          para os acessos que se pede naquela etapa.
 
      tipo: 'links'        itens: { titulo, descricao?, href?, formato?, icone? }
                           Lista de links com ícone à esquerda e seta à direita.
@@ -172,11 +175,20 @@ window.PAGINAS = {};
         ? comLink(`<span>${esc(item.destaque)}</span>`, 'callout')
         : `<p class="callout">${esc(item.destaque)}</p>`;
 
+    /* Grade de sistema + perfil pendurada no passo, com o MESMO renderizador do
+       bloco 'sistemas' — é a lista de acessos que se pede naquela etapa, e não
+       um assunto à parte. Como bloco irmão ela sairia fora do card e, pior,
+       partiria a lista em duas: o contador reseta a cada <ol class="steps">
+       (ver css/pagina.css), então os passos seguintes voltariam a numerar do 1. */
+    const grupos = !Array.isArray(item.grupos) || !item.grupos.length ? ''
+      : `<ul class="sys-list">${item.grupos.map(sistema).join('')}</ul>`;
+
     return `
       <li>
         <h3>${titulo}</h3>
         ${texto}
         ${destaque}
+        ${grupos}
       </li>`;
   }
 

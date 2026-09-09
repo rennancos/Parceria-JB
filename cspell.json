@@ -1,0 +1,31 @@
+{
+  "version": "0.2",
+  "language": "pt-BR,en",
+  "ignorePaths": [
+    "node_modules/**",
+    "dist/**",
+    ".git/**"
+  ],
+  "allowCompoundWords": true,
+  "words": [
+    "AJA",
+    "ARKONA",
+    "CAPCORE",
+    "COMPGRAFIC",
+    "DANTE",
+    "descricao",
+    "Globoservice",
+    "GNEWS",
+    "GVORBIT",
+    "LAWO",
+    "NCAM",
+    "Parceria",
+    "ParcerIA",
+    "PIXOTOPE",
+    "POUPATEMPO",
+    "SCOUTWEB",
+    "secoes",
+    "VIZRT",
+    "VMIX"
+  ]
+}

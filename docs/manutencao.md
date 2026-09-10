@@ -26,6 +26,7 @@ O Electron é outra distribuição do modo local, não uma cópia sincronizada d
 | `js/router.js` | Rotas por hash, views, título da aba, foco e evento de renderização |
 | `js/equipe-dados.js`, `js/equipe.js` | Cadastro/identidade e cards, fotos, contatos e fallback de cópia de e-mail |
 | `js/busca/`, `js/busca.js` | Índice em memória, ranking, destaque seguro e diálogo de busca |
+| `js/atalhos.js` | Filtro, favoritos (localStorage), grade/lista e limite dos blocos `tipo: 'atalhos'` |
 | `js/documentos/`, `js/documentos.js` | Transporte HTTP, acervo local, diálogos, formulários e integração da edição |
 | `js/script.js` | Drawer e teclado; não controla tema |
 | `servidor/servidor.js` | Entrada HTTP, roteamento, autorização, leitura dos corpos, upload e arquivos estáticos |

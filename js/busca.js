@@ -16,7 +16,7 @@
 
   const ROTULOS = {
     pagina: 'Página', secao: 'Seção', pessoa: 'Pessoa', links: 'Link',
-    passos: 'Passo', paineis: 'Item', sistemas: 'Sistema',
+    passos: 'Passo', paineis: 'Item', sistemas: 'Sistema', atalhos: 'Atalho',
     fabricantes: 'Fabricante', notas: 'Nota',
   };
 

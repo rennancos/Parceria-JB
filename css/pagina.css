@@ -555,6 +555,347 @@ a.callout .link-arrow{
   line-height: 1.55;
 }
 
+/* ---------- Grade de acesso rápido (tipo 'atalhos') ----------
+
+   Mesmo desenho do acesso rápido do portal corporativo: barra com busca e
+   alternância de formato, cards com categoria e coração, botão no rodapé.
+   O markup sai de js/paginas.js e o comportamento de js/atalhos.js — renomear
+   um seletor daqui exige acertar os dois. */
+
+.atalhos{
+  display: grid;
+  gap: var(--sp-3);
+}
+
+/* Barra: o campo cresce, os dois botões de formato ficam colados na direita.
+   Em tela estreita o `wrap` desce o par de botões para a linha de baixo. */
+.atalhos-barra{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.atalhos-campo{
+  display: flex;
+  align-items: stretch;
+  flex: 1 1 300px;
+  max-width: 460px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-2);
+  overflow: hidden;                 /* a lupa encosta na borda arredondada */
+  transition: border-color 0.15s ease;
+}
+.atalhos-campo:focus-within{ border-color: var(--accent); }
+
+.atalhos-campo input{
+  flex: 1;
+  min-width: 0;
+  padding: 11px 14px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--fs-sm);
+  outline: none;                    /* o anel vai no campo inteiro, acima */
+}
+.atalhos-campo input::placeholder{ color: var(--ink-soft); opacity: 0.9; }
+
+/* O "x" nativo do type=search sobra: o campo esvazia com Esc e a lista volta
+   inteira sozinha. */
+.atalhos-campo input::-webkit-search-cancel-button{ display: none; }
+
+/* A lupa não é o que filtra — o filtro roda a cada tecla. Ela existe porque o
+   controle é reconhecido assim, e leva o cursor para o campo. */
+.atalhos-lupa{
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  border: 0;
+  border-left: 1px solid var(--line);
+  background: var(--tile);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.atalhos-lupa:hover{ background: var(--accent); color: var(--on-accent); }
+.atalhos-lupa:focus-visible{ outline: 2px solid var(--accent-1); outline-offset: -2px; }
+.atalhos-lupa svg{ width: 17px; height: 17px; }
+
+.atalhos-vista{ display: flex; gap: 6px; }
+.atalhos-vista button{
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-xs);
+  background: var(--bg-2);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.atalhos-vista button:hover{ color: var(--ink); border-color: var(--accent-soft); }
+.atalhos-vista button:focus-visible{ outline: 2px solid var(--accent-1); outline-offset: 2px; }
+
+/* aria-pressed é o estado real do botão, então é ele que pinta o ativo: não
+   existe classe paralela para o JS esquecer de sincronizar. */
+.atalhos-vista button[aria-pressed="true"]{
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+.atalhos-vista svg{ width: 17px; height: 17px; }
+
+/* ---------- Cards ---------- */
+
+.atalhos-grade{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+  gap: var(--sp-3);
+}
+
+.atalho{
+  position: relative;
+  display: flex;
+  border: 1px solid var(--panel-line);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  box-shadow: var(--shadow-panel);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.15s ease;
+}
+
+/* Card filtrado pela busca ou preso atrás do "Mostrar mais": o `hidden` do JS
+   precisa vencer o `display: flex` acima. */
+.atalho[hidden]{ display: none; }
+
+.atalho:hover{
+  transform: translateY(-3px);
+  border-color: var(--accent-soft);
+  box-shadow: var(--shadow-card);
+}
+
+/* Card sem destino não se mexe no hover: não há para onde ir. */
+.atalho:has(.atalho-pendente){ border-style: dashed; }
+.atalho:has(.atalho-pendente):hover{
+  transform: none;
+  border-color: var(--panel-line);
+  box-shadow: var(--shadow-panel);
+}
+
+.atalho-alvo{
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  flex: 1;
+  min-width: 0;
+  padding: 16px 18px 18px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+/* A área clicável é o card inteiro, e não só o texto: o <a> se estica sobre o
+   <li>. Só quem tem href — o card pendente é um <div> e não vira alvo. */
+.atalho-alvo[href]::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.atalho-alvo:focus-visible{
+  outline: 2px solid var(--accent-1);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* Linha da categoria. O padding à direita é o espaço do coração — sem ele, uma
+   categoria longa passa por baixo do botão. */
+.atalho-topo{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 26px;
+}
+.atalho-topo svg{
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--accent-1);
+}
+.atalho-tipo{
+  font-size: var(--fs-2xs);
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+}
+
+.atalho-titulo{
+  font-size: var(--fs-md);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+/* Duas linhas e reticências: os cards de uma fileira ficam com alturas
+   parecidas e a descrição não decide o tamanho da grade. O texto inteiro
+   continua no destino — aqui ele é chamada, não conteúdo. */
+.atalho-desc{
+  font-size: var(--fs-xs);
+  line-height: 1.5;
+  color: var(--ink-soft);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.atalho-pendente .field-vazio{
+  margin-top: auto;
+  font-size: var(--fs-xs);
+}
+
+/* O coração é um marcador local: fica no localStorage deste navegador e não
+   muda o conteúdo da página para mais ninguém (ver js/atalhos.js). */
+.atalho-fav{
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  z-index: 1;                       /* acima do <a> esticado */
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.atalho-fav svg{ width: 17px; height: 17px; fill: none; }
+.atalho-fav:hover{ background: var(--tile); color: var(--accent-1); }
+.atalho-fav:focus-visible{ outline: 2px solid var(--accent-1); outline-offset: 1px; }
+.atalho-fav[aria-pressed="true"]{ color: var(--accent-1); }
+.atalho-fav[aria-pressed="true"] svg{ fill: currentColor; }
+
+/* ---------- Formato de lista ----------
+
+   Mesma leitura das listas do portal (ícone, texto, chip): o card vira linha,
+   a categoria vira chip à direita e a descrição cai para uma linha só.
+   `display: contents` no topo entrega ícone e categoria direto ao grid da
+   linha — sem isso os dois ficariam presos na mesma coluna. */
+.atalhos-grade[data-vista="lista"]{
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+.atalhos-grade[data-vista="lista"] .atalho:hover{ transform: none; }
+.atalhos-grade[data-vista="lista"] .atalho-alvo{
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2px 14px;
+  padding: 14px 48px 14px 18px;     /* a direita reserva o coração */
+}
+.atalhos-grade[data-vista="lista"] .atalho-topo{ display: contents; }
+/* Cada pedaço do texto tem a SUA linha na coluna do meio — título, descrição e
+   o "a definir" do item pendente. Sem as três declaradas, o "a definir" caía
+   na mesma célula da descrição e os dois saíam impressos um por cima do outro.
+   Ícone e chip atravessam as três com span 3, e não com 1 / -1: as linhas aqui
+   nascem do conteúdo, e -1 conta a partir da grade explícita, que não existe.
+   Card sem descrição apenas não usa a linha que sobra. */
+.atalhos-grade[data-vista="lista"] .atalho-topo svg{ grid-column: 1; grid-row: 1 / span 3; align-self: center; }
+.atalhos-grade[data-vista="lista"] .atalho-titulo{ grid-column: 2; grid-row: 1; }
+.atalhos-grade[data-vista="lista"] .atalho-desc{
+  grid-column: 2;
+  grid-row: 2;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+}
+.atalhos-grade[data-vista="lista"] .atalho-pendente .field-vazio{
+  grid-column: 2;
+  grid-row: 3;
+  margin: 0;
+}
+
+/* Em linha o coração acompanha a altura da linha, como o chip: no topo ele
+   ficaria alto demais num card de uma linha só. */
+.atalhos-grade[data-vista="lista"] .atalho-fav{ top: 50%; transform: translateY(-50%); }
+
+/* Mesmo chip do .link-format: em linha, a categoria em caixa alta solta ficava
+   com cara de segundo título. */
+.atalhos-grade[data-vista="lista"] .atalho-tipo{
+  grid-column: 3;
+  grid-row: 1 / span 3;
+  align-self: center;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  background: var(--chip);
+  text-transform: none;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* ---------- Rodapé e vazio ---------- */
+
+.atalhos-vazio{
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: var(--fs-sm);
+}
+
+.atalhos-rodape{
+  display: flex;
+  justify-content: center;
+}
+
+/* Sem botão não há rodapé: o gap do .atalhos deixaria um vão sob a grade. */
+.atalhos-rodape:has(> [hidden]){ display: none; }
+
+.atalhos-mais{
+  padding: 10px 24px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--bg-2);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.atalhos-mais:hover{
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+.atalhos-mais:focus-visible{ outline: 2px solid var(--accent-1); outline-offset: 2px; }
+
+@media (max-width: 600px){
+  /* Em tela estreita a lista é o único formato que cabe sem apertar o texto,
+     mas quem escolheu grade continua com grade: a coluna única já vem do
+     `min(100%, 250px)` da grade. Aqui só o respiro diminui. */
+  .atalho-alvo{ padding: 14px 16px 16px; }
+  .atalhos-grade[data-vista="lista"] .atalho-alvo{ padding: 12px 44px 12px 16px; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .atalho, .atalho-fav, .atalhos-mais, .atalhos-lupa, .atalhos-vista button, .atalhos-campo{
+    transition: none;
+  }
+  .atalho:hover{ transform: none; }
+}
+
 @media (max-width: 900px){
   .steps{ --recuo: 58px; --folga: 20px; --respiro: 18px; }
   .steps > li:not(:has(p)){ --respiro: 14px; }

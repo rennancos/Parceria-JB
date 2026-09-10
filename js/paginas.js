@@ -72,6 +72,20 @@
                           (js/documentos.js). Item vindo do servidor traz `id`,
                           que sai como data-item-id no <li>.
 
+     tipo: 'atalhos'      itens: { titulo, descricao?, href?, icone?, categoria? }
+                          Grade de acesso rápido: os MESMOS itens de 'links',
+                          desenhados em cards com campo de busca, alternância
+                          grade/lista, coração de favorito e "Mostrar mais".
+                          Trocar o `tipo` do bloco troca o layout sem mexer nos
+                          itens. `categoria` é o rótulo curto no topo do card;
+                          sem ele entra o `formato` ("Link", "PDF") e, sem
+                          formato, "Acesso". O bloco aceita `limite`: quantos
+                          cards aparecem antes do botão (padrão 8; 0 mostra
+                          todos e o botão não aparece).
+                          Busca, favoritos e limite são de js/atalhos.js. A
+                          edição pela própria página (`chave`) continua só em
+                          'links'.
+
      tipo: 'notas'        itens: ['texto', 'texto', ...]
                           Lista com marcador. Para observações e regras curtas.
 
@@ -115,11 +129,21 @@ window.PAGINAS = {};
     escudo:     svg('<path d="M12 2 4 6v6c0 5 3.4 9.4 8 10 4.6-.6 8-5 8-10V6z"/>'),
     documento:  svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/>'),
     pdf:        svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 18v-4h1.6a1.2 1.2 0 0 1 0 2.4H8"/><path d="M13 18v-4h1a1.7 1.7 0 0 1 0 4z"/>'),
+    mapa:       svg('<path d="m9 4-6 2v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/>'),
     externo:    svg('<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>')
   };
 
   const ICONE_VOLTAR = svg('<path d="M19 12H5M11 18l-6-6 6-6"/>');
   const ICONE_SETA = svg('<path d="M5 12h14M13 6l6 6-6 6"/>', 'link-arrow');
+
+  /* Ícones da grade de acesso rápido (tipo 'atalhos'). Ficam aqui, e não em
+     ICONES, porque não são escolha de dado: são partes fixas do controle. */
+  const ICONE_LUPA = svg('<circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/>');
+  const ICONE_GRADE = svg('<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>');
+  const ICONE_LISTA = svg('<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>');
+  /* O coração é o único ícone do portal que ganha preenchimento: vazio quando
+     o item não é favorito, cheio quando é (`fill: currentColor` no CSS). */
+  const ICONE_CORACAO = svg('<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 1 0-7.8 7.8l8.8 8.8 8.8-8.8a5.5 5.5 0 0 0 0-7.8z"/>');
 
   /* ---------- Blocos ---------- */
 
@@ -294,11 +318,98 @@ window.PAGINAS = {};
     return `<li${marca}><a href="${esc(item.href)}"${alvoDe(item.href)}>${corpo}${ICONE_SETA}</a></li>`;
   }
 
+  /* ---------- Acesso rápido (tipo 'atalhos') ----------
+
+     A mesma grade de cards do portal corporativo: campo de busca, alternância
+     entre grade e lista, categoria e coração de favorito em cada card, e o
+     botão "Mostrar mais" quando a lista passa do limite.
+
+     O item é o MESMO de 'links', com um campo a mais (`categoria`): trocar o
+     `tipo` do bloco troca o layout sem reescrever um item sequer, e um bloco
+     não fica com dois vocabulários de dados para a mesma coisa.
+
+     Aqui só sai markup. Filtro, favoritos e limite são de js/atalhos.js, que
+     mexe no que já está desenhado — sem ele (ou com ele quebrado) a grade
+     aparece inteira e legível, só a barra é que deixa de responder. */
+
+  function atalho(item){
+    const formato = formatoDe(item);
+    const icone = ICONES[item.icone] || (formato && ICONES[formato.icone]) || ICONES.arquivo;
+    const marca = item.id ? ` data-item-id="${esc(item.id)}"` : '';
+    const categoria = item.categoria || (formato ? formato.rotulo : 'Acesso');
+
+    const corpo =
+      `<span class="atalho-topo">${icone}<span class="atalho-tipo">${esc(categoria)}</span></span>` +
+      `<span class="atalho-titulo">${esc(item.titulo)}</span>` +
+      (item.descricao ? `<span class="atalho-desc">${esc(item.descricao)}</span>` : '');
+
+    // Mesma regra do resto da página: item sem destino não vira <a>. Fica na
+    // grade como pendência visível, em vez de um card que não leva a nada.
+    const alvo = item.href
+      ? `<a class="atalho-alvo" href="${esc(item.href)}"${alvoDe(item.href)}>${corpo}</a>`
+      : `<div class="atalho-alvo atalho-pendente">${corpo}<span class="field-vazio">a definir</span></div>`;
+
+    /* O coração fica FORA do <a>: botão dentro de link não é markup válido e o
+       clique cairia na navegação. O card inteiro continua clicável porque o
+       <a> se estica por cima do <li> (::after em css/pagina.css) e o coração
+       sobe acima dele. */
+    const favorito =
+      `<button class="atalho-fav" type="button" aria-pressed="false"` +
+      ` data-fav="${esc(item.titulo)}" aria-label="Favoritar ${esc(item.titulo)}">${ICONE_CORACAO}</button>`;
+
+    /* data-termos junta o que o filtro compara — título, descrição e categoria
+       — para js/atalhos.js não ter de remontar isso a cada tecla digitada.
+
+       O nome NÃO pode ser data-busca: js/busca.js liga todo [data-busca] ao
+       botão que abre a janela de busca do portal, e cada card viraria um
+       gatilho dela — clicar num atalho abria a janela em vez de ir ao destino. */
+    const termos = [item.titulo, item.descricao, categoria].filter(Boolean).join(' ');
+
+    return `<li class="atalho" data-termos="${esc(termos)}"${marca}>${alvo}${favorito}</li>`;
+  }
+
+  // Cards visíveis antes do "Mostrar mais". O bloco pode declarar outro valor
+  // em `limite`; 0 (ou negativo) desliga o botão e mostra a lista inteira.
+  const ATALHOS_LIMITE = 8;
+
+  /* O botão "Mostrar mais" e o aviso de busca vazia nascem com `hidden`: quem
+     decide se eles aparecem é js/atalhos.js, depois de contar quantos cards
+     sobraram. Assim, sem JavaScript nenhum, a página não mostra um botão que
+     não faz nada nem um "nada encontrado" acima de doze cards. */
+  function gradeAtalhos(itens, dados){
+    const declarado = Number(dados.limite);
+    const limite = Number.isFinite(declarado) ? Math.max(0, Math.floor(declarado)) : ATALHOS_LIMITE;
+
+    return `
+      <div class="atalhos" data-atalhos data-limite="${limite}">
+        <div class="atalhos-barra">
+          <div class="atalhos-campo">
+            <input type="search" placeholder="Pesquise aqui" aria-label="Pesquisar nesta lista" autocomplete="off">
+            <button class="atalhos-lupa" type="button" aria-label="Pesquisar">${ICONE_LUPA}</button>
+          </div>
+
+          <div class="atalhos-vista" role="group" aria-label="Formato de exibição">
+            <button type="button" data-vista="grade" aria-pressed="true" aria-label="Ver em grade" title="Grade">${ICONE_GRADE}</button>
+            <button type="button" data-vista="lista" aria-pressed="false" aria-label="Ver em lista" title="Lista">${ICONE_LISTA}</button>
+          </div>
+        </div>
+
+        <ul class="atalhos-grade" data-vista="grade">${itens.map(atalho).join('')}</ul>
+
+        <p class="atalhos-vazio" role="status" hidden>Nenhum item corresponde à busca.</p>
+
+        <div class="atalhos-rodape">
+          <button class="atalhos-mais" type="button" aria-expanded="false" hidden>Mostrar Mais</button>
+        </div>
+      </div>`;
+  }
+
   /* O segundo argumento é o bloco inteiro; só 'links' usa, para carimbar a
      `chave` na lista (o gancho do botão "Incluir" — ver js/documentos.js).
      Bloco sem `chave` sai sem o atributo, igual a antes. */
   const LAYOUTS = {
     passos:      (itens) => `<ol class="steps">${itens.map(passo).join('')}</ol>`,
+    atalhos:     (itens, dados) => gradeAtalhos(itens, dados),
     links:       (itens, dados) => `<ul class="link-list"${dados.chave ? ` data-bloco="${esc(dados.chave)}"` : ''}>${itens.map(link).join('')}</ul>`,
     paineis:     (itens) => `<div class="panel-grid">${itens.map(painel).join('')}</div>`,
     notas:       (itens) => `<ul class="notes">${itens.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>`,

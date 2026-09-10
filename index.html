@@ -231,6 +231,12 @@
 <script src="js/busca/indice.js"></script>
 <script src="js/busca.js"></script>
 
+<!-- Barra de busca, grade/lista, favoritos e "Mostrar mais" dos blocos
+     `tipo: 'atalhos'`. Depois do router porque mexe no HTML que ele acabou
+     de desenhar (e a cada pagina:render), e depois do motor da busca porque
+     reaproveita a normalização de acentos dele. -->
+<script src="js/atalhos.js"></script>
+
 <!-- Edição pela própria página. Depois do router de propósito: depende do
      renderizador e do router já existirem. Sem o servidor Node no ar (file://
      ou `pnpm start`), este arquivo não faz nada e a página fica como está. -->

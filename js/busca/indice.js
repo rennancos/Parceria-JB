@@ -28,6 +28,9 @@
     paineis:     (i) => ({ titulo: i.titulo, subtitulo: i.texto, corpo: i.meta, href: i.href }),
     passos:      (i) => ({ titulo: i.titulo, subtitulo: i.texto, corpo: i.destaque, href: i.href }),
     links:       (i) => ({ titulo: i.titulo, subtitulo: i.descricao, corpo: i.formato, href: i.href }),
+    // Mesmos campos de 'links' mais a categoria: o bloco muda de layout,
+    // não de conteúdo, e o resultado da busca continua o mesmo.
+    atalhos:     (i) => ({ titulo: i.titulo, subtitulo: i.descricao, corpo: i.categoria || i.formato, href: i.href }),
     sistemas:    (i) => ({ titulo: i.sistema, subtitulo: i.perfil ? `Perfil: ${i.perfil}` : '' }),
     fabricantes: (i) => ({ titulo: i.nome, subtitulo: i.portal || i.email || '',
                            corpo: [i.email, i.telefone, i.horario].filter(Boolean).join(' ') }),

@@ -73,11 +73,32 @@ Com **vários**, use `blocos` — cada um pode ter `titulo` próprio, que vira u
 | `paineis` | `titulo`, `texto`, `meta?`, `href?` | Grade de blocos. Com `href` o bloco vira card clicável; sem, fica estático. |
 | `passos` | `titulo`, `texto`, `destaque?` | Lista numerada — a numeração é do CSS, não digite "1.". `destaque` desenha a faixa azul dentro do passo (caminho de menu, nome de categoria). |
 | `links` | `titulo`, `descricao?`, `href?`, `formato?`, `icone?` | Lista com ícone à esquerda e seta à direita. Serve tanto para endereço quanto para arquivo DOC/PDF — ver abaixo. |
+| `atalhos` | `titulo`, `descricao?`, `href?`, `icone?`, `categoria?` | Os mesmos itens de `links` em grade de cards, com busca, grade/lista, favorito e "Mostrar mais" — ver abaixo. |
 | `notas` | strings simples, não objetos | Lista com marcador, para observações e regras curtas. |
 | `sistemas` | `sistema`, `perfil` | Grade compacta de sistema + perfil de acesso. |
 | `fabricantes` | `nome`, `portal?`, `email?`, `telefone?`, `horario?` | Ficha de contato. Os quatro rótulos e a ordem ficam no renderizador, não nos dados — nenhuma ficha sai fora do padrão. |
 
 **Campo de fabricante em branco vira "a definir" em itálico**, visível como pendência. Isso é deliberado: contato de suporte errado custa caro, então o vazio aparece como vazio em vez de sumir da tela. `email` e `portal` só viram link quando preenchidos.
+
+### Grade de acesso rápido (`atalhos`)
+
+É o layout da página **Acessos Parceria**: os mesmos itens de `links`, desenhados em cards, com campo de busca, alternância entre grade e lista, coração de favorito e botão "Mostrar mais".
+
+```js
+{ titulo: 'Portais e sistemas', tipo: 'atalhos', limite: 8, itens: [
+    { titulo: 'Portal corporativo', descricao: 'Intranet e serviços internos',
+      categoria: 'Portal', icone: 'portal', href: 'https://...' },
+    { titulo: 'Contatos de plantão', descricao: 'Quem acionar fora do horário',
+      categoria: 'Emergência', icone: 'pessoas' }        // sem href: pendência
+]}
+```
+
+- **É o mesmo item de `links`**, com `categoria` a mais. Trocar o `tipo` do bloco troca o layout sem reescrever nenhum item — e o contrário também vale.
+- **`categoria`** é o rótulo curto no topo do card (no formato de lista ele vira o chip da direita). Sem ele entra o `formato` ("Link", "PDF"); sem formato, "Acesso".
+- **`limite`** é quantos cards aparecem antes do botão "Mostrar mais" — 8 por padrão. `limite: 0` mostra a lista inteira e o botão não aparece.
+- **Item sem `href`** não vira link, igual em `links`: fica no lugar dele, com borda tracejada e "a definir".
+- **Busca, favorito, formato e "Mostrar mais" são de `js/atalhos.js`.** O filtro compara título, descrição e categoria, ignorando acento (é a normalização da busca do portal). O formato escolhido e os favoritos ficam no `localStorage` de quem está usando: são preferência de uma pessoa naquele navegador, não conteúdo da página, e não mudam o que os outros veem. Sem esse arquivo a grade aparece inteira e legível — só a barra deixa de responder.
+- **Não aceita `chave`**: a edição pela própria página continua só em `links` (ver [09-edicao-pela-pagina.md](09-edicao-pela-pagina.md)).
 
 ### Link ou arquivo, na mesma lista
 
@@ -99,7 +120,7 @@ Os arquivos ficam em `docs/`, ao lado do `index.html` (ver [docs/LEIA-ME.md](../
 
 **Bloco de `links` com `chave`** — é o caso dos três de Documentação — deixa de ser editado aqui: os `itens` do arquivo viram semente, e quem manda passa a ser o acervo do servidor, editado pela própria página. A `chave` sai como `data-bloco` no `<ul>` e precisa existir também em `BLOCOS`, no topo de `servidor/dados.js`. Ver [09-edicao-pela-pagina.md](09-edicao-pela-pagina.md). Sem o serviço no ar, a semente daqui é o que aparece.
 
-`icone` é uma chave da tabela `ICONES` em `paginas.js` (`portal`, `chamado`, `agenda`, `sharepoint`, `pessoas`, `pasta`, `arquivo`, `planilha`, `imagem`, `escudo`, `documento`, `pdf`, `externo`) e sobrepõe o ícone do formato. Chave inválida ou ausente cai no ícone do formato e, sem formato, no de arquivo — sem quebrar nada. Para linkar outra página interna, use o hash dela: `href: '#documentacao'`.
+`icone` é uma chave da tabela `ICONES` em `paginas.js` (`portal`, `chamado`, `agenda`, `parceria`, `pessoas`, `pasta`, `mapa`, `arquivo`, `planilha`, `imagem`, `escudo`, `documento`, `pdf`, `externo`) e sobrepõe o ícone do formato. Chave inválida ou ausente cai no ícone do formato e, sem formato, no de arquivo — sem quebrar nada. Para linkar outra página interna, use o hash dela: `href: '#documentacao'`.
 
 O campo opcional `aviso` desenha o bloco tracejado no fim da página — remova quando o conteúdo real entrar.
 
@@ -115,7 +136,7 @@ O `data-pagina` é o que o router usa para marcar o item ativo — sem ele o lin
 
 ## Estilos
 
-`css/pagina.css` guarda as classes que o renderizador emite: `.back-link`, `.page-eyebrow`, `.page-section`, `.block-title`, `.panel-grid`/`.panel`, `.steps`, `.callout`, `.notes`, `.sys-list`, `.field-list`, `.link-list` e `.notice`. Como esse markup não existe no HTML, ao renomear um seletor lá é preciso ajustar `js/paginas.js` junto — e, no caso de `.link-list`, também `js/documentos.js` e `css/edicao.css`, que penduram os botões de edição nele.
+`css/pagina.css` guarda as classes que o renderizador emite: `.back-link`, `.page-eyebrow`, `.page-section`, `.block-title`, `.panel-grid`/`.panel`, `.steps`, `.callout`, `.notes`, `.sys-list`, `.field-list`, `.link-list`, a família `.atalhos*`/`.atalho*` e `.notice`. Como esse markup não existe no HTML, ao renomear um seletor lá é preciso ajustar `js/paginas.js` junto — e, no caso de `.link-list`, também `js/documentos.js` e `css/edicao.css`, que penduram os botões de edição nele. Os seletores de `.atalhos` são lidos por `js/atalhos.js`, que filtra, marca favorito e aplica o limite em cima do que o renderizador desenhou.
 
 ## De onde vem o conteúdo
 

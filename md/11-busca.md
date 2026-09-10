@@ -42,6 +42,7 @@ Cada tipo de bloco guarda o texto em campos diferentes, e `ITEM_POR_TIPO` em `js
 | `paineis` | título, texto, `meta`, e o `href` se tiver |
 | `passos` | título, texto, destaque |
 | `links` | título, descrição, formato, `href` |
+| `atalhos` | título, descrição, categoria, `href` |
 | `sistemas` | nome do sistema e o perfil de acesso |
 | `fabricantes` | nome, portal, e-mail, telefone, horário |
 | `notas` | o texto da nota |

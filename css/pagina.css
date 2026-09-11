@@ -377,6 +377,14 @@ a.callout .link-arrow{
 .steps > li{
   counter-increment: etapa;
   position: relative;
+  /* Item de grade nasce com `min-width: auto`: não encolhe abaixo do próprio
+     conteúdo. Bastava UM passo com conteúdo que não encolhe — a `.sys-list` de
+     `grupos`, cuja coluna tem mínimo de 360px — para a coluna da lista inteira
+     ser medida pelo conteúdo, e aí TODOS os passos irmãos saíam com a largura
+     máxima (902px) e vazavam a tela no celular. Com o zero aqui, cada passo
+     obedece à coluna, e a `.sys-list` recebe uma largura definida: o
+     `min(100%, 360px)` dela resolve para a largura real e cai em uma coluna. */
+  min-width: 0;
   padding: var(--respiro) var(--folga) var(--respiro) var(--recuo);
   border: 1px solid var(--panel-line);
   border-radius: var(--radius);

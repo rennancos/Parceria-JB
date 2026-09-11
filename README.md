@@ -1,16 +1,16 @@
-# Parceria JB — Portal
+# Portal Parceria JB
 
 Para alterar o código, consulte o [Guia de Manutenção](docs/manutencao.md): arquitetura, contratos, dependências, riscos e validações.
 
 Portal interno da Parceria JB: ponto único de entrada para primeiros passos, documentação, manuais, acessos e SharePoint da operação.
 
-Sem build e sem framework — HTML, CSS e JavaScript em arquivos separados, lidos direto pelo navegador. A página abre até por duplo clique em `index.html`.
+Sem build e sem framework. HTML, CSS e JavaScript em arquivos separados, lidos direto pelo navegador. A página abre até por duplo clique em `index.html`.
 
 > **Repositório privado, e precisa continuar assim.** O código carrega nomes e e-mails reais da equipe (`js/equipe-dados.js`), fotos de pessoas (`Fotos/EQUIPE/`) e marca corporativa. Leia [md/02-seguranca.md](md/02-seguranca.md) antes de publicar isto em qualquer lugar.
 
 ## Como rodar
 
-A raiz do projeto é esta pasta (`PA_JB/`) — é onde ficam o `.git` e o `package.json`.
+A raiz do projeto é esta pasta (`PA_JB/`), onde ficam o `.git` e o `package.json`.
 
 ```bash
 cd PA_JB       # a partir de DEV PAJB
@@ -18,7 +18,7 @@ pnpm install   # só na primeira vez
 pnpm dev       # http://localhost:8000
 ```
 
-Duplo clique em `index.html` também funciona. A diferença prática — `localStorage`, teste em celular, fidelidade ao resultado final — está em [md/01-como-rodar.md](md/01-como-rodar.md).
+Duplo clique em `index.html` também funciona. O [md/01-como-rodar.md](md/01-como-rodar.md) explica o que muda na prática: `localStorage`, teste em celular e fidelidade ao resultado final.
 
 Para ter também a API pela qual a equipe edita os documentos sem abrir código:
 
@@ -29,14 +29,14 @@ pnpm usuarios   # cadastro de quem edita
 
 O portal funciona sem esse serviço: quando não há API respondendo, os botões de edição simplesmente não aparecem.
 
-O mesmo portal também é distribuível como **aplicativo Windows**, com verificação de atualização ao abrir:
+O mesmo portal também é distribuível como aplicativo Windows, com verificação de atualização ao abrir:
 
 ```bash
 npm run app         # abre o aplicativo, sem empacotar
 npm run app:build   # gera dist/Parceria-JB-Setup-<versão>.exe
 ```
 
-É Electron, e só existe em `app/` — o site não mudou uma linha para isso. Passo a passo em [md/10-aplicativo-windows.md](md/10-aplicativo-windows.md).
+É Electron, e só existe em `app/`. O site não mudou uma linha para isso. Passo a passo em [md/10-aplicativo-windows.md](md/10-aplicativo-windows.md).
 
 ## As três ideias que explicam o resto
 
@@ -44,7 +44,7 @@ npm run app:build   # gera dist/Parceria-JB-Setup-<versão>.exe
 
 **2. Conteúdo é dado, não markup.** Texto das páginas e lista de pessoas vivem em `.js` como objetos e arrays; o HTML é gerado a partir deles. Quem edita conteúdo nunca toca em tag.
 
-**3. Tem que funcionar em `file://`.** Isso proíbe `fetch()` de arquivo local e `<script type="module">` — é a razão de os dados serem `.js` e não `.json`, e de o servidor local ser um estático burro em vez do Vite.
+**3. Tem que funcionar em `file://`.** Isso proíbe `fetch()` de arquivo local e `<script type="module">`, e é a razão de os dados serem `.js` e não `.json`, e de o servidor local ser um estático burro em vez do Vite.
 
 ## Estrutura
 
@@ -86,7 +86,7 @@ O teste de navegador usa uma API simulada em memória e não modifica usuários,
 
 As verificações cobrem `file://`, HTTP sem API, submissões pendentes, sessão expirada, busca e layout responsivo. O resultado da refatoração está em [Auditoria do frontend](md/auditoria-estrutura-frontend.md).
 
-Para abrir o portal e mexer nele sem ser por teste — conferir uma mudança de CSS, tirar print de uma página, reproduzir um bug —, há um driver em `.claude/skills/run-pa-jb-portal/`:
+Para abrir o portal e mexer nele sem ser por teste (conferir uma mudança de CSS, tirar print de uma página, reproduzir um bug), há um driver em `.claude/skills/run-pa-jb-portal/`:
 
 ```bash
 node servidor/servidor.js --porta 8123                                   # em outro terminal
@@ -94,7 +94,7 @@ node .claude/skills/run-pa-jb-portal/driver.mjs --porta 8123 --smoke     # dez c
 node .claude/skills/run-pa-jb-portal/driver.mjs --file --smoke           # o mesmo em file://
 ```
 
-Sem dependência: fala CDP direto com o Chrome. Aceita comandos avulsos (`ir #documentacao`, `clique`, `digitar`, `foto`) e, com `--anexar <porta>`, dirige o **aplicativo Windows** — que os testes acima não alcançam. Comandos e armadilhas em `.claude/skills/run-pa-jb-portal/SKILL.md`.
+Sem dependência: fala CDP direto com o Chrome. Aceita comandos avulsos (`ir #documentacao`, `clique`, `digitar`, `foto`) e, com `--anexar <porta>`, dirige o aplicativo Windows, que os testes acima não alcançam. Comandos e armadilhas em `.claude/skills/run-pa-jb-portal/SKILL.md`.
 
 ## Documentação
 
@@ -109,20 +109,20 @@ Sem dependência: fala CDP direto com o Chrome. Aceita comandos avulsos (`ir #do
 | [05-equipe.md](md/05-equipe.md) | A seção "Nossa equipe": array, fotos, destaques |
 | [06-estilos-e-tema.md](md/06-estilos-e-tema.md) | Tokens do tema atual, responsivo, drawer, acessibilidade |
 | [07-pendencias.md](md/07-pendencias.md) | O que está inacabado ou merece atenção |
-| [08-futuros-passos.md](md/08-futuros-passos.md) | Roteiro: subir na VM, conteúdo real, busca — e o que **não** fazer |
+| [08-futuros-passos.md](md/08-futuros-passos.md) | Roteiro: subir na VM, conteúdo real, busca, e o que não fazer |
 | [09-edicao-pela-pagina.md](md/09-edicao-pela-pagina.md) | A equipe editando documentos pela própria página: uso, administração e o servidor por trás |
 | [10-aplicativo-windows.md](md/10-aplicativo-windows.md) | O portal como `.exe`: gerar o instalador, versionar, publicar atualização |
 | [11-busca.md](md/11-busca.md) | A busca do portal: o que indexa, como ordena e as armadilhas do componente |
 
-Para mexer em conteúdo, **04** e **05** bastam. Para aparência, **06**.
+Para mexer em conteúdo, 04 e 05 bastam. Para aparência, 06.
 
 Duas auditorias de estrutura, fora da numeração porque são fotografias de um momento e não guias de uso:
 
 | Documento | Para quê |
 |---|---|
-| [auditoria-estrutura-backend.md](md/auditoria-estrutura-backend.md) | `servidor/`: os achados, o plano P0-P3 e **por que a arquitetura não foi refatorada** — leia antes de propor camadas novas |
+| [auditoria-estrutura-backend.md](md/auditoria-estrutura-backend.md) | `servidor/`: os achados, o plano P0-P3 e por que a arquitetura não foi refatorada. Leia antes de propor camadas novas |
 | [auditoria-estrutura-frontend.md](md/auditoria-estrutura-frontend.md) | A divisão de `js/` em módulos e o que os testes passaram a cobrir |
 
 ## Status
 
-A edição pela própria página está funcionando de ponta a ponta e testada nos dois papéis (`equipe` e `dev`); falta subir na VM. O conteúdo ainda é parcial — os itens de Documentação estão sem destino ("a definir"), `docs/` está vazia e a equipe está com dados de exemplo. A lista completa está em [md/07-pendencias.md](md/07-pendencias.md).
+A edição pela própria página está funcionando de ponta a ponta e testada nos dois papéis (`equipe` e `dev`); falta subir na VM. O conteúdo ainda é parcial: os itens de Documentação estão sem destino ("a definir"), `docs/` está vazia e a equipe está com dados de exemplo. A lista completa está em [md/07-pendencias.md](md/07-pendencias.md).

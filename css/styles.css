@@ -1,6 +1,6 @@
 /* Base e layout do portal. Os valores do tema estão em tokens.css. */
 
-/* Regra global: hidden prevalece sobre os layouts flex e grid. */
+/* [hidden] precisa vencer flex e grid. */
 [hidden]{ display: none !important; }
 
 body h1,
@@ -23,8 +23,8 @@ body .page-eyebrow{
 h1, h2, h3, h4{ text-wrap: balance; }
 p, li, dd, figcaption, blockquote{ text-wrap: pretty; }
 
-/* O corpo usa entrelinha de leitura (1.55); título com esse valor fica solto,
-   ainda mais quando a escala fluida o quebra em duas linhas no celular. */
+/* 1.55 é entrelinha de leitura: em título fica solto, ainda mais quebrado em
+   duas linhas no celular. */
 h1, h2, h3, h4{ line-height: 1.25; }
 
 html, body{
@@ -36,22 +36,19 @@ html, body{
   -webkit-font-smoothing: antialiased;
 }
 
-/* Tamanho herdado por qualquer texto sem regra própria — também fluido, para
-   não sobrar nenhum ponto da página com escala travada. */
+/* Herdado por qualquer texto sem regra própria, para não sobrar escala travada. */
 body{
   font-size: var(--fs-base);
   line-height: 1.55;
 }
 
-/* `clip` e não `hidden`: nenhum elemento pode gerar rolagem lateral, mas
-   `overflow-x: hidden` transformaria o documento em contêiner de rolagem e o
-   cabeçalho sticky pararia de grudar no topo. `clip` corta sem criar rolagem.
-   Em navegador sem suporte a `clip`, o comportamento cai em `visible` — o
-   cabeçalho continua correto, que é o que não pode falhar. */
+/* `clip` e não `hidden`: `overflow-x: hidden` tornaria o documento contêiner
+   de rolagem e o cabeçalho sticky pararia de grudar no topo. Sem suporte a
+   `clip` cai em `visible`, e o cabeçalho continua certo. */
 html{
   overflow-x: clip;
-  /* Calha sempre reservada: com o drawer aberto o body vira overflow:hidden
-     e, sem isto, a página daria um pulo lateral quando a barra sumisse. */
+  /* Calha sempre reservada: o drawer põe overflow:hidden no body, e sem ela
+     a página pula de lado quando a barra some. */
   scrollbar-gutter: stable;
 }
 
@@ -63,15 +60,13 @@ body{
   overflow-x: clip;
 }
 
-/* Toda imagem do projeto é fluida por padrão: nunca estoura o container. */
 img{
   max-width: 100%;
   display: block;
 }
 
-/* Sem `overflow` aqui: o cabeçalho é sticky e um ancestral com overflow
-   diferente de `visible` viraria a referência de rolagem dele. Os dois
-   pseudoelementos decorativos já ficam dentro da caixa por conta própria. */
+/* Sem `overflow` aqui: o cabeçalho é sticky, e um ancestral com overflow
+   diferente de `visible` viraria a referência de rolagem dele. */
 .backdrop{
   position: relative;
   background: var(--bg);
@@ -134,8 +129,7 @@ header{
   border-radius: var(--radius-xs);
 }
 
-/* Caixa da logo: a marca é centrada e cabe inteira (contain), sem corte.
-   O fundo bege dá a mesma moldura para qualquer arquivo, com ou sem alpha. */
+/* O fundo bege dá a mesma moldura para qualquer arquivo, com ou sem alpha. */
 .brand-mark{
   display: flex;
   align-items: center;
@@ -162,9 +156,8 @@ header{
   letter-spacing: -0.01em;
 }
 
-/* Barra de navegação do topo. Elemento próprio, separado do drawer: os dois
-   coexistem, cada um com o seu layout, e o botão hambúrguer não depende mais
-   da largura da tela para ter o que abrir. */
+/* Elemento próprio, separado do drawer: os dois coexistem, e o hambúrguer não
+   depende da largura da tela para ter o que abrir. */
 .top-nav{
   display: flex;
   align-items: center;
@@ -187,10 +180,9 @@ header{
 
 /* ---------- Menu lateral (drawer) ----------
 
-   Vale em qualquer largura: o hambúrguer abre este painel no celular e no
-   desktop. Ele fica fora do <header> de propósito — o cabeçalho tem z-index e
-   backdrop-filter, e um "position: fixed" lá dentro ficaria preso ao contexto
-   de empilhamento dele, atrás do scrim. */
+   Vale em qualquer largura, e fica fora do <header> de propósito: o cabeçalho
+   tem z-index e backdrop-filter, e um `position: fixed` lá dentro ficaria
+   preso ao contexto de empilhamento dele, atrás do scrim. */
 .menu-panel{
   display: flex;
   flex-direction: column;
@@ -209,8 +201,8 @@ header{
   visibility: hidden;
   transition: transform 0.25s ease, visibility 0.25s ease;
 }
-/* "visibility: hidden" também tira o conteúdo do painel da ordem de tabulação
-   enquanto ele está fechado: não precisa de inert nem de tabindex negativo. */
+/* `visibility: hidden` já tira o painel fechado da ordem de tabulação: não
+   precisa de inert nem tabindex negativo. */
 body.menu-open .menu-panel{
   transform: translateX(0);
   visibility: visible;
@@ -230,8 +222,8 @@ body.menu-open .menu-panel{
   color: var(--ink-soft);
 }
 
-/* No drawer o link deixa de ser item de barra e vira linha de toque: sobe um
-   passo na escala (--fs-sm → --fs-md) porque o alvo é o dedo, não o mouse. */
+/* Linha de toque, não item de barra: sobe um passo na escala porque o alvo é
+   o dedo. */
 .menu-panel nav{
   display: flex;
   flex-direction: column;
@@ -298,8 +290,7 @@ body.menu-open .scrim{
   visibility: visible;
 }
 
-/* Trava a rolagem do fundo com o painel aberto. A calha reservada no html
-   evita que a página escorregue de lado quando a barra de rolagem some. */
+/* Trava a rolagem do fundo com o painel aberto (a calha no html cobre o pulo). */
 body.menu-open{ overflow: hidden; }
 
 .icons{
@@ -428,8 +419,6 @@ main{
   outline-offset: 3px;
 }
 
-/* Todo ícone dentro de moldura fica centrado nos dois eixos — mesma regra
-   vale para o avatar da equipe (equipe.css) e para a logo do cabeçalho. */
 .card-icon{
   display: flex;
   align-items: center;
@@ -560,11 +549,9 @@ footer{
 
 /* ---------- Notebook ----------
 
-   Daqui para baixo as media queries mexem em espaçamento e arranjo, nunca em
-   font-size: quem cuida do tamanho do texto é a escala fluida do :root, que já
-   acompanha a largura dentro de cada faixa. Repetir font-size aqui traria de
-   volta o degrau no breakpoint. A única exceção é o drawer: lá o link e as
-   ações trocam de papel — viram alvo de toque —, e não só de tamanho. */
+   Daqui para baixo: espaçamento e arranjo, nunca font-size. O tamanho do texto
+   é da escala fluida do :root, e repeti-lo aqui traz de volta o degrau no
+   breakpoint. Exceção é o drawer, onde o link vira alvo de toque. */
 
 @media (max-width: 1100px){
   header{ padding: 14px 24px; }
@@ -589,8 +576,7 @@ footer{
 
   .intro{ margin-bottom: var(--sp-5); }
 
-  /* Cabeçalho estreito: a navegação e os ícones secundários saem da barra e
-     passam a existir só dentro do drawer, que já traz os dois. */
+  /* Navegação e ícones secundários passam a existir só dentro do drawer. */
   .top-nav{ display: none; }
   .icons{ gap: 6px; }
   .icon-secondary{ display: none; }
@@ -629,14 +615,13 @@ footer{
 }
 
 
-/* Marca o item correspondente à página aberta, nos dois menus. */
 .top-nav a[aria-current="page"],
 .menu-panel nav a[aria-current="page"]{
   color: var(--ink);
   font-weight: 650;
 }
-/* No drawer o link é um bloco: o sublinhado ficaria solto no meio do padding,
-   então lá o item ativo é marcado pelo fundo. */
+/* No drawer o link é bloco: o sublinhado ficaria solto no padding, então o
+   ativo é marcado pelo fundo. */
 .menu-panel nav a[aria-current="page"]{ background: var(--bg-2); }
 .top-nav a[aria-current="page"]::after{
   content: "";

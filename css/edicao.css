@@ -1,6 +1,5 @@
-/* Edição pela página: botões em documentos.js, formulários em
-   documentos/formularios.js e janela em documentos/dialogo.js.
-   Tokens compartilhados em tokens.css; layout das listas em pagina.css. */
+/* Edição pela página: botões em documentos.js, formulários e janela em
+   documentos/. Tokens em tokens.css, layout das listas em pagina.css. */
 
 /* ---------- Botões ---------- */
 
@@ -40,7 +39,6 @@
   cursor: default;
 }
 
-/* Ações destrutivas usam a cor semântica de perigo. */
 .ed-btn.ed-perigo:hover{
   border-color: var(--danger);
   background: transparent;
@@ -58,8 +56,7 @@
 }
 /* ---------- Item da lista com botões ---------- */
 
-/* O <li> normal é só a caixa do link. Com ações, ele vira a linha: o link (ou o
-   "a definir") ocupa o espaço que sobra e os botões ficam à direita. */
+/* Com ações o <li> deixa de ser a caixa do link e vira a linha inteira. */
 .link-list li.com-acoes{
   display: flex;
   align-items: stretch;
@@ -78,15 +75,13 @@
   flex-shrink: 0;
 }
 
-/* Barra do "Incluir", logo abaixo de cada lista. */
 .ed-barra{
   display: flex;
   margin-top: 10px;
 }
 
 @media (max-width: 700px){
-  /* Lado a lado os botões espremem o título do documento. Empilhados, o item
-     continua legível e as ações ficam logo abaixo dele. */
+  /* Lado a lado, os botões espremem o título do documento. */
   .link-list li.com-acoes{
     flex-direction: column;
     align-items: stretch;
@@ -94,8 +89,7 @@
   .ed-acoes{ justify-content: flex-end; }
 }
 
-/* Ponto no botão Perfil enquanto há sessão aberta — o único sinal permanente de
-   que a pessoa está logada. */
+/* Único sinal permanente de que há sessão aberta. */
 .perfil-ativo{ position: relative; }
 .perfil-ativo::after{
   content: "";
@@ -233,7 +227,6 @@
   color: var(--ink-soft);
 }
 
-/* Escolha entre endereço e arquivo. */
 .ed-tipo{
   gap: 8px;
   padding: 14px 16px;
@@ -265,7 +258,6 @@
   color: var(--ink-soft);
 }
 
-/* Arquivo que o item já usa hoje, ao editar. */
 .ed-atual{
   margin: 0;
   font-size: var(--fs-xs);
@@ -305,8 +297,7 @@
   overflow-wrap: anywhere;
 }
 
-/* Erro vindo do servidor (senha errada, endereço recusado, arquivo grande
-   demais). As mensagens já chegam em português — ver servidor/dados.js. */
+/* Erro do servidor. As mensagens já chegam em português (servidor/dados.js). */
 .ed-erro{
   margin: 0;
   padding: 11px 14px;

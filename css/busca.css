@@ -1,15 +1,9 @@
-/* Busca (js/busca.js).
-
-   Aparência baseada nos tokens de css/tokens.css. Estados locais de realce
-   permanecem neste arquivo — ver md/06-estilos-e-tema.md.
-
-   A janela é um <dialog> modal, como o da edição: o ::backdrop, o foco preso e
-   o Esc são do navegador. Aqui só há aparência. */
+/* Busca (js/busca.js). Tokens em css/tokens.css, realce local aqui.
+   A janela é <dialog> modal: ::backdrop, foco preso e Esc são do navegador. */
 
 /* ---------- Janela ---------- */
 
-/* Alinhada ao topo, não centralizada: a lista cresce para baixo conforme se
-   digita, e uma caixa centralizada saltaria a cada tecla. */
+/* Alinhada ao topo: centralizada, a caixa saltaria a cada tecla digitada. */
 .busca-janela{
   position: fixed;
   inset: 0;
@@ -22,14 +16,13 @@
   background: var(--card);
   color: var(--ink);
   box-shadow: var(--shadow-card-lg);
-  overflow: hidden;                 /* quem rola é a lista, não a janela */
+  overflow: hidden; /* quem rola é a lista, não a janela */
 
   display: flex;
   flex-direction: column;
 }
 
-/* `display: flex` acima sobrescreve o `dialog:not([open]){display:none}` do
-   navegador — sem isto a janela continua na tela depois de fechada. */
+/* O `display: flex` acima mata o `dialog:not([open]){display:none}` nativo. */
 .busca-janela:not([open]){ display: none; }
 
 .busca-janela::backdrop{
@@ -38,7 +31,7 @@
   backdrop-filter: blur(2px);
 }
 
-/* O <h2> existe para o aria-labelledby da janela; não precisa aparecer. */
+/* Rótulo do aria-labelledby da janela. */
 .busca-rotulo{
   position: absolute;
   width: 1px;
@@ -76,20 +69,17 @@
   color: var(--ink);
   font: inherit;
   font-size: var(--fs-md);
-  outline: none;                    /* o anel fica na janela inteira, abaixo */
+  outline: none; /* o anel fica na janela inteira, abaixo */
 }
 
 .busca-campo input::placeholder{ color: var(--ink-soft); opacity: 0.85; }
 
-/* O campo recebe o foco assim que a janela abre, e é o único lugar onde o
-   cursor fica: o anel vai na linha inteira para que ele seja visível sem
-   competir com o texto digitado. */
+/* O anel vai na linha inteira: no próprio campo competiria com o texto. */
 .busca-campo:focus-within{
   box-shadow: inset 0 -2px 0 0 var(--accent-1);
 }
 
-/* Some o "x" nativo do type=search: já existe um botão de fechar ao lado, e os
-   dois juntos confundem. */
+/* Some o "x" nativo do type=search: já há um botão de fechar ao lado. */
 .busca-campo input::-webkit-search-cancel-button{ display: none; }
 
 .busca-fechar{
@@ -113,8 +103,7 @@
 
 /* ---------- Resumo (contagem, vazio, mínimo de caracteres) ---------- */
 
-/* role="status": o número de resultados é anunciado sem roubar o foco. Fica
-   fora da lista para não virar uma option do listbox. */
+/* role="status", fora da lista para não virar uma option do listbox. */
 .busca-resumo{
   margin: 0;
   padding: var(--sp-2) var(--sp-3);
@@ -126,20 +115,20 @@
 
 /* ---------- Resultados ---------- */
 
-/* flex-basis auto, e NÃO `flex: 1`. Com basis 0 a lista não contribui altura
-   nenhuma para a janela — que é dimensionada pelo conteúdo, não por altura
-   fixa — e o resultado é uma lista de altura zero: os itens existem no DOM,
-   respondem a clique e a leitor de tela, e não aparecem para ninguém.
+/* flex-basis auto, e NÃO `flex: 1`. A janela é dimensionada pelo conteúdo, não
+   por altura fixa, então com basis 0 a lista não contribui altura nenhuma e o
+   resultado é uma lista de altura zero: os itens existem no DOM, respondem a
+   clique e a leitor de tela, e não aparecem para ninguém.
    Com `0 1 auto` ela cresce com o conteúdo e só encolhe (rolando) ao bater no
    max-height da janela. */
 .busca-lista{
   flex: 0 1 auto;
-  min-height: 0;                    /* deixa encolher abaixo do conteúdo, para rolar */
+  min-height: 0; /* deixa encolher abaixo do conteúdo, para rolar */
   margin: 0;
   padding: 0 var(--sp-2) var(--sp-2);
   list-style: none;
   overflow-y: auto;
-  overscroll-behavior: contain;     /* rolar até o fim não rola a página atrás */
+  overscroll-behavior: contain; /* rolar até o fim não rola a página atrás */
 }
 
 .busca-lista:empty{ display: none; }
@@ -153,9 +142,8 @@
   cursor: pointer;
 }
 
-/* Sem :hover para o item ativo: quem manda é o aria-selected, que segue tanto
-   o teclado quanto o mouse. Assim teclado e ponteiro nunca mostram dois itens
-   destacados ao mesmo tempo. */
+/* Sem :hover: quem marca o ativo é o aria-selected, que segue teclado e mouse.
+   Com os dois, apareciam dois itens destacados ao mesmo tempo. */
 .busca-item[aria-selected="true"]{
   background: var(--bg-2);
   box-shadow: inset 2px 0 0 0 var(--accent-1);
@@ -178,7 +166,7 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  min-width: 0;                     /* deixa o text-overflow funcionar no filho */
+  min-width: 0; /* deixa o text-overflow funcionar no filho */
 }
 
 .busca-titulo{
@@ -191,8 +179,7 @@
 .busca-contexto{
   color: var(--ink-soft);
   font-size: var(--fs-xs);
-  /* Duas linhas no máximo: o subtítulo de uma seção pode ser um parágrafo
-     inteiro, e um resultado não pode empurrar os outros para fora da tela. */
+  /* Duas linhas: o subtítulo de uma seção pode ser um parágrafo inteiro. */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
@@ -205,19 +192,15 @@
   opacity: 0.85;
 }
 
-/* O trecho que casou. Fundo + peso, e não só cor de texto: cor sozinha
-   falharia o critério 1.4.1 do WCAG (não usar só cor para informar).
+/* Fundo + peso, e não só cor de texto: cor sozinha falharia o 1.4.1 do WCAG.
 
-   `color: inherit` é deliberado. A primeira tentativa pintava o texto com
-   --on-accent sobre --accent-soft, e esse par não é garantido: numa das
-   paletas do projeto ele dá ~2:1, bem abaixo dos 4.5:1 exigidos pelo AA.
-   Herdando a cor, o texto grifado mantém a MESMA cor que já tinha — que só
-   está ali porque já contrasta com a superfície — e o fundo entra como um véu
-   translúcido do acento, que escurece ou clareia junto com o tema. Assim o
-   contraste passa a não depender de nenhum par de tokens.
+   `color: inherit` é deliberado. --on-accent sobre --accent-soft dá ~2:1 numa
+   das paletas do projeto, longe dos 4.5:1 do AA; herdando, o texto fica com a
+   cor que já contrastava com a superfície e o acento entra só como véu
+   translúcido. O contraste deixa de depender de qualquer par de tokens.
 
-   O `background` sólido antes do color-mix é o fallback de quem não suporta a
-   função: navegador antigo ignora a segunda declaração e fica com a primeira. */
+   O `background` sólido antes do color-mix é fallback: navegador sem a função
+   ignora a segunda declaração. */
 .busca-lista mark{
   padding: 0 1px;
   border-radius: 3px;
@@ -254,8 +237,7 @@
   text-align: center;
 }
 
-/* No celular o rodapé de atalhos não serve para nada — não há teclado físico,
-   e ele rouba altura da lista, que é o que importa numa tela pequena. */
+/* Sem teclado físico o rodapé de atalhos só rouba altura da lista. */
 @media (max-width: 600px){
   .busca-janela{
     margin-top: var(--sp-3);
@@ -272,8 +254,7 @@ body.busca-aberta{ overflow: hidden; }
 
 /* ---------- Realce de quem foi encontrado ---------- */
 
-/* Buscar uma pessoa leva até o card dela, no meio de 36 iguais. O anel diz
-   qual é — some sozinho, porque é resposta a uma ação, não estado. */
+/* Diz qual dos 36 cards iguais é, e some: resposta a uma ação, não estado. */
 .team-card.is-encontrado{
   animation: busca-realce 2s ease-out;
 }
@@ -285,8 +266,7 @@ body.busca-aberta{ overflow: hidden; }
 
 @media (prefers-reduced-motion: reduce){
   .busca-fechar{ transition: none; }
-  /* O realce continua existindo — só para de animar. Sem ele, quem pediu menos
-     movimento perderia a única indicação de qual card foi encontrado. */
+  /* Continua existindo, só para de animar: é a única indicação de qual card é. */
   .team-card.is-encontrado{
     animation: none;
     box-shadow: 0 0 0 3px var(--accent-1), var(--shadow-card-lg);

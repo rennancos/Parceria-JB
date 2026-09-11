@@ -36,22 +36,18 @@
   margin: 0 0 8px;
 }
 
-/* Escopado em #view-pagina de propósito: .intro também é usado pela home, e
-   sem o escopo estas regras sobrescreveriam o título dela.
-   Um passo abaixo da home (--fs-2xl no lugar de --fs-3xl): título de página
-   interna é orientação, não capa. Como os dois são fluidos, a diferença entre
-   eles se mantém proporcional em qualquer largura. */
+/* Escopado em #view-pagina: .intro também é usado pela home, e sem o escopo
+   estas regras sobrescreveriam o título dela. Um passo abaixo na escala
+   (--fs-2xl e não --fs-3xl), fluido nos dois casos. */
 #view-pagina .intro h1{
   font-size: var(--fs-2xl);
 }
-/* Toda linha de texto corrido da página para em --medida (ver styles.css): a
-   descrição daqui, o texto de cada seção, as notas e o texto dentro dos passos.
-   É uma trava só, no mesmo x, e é o que impede a página de mostrar quatro
-   larguras de parágrafo empilhadas numa tela grande.
+/* Todo texto corrido da página para em --medida (ver styles.css): descrição,
+   texto de seção, notas e o texto dos passos. Uma trava só, no mesmo x, senão
+   a tela grande mostra quatro larguras de parágrafo empilhadas.
 
-   A trava fica no .intro inteiro, não no parágrafo: assim eyebrow, h1 e
-   descrição terminam juntos. O escopo em #view-pagina preserva a coluna mais
-   estreita da home, que é chamada de capa e não texto de leitura. */
+   Fica no .intro inteiro, não no parágrafo, para eyebrow, h1 e descrição
+   terminarem juntos. */
 #view-pagina .intro{
   max-width: var(--medida);
 }
@@ -59,9 +55,8 @@
   line-height: 1.55;
 }
 
-/* Grade genérica de blocos de conteúdo.
-   `min(100%, 280px)` no lugar de 280px fixo: em telas mais estreitas que a
-   coluna mínima, a célula encolhe junto em vez de estourar a largura. */
+/* Grade genérica de blocos. `min(100%, 280px)` e não 280px fixo: abaixo da
+   coluna mínima a célula encolhe junto em vez de estourar a largura. */
 .panel-grid{
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
@@ -79,7 +74,6 @@
   text-decoration: none;
 }
 
-/* Só os painéis que são link ganham o hover de card. */
 a.panel{
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
@@ -119,7 +113,6 @@ a.panel:focus-visible{
   font-weight: 600;
 }
 
-/* Seções dentro da página. */
 .page-section{
   margin-top: var(--sp-6);
 }
@@ -136,7 +129,7 @@ a.panel:focus-visible{
   max-width: var(--medida);
 }
 
-/* Rótulo de um bloco dentro da seção. É <p>, não heading — ver js/paginas.js. */
+/* Rótulo de um bloco dentro da seção. É <p>, não heading (ver js/paginas.js). */
 .block-title{
   margin: 30px 0 12px;
   font-size: var(--fs-xs);
@@ -158,16 +151,14 @@ a.panel:focus-visible{
   font-size: var(--fs-base);
   line-height: 1.55;
   color: var(--ink-soft);
-  /* O <ul> tem padding-left de 20px para o marcador: descontado aqui, a nota
-     termina no mesmo x dos parágrafos soltos da seção. */
+  /* Desconta o padding-left de 20px do marcador, para a nota terminar no mesmo
+     x dos parágrafos da seção. */
   max-width: calc(var(--medida) - 20px);
 }
 .notes li::marker{ color: var(--accent); }
 
 /* Faixa de destaque dentro de um passo: caminho de menu, nome de categoria.
-   Pode ser parágrafo ou link; ambos recebem a mesma trava de largura nos
-   passos — a faixa termina no mesmo x do texto, em vez de atravessar
-   o card inteiro com 400px de texto dentro. */
+   Parágrafo ou link, os dois travam na largura do texto do passo. */
 .callout{
   margin: 12px 0 0;
   padding: 12px 15px;
@@ -180,10 +171,9 @@ a.panel:focus-visible{
   line-height: 1.5;
 }
 
-/* O mesmo destaque, quando o passo tem `href` (ver `passo` em js/paginas.js).
-   `color: inherit` e `text-decoration: none` são necessários: sem eles o link
-   puxa a cor global de link e o destaque deixa de parecer o que é. A seta vai
-   para a direita e diz que aquilo abre alguma coisa. */
+/* O mesmo destaque quando o passo tem `href` (`passo` em js/paginas.js). Sem
+   `color: inherit` e `text-decoration: none` o link puxa a cor global e o
+   destaque deixa de parecer o que é. */
 a.callout{
   display: flex;
   align-items: center;
@@ -203,9 +193,8 @@ a.callout:focus-visible{
   outline-offset: 2px;
 }
 
-/* O svg() de js/paginas.js sai sem width/height — quem dimensiona é o CSS, e a
-   regra que faz isso está escopada em `.link-list`. Fora dali o SVG estica até
-   o tamanho do container, então a medida precisa vir junto aqui. */
+/* O svg() de js/paginas.js sai sem width/height, e a regra que dimensiona está
+   escopada em `.link-list`. Fora dali o SVG estica até o container. */
 a.callout .link-arrow{
   width: 18px;
   height: 18px;
@@ -214,10 +203,9 @@ a.callout .link-arrow{
   color: var(--ink-soft);
 }
 
-/* Passo com destino e SEM destaque: o link é o texto do passo — ou o título,
-   quando o passo não tem texto (ver `passo` em js/paginas.js). `inline-flex`
-   para a seta ficar colada no fim do texto, e não empurrada para a borda do
-   card como no destaque. */
+/* Passo com destino e SEM destaque: o link é o texto, ou o título quando não
+   há texto. `inline-flex` cola a seta no fim do texto em vez de empurrá-la
+   para a borda do card. */
 .steps .step-link{
   display: inline-flex;
   align-items: center;
@@ -266,10 +254,9 @@ a.callout .link-arrow{
   background: var(--panel);
 }
 
-/* Sistema com destino usa a MESMA faixa dos passos (`a.callout`, acima) — todo
-   href da página tem um layout só. Aqui fica apenas o encaixe na grade: o <li>
-   abre mão de borda, fundo e padding porque quem desenha o card passa a ser a
-   faixa; sem isso sobrariam duas caixas aninhadas, uma dentro da outra. */
+/* Sistema com destino usa a MESMA faixa dos passos (`a.callout`, acima). Aqui
+   só o encaixe na grade: o <li> abre mão de borda, fundo e padding porque quem
+   desenha o card vira a faixa, senão sobram duas caixas aninhadas. */
 .sys-list li:has(> .callout){
   padding: 0;
   border: 0;
@@ -278,16 +265,12 @@ a.callout .link-arrow{
 }
 
 /* `margin` porque a faixa nasce com 12px de afastamento do texto do passo, que
-   aqui não existe, e `flex` para ela ocupar o card inteiro — a área clicável é
-   o card, não só o texto.
+   aqui não existe, e `flex` para a área clicável ser o card, não só o texto.
 
-   O grid substitui o flex de `a.callout` porque aqui o conteúdo é empilhado:
-   nome na primeira linha, perfil na segunda ("SOLICITAR CONFLUENCE | GOVERNANÇA
-   E ESTRATÉGIA DE TECNOLOGIA" é uma frase, não um rótulo curto como "JCORP"),
-   e a seta numa segunda coluna que atravessa as duas linhas — assim ela fica
-   centrada na altura do card em vez de descer junto com o texto.
-   As áreas são explícitas porque o encaixe automático colocaria o perfil ao
-   lado do nome, e não embaixo. */
+   O grid substitui o flex de `a.callout` porque o conteúdo é empilhado: nome
+   em cima, perfil embaixo (ele é frase, não rótulo curto como "JCORP"), e a
+   seta numa coluna que atravessa as duas linhas. As áreas são explícitas
+   porque o encaixe automático põe o perfil ao lado do nome, não embaixo. */
 .sys-list .callout{
   margin: 0;
   flex: 1;
@@ -304,7 +287,7 @@ a.callout .link-arrow{
 .sys-list .callout .sys-role{ grid-area: 2 / 1; }
 
 /* `margin: 0` desfaz o `margin-left: auto` de `a.callout`, que no grid não tem
-   o que empurrar — quem posiciona a seta agora é a coluna. */
+   o que empurrar: quem posiciona a seta agora é a coluna. */
 .sys-list .callout .link-arrow{
   grid-column: 2;
   grid-row: 1;
@@ -312,11 +295,9 @@ a.callout .link-arrow{
   align-self: center;
 }
 
-/* Com perfil, a seta atravessa as duas linhas para ficar centrada na altura do
-   card; sem perfil ela fica na única linha que existe. É `span 2` e não
-   `1 / -1` porque `-1` conta a partir da grade EXPLÍCITA, que aqui não é
-   declarada (as linhas nascem do conteúdo) — ali `-1` virava a linha 1 e a
-   seta subia para o nome. */
+/* `span 2` e não `1 / -1`: `-1` conta a partir da grade EXPLÍCITA, que aqui
+   não existe (as linhas nascem do conteúdo), e virava a linha 1, com a seta
+   subindo para o nome. */
 .sys-list .callout:has(.sys-role) .link-arrow{ grid-row: 1 / span 2; }
 .sys-name{
   font-size: var(--fs-sm);
@@ -332,16 +313,13 @@ a.callout .link-arrow{
 }
 
 /* Ficha de contato de fabricante (tipo 'fabricantes'). */
-/* O grid das duas colunas fica na ficha inteira, e não em cada linha: assim
-   todos os valores começam no mesmo x. A coluna do rótulo acompanha o rótulo
-   mais largo — com os 96px fixos que havia aqui, "ATENDIMENTO" não cabia, e
-   como o body declara `overflow-wrap: break-word` ele quebrava no meio da
-   palavra ("ATENDIMENT / O") em vez de só vazar.
+/* O grid das duas colunas fica na ficha inteira, não em cada linha, para todos
+   os valores começarem no mesmo x. A coluna do rótulo é `auto` e não fixa:
+   com 96px, "ATENDIMENTO" quebrava no meio da palavra, porque o body declara
+   `overflow-wrap: break-word`.
 
-   `display: contents` nas linhas faz o <div> sumir da caixa e entregar <dt> e
-   <dd> direto ao grid da <dl>. É o que permite as colunas serem compartilhadas
-   por todas as linhas; sem isso cada linha vira um grid próprio e as larguras
-   divergem. */
+   `display: contents` nas linhas some com o <div> e entrega <dt> e <dd> direto
+   ao grid da <dl>. Sem isso cada linha vira um grid próprio. */
 .field-list{
   margin: 16px 0 0;
   display: grid;
@@ -370,26 +348,22 @@ a.callout .link-arrow{
 }
 
 /* Lista numerada de etapas (Primeiros passos, Manuais). */
-/* Os três tokens do passo ficam na lista, e não no <li>, porque a largura
-   máxima daqui é calculada a partir deles — variável declarada no filho não é
-   legível no pai. O <li> herda os três.
+/* Os três tokens ficam na lista e não no <li>: a largura máxima daqui é
+   calculada a partir deles, e variável declarada no filho não é legível no
+   pai. O <li> herda os três.
 
-   A largura fecha o card onde o conteúdo termina: o texto lá dentro para em
-   `--medida - --recuo` e o card acrescenta o recuo à esquerda, a folga à
-   direita e as duas bordas — o --recuo se cancela na soma. Sem esta trava o
-   card ia até a borda da página e sobrava um terço dele vazio à direita, com o
-   texto parando na medida no meio do caminho. */
+   A largura fecha o card onde o conteúdo termina. O texto para em
+   `--medida - --recuo`, o card soma recuo, folga e bordas, e o --recuo se
+   cancela. Sem a trava, o card ia até a borda com um terço vazio. */
 .steps{
   --recuo: 64px;
   --folga: 24px;
   --respiro: 20px;
 
-  /* Os passos não são texto corrido: cada card tem um título curto e uma faixa
-     de link, raramente duas linhas. Parar em 44rem como o resto da página não
-     ganhava legibilidade nenhuma e deixava um terço da largura vazio à direita.
-     A trava local vale só dentro da lista — as regras abaixo e o texto dos
-     passos herdam este valor —, e a intro, o texto de seção e as notas
-     continuam parando em --medida. */
+  /* Os passos não são texto corrido: título curto e faixa de link, raramente
+     duas linhas. Parar em 44rem não ganhava legibilidade e deixava um terço da
+     largura vazio. Vale só dentro da lista; intro, seção e notas seguem
+     em --medida. */
   --medida: 55rem;
 
   list-style: none;
@@ -410,14 +384,12 @@ a.callout .link-arrow{
   box-shadow: var(--shadow-panel);
 }
 
-/* Passo sem texto corrido — só o título e a faixa do link ("Acesse o KB.") —
-   pede menos respiro: com o padding cheio, três linhas de conteúdo ocupavam a
-   altura de um card de parágrafo. O seletor é a ausência de <p>: texto de passo
-   sai como <p>, e a faixa com href sai como <a class="callout">. */
+/* Passo só com título e faixa pede menos respiro: com o padding cheio, três
+   linhas ocupavam a altura de um card de parágrafo. O seletor é a ausência de
+   <p>, que é como o texto do passo sai de js/paginas.js. */
 .steps > li:not(:has(p)){ --respiro: 15px; }
 .steps > li:not(:has(p)) > .callout{ margin-top: 9px; }
-/* O número vai em tinta escura sobre o azul da paleta: branco sobre #89A8B2
-   ficaria em 2.5:1 e some na leitura. */
+/* Tinta escura sobre o azul: branco sobre #89A8B2 dá 2.5:1 e some. */
 .steps > li::before{
   content: counter(etapa);
   position: absolute;
@@ -436,9 +408,8 @@ a.callout .link-arrow{
   font-size: var(--fs-xs);
   font-weight: 650;
 }
-/* A trava por elemento continua aqui, e não só na lista: ela é o que faz o
-   texto terminar no mesmo x do resto da página, e é dela que sai a conta da
-   largura máxima da lista (acima). */
+/* A trava por elemento continua aqui: é ela que alinha o texto com o resto da
+   página, e é dela que sai a conta da largura da lista (acima). */
 .steps h3,
 .steps p,
 .steps .sys-list,
@@ -458,8 +429,7 @@ a.callout .link-arrow{
 }
 
 /* Grade de grupos pendurada num passo (`grupos` em js/paginas.js). Os 12px são
-   os mesmos que a faixa de destaque usa para se afastar do texto acima: os dois
-   formatos deixam o mesmo respiro dentro do card, venham juntos ou sozinhos. */
+   os mesmos da faixa de destaque, para o respiro bater venham juntos ou não. */
 .steps .sys-list{ margin-top: 12px; }
 
 /* Lista de links e arquivos (Documentação, Acessos, ParcerIA). */
@@ -502,12 +472,12 @@ a.callout .link-arrow{
 }
 /* A seta é decorativa e não deve competir com o ícone de formato. */
 .link-list svg.link-arrow{ color: var(--ink-soft); }
-/* O texto empurra chip e seta para a direita — com ou sem chip de formato.
+/* O texto empurra chip e seta para a direita, com ou sem chip de formato.
    `pretty` aqui porque título e descrição do item são <span>, e a regra geral
    de quebra em styles.css alcança só p/li/dd. */
 .link-list .link-text{
   flex: 1;
-  min-width: 0;          /* item de flex não encolhe abaixo do conteúdo sem isto */
+  min-width: 0; /* item de flex não encolhe abaixo do conteúdo sem isto */
   overflow-wrap: anywhere;
 }
 .link-list .link-desc{
@@ -531,8 +501,7 @@ a.callout .link-arrow{
   white-space: nowrap;
 }
 
-/* Documento previsto mas ainda sem arquivo ou endereço: fica na lista, no
-   lugar certo, sem fingir que já dá para abrir. */
+/* Documento previsto e ainda sem destino: fica na lista, sem fingir que abre. */
 .link-list .link-pendente{
   border-style: dashed;
   cursor: default;
@@ -541,8 +510,7 @@ a.callout .link-arrow{
 .link-list .link-pendente svg{ color: var(--ink-soft); }
 .link-list .link-pendente .field-vazio{ font-size: var(--fs-xs); }
 
-/* Aviso de conteúdo ainda não definido. Também para na medida: é texto de
-   leitura, não faixa de largura cheia. */
+/* Também para na medida: é texto de leitura, não faixa de largura cheia. */
 .notice{
   max-width: var(--medida);
   margin-top: var(--sp-6);
@@ -557,18 +525,16 @@ a.callout .link-arrow{
 
 /* ---------- Grade de acesso rápido (tipo 'atalhos') ----------
 
-   Mesmo desenho do acesso rápido do portal corporativo: barra com busca e
-   alternância de formato, cards com categoria e coração, botão no rodapé.
-   O markup sai de js/paginas.js e o comportamento de js/atalhos.js — renomear
-   um seletor daqui exige acertar os dois. */
+   Markup em js/paginas.js, comportamento em js/atalhos.js: renomear um seletor
+   daqui exige acertar os dois. */
 
 .atalhos{
   display: grid;
   gap: var(--sp-3);
 }
 
-/* Barra: o campo cresce, os dois botões de formato ficam colados na direita.
-   Em tela estreita o `wrap` desce o par de botões para a linha de baixo. */
+/* O campo cresce, os botões colam na direita, e o `wrap` desce o par em tela
+   estreita. */
 .atalhos-barra{
   display: flex;
   flex-wrap: wrap;
@@ -584,7 +550,7 @@ a.callout .link-arrow{
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
   background: var(--bg-2);
-  overflow: hidden;                 /* a lupa encosta na borda arredondada */
+  overflow: hidden; /* a lupa encosta na borda arredondada */
   transition: border-color 0.15s ease;
 }
 .atalhos-campo:focus-within{ border-color: var(--accent); }
@@ -598,16 +564,14 @@ a.callout .link-arrow{
   color: var(--ink);
   font: inherit;
   font-size: var(--fs-sm);
-  outline: none;                    /* o anel vai no campo inteiro, acima */
+  outline: none; /* o anel vai no campo inteiro, acima */
 }
 .atalhos-campo input::placeholder{ color: var(--ink-soft); opacity: 0.9; }
 
-/* O "x" nativo do type=search sobra: o campo esvazia com Esc e a lista volta
-   inteira sozinha. */
+/* O "x" nativo sobra: Esc já esvazia o campo e a lista volta inteira. */
 .atalhos-campo input::-webkit-search-cancel-button{ display: none; }
 
-/* A lupa não é o que filtra — o filtro roda a cada tecla. Ela existe porque o
-   controle é reconhecido assim, e leva o cursor para o campo. */
+/* A lupa não filtra (isso roda a cada tecla): ela leva o cursor para o campo. */
 .atalhos-lupa{
   flex: none;
   display: grid;
@@ -641,8 +605,7 @@ a.callout .link-arrow{
 .atalhos-vista button:hover{ color: var(--ink); border-color: var(--accent-soft); }
 .atalhos-vista button:focus-visible{ outline: 2px solid var(--accent-1); outline-offset: 2px; }
 
-/* aria-pressed é o estado real do botão, então é ele que pinta o ativo: não
-   existe classe paralela para o JS esquecer de sincronizar. */
+/* Pinta pelo aria-pressed: sem classe paralela para o JS dessincronizar. */
 .atalhos-vista button[aria-pressed="true"]{
   background: var(--accent);
   border-color: var(--accent);
@@ -671,8 +634,7 @@ a.callout .link-arrow{
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.15s ease;
 }
 
-/* Card filtrado pela busca ou preso atrás do "Mostrar mais": o `hidden` do JS
-   precisa vencer o `display: flex` acima. */
+/* O `hidden` do JS precisa vencer o `display: flex` acima. */
 .atalho[hidden]{ display: none; }
 
 .atalho:hover{
@@ -700,8 +662,8 @@ a.callout .link-arrow{
   text-decoration: none;
 }
 
-/* A área clicável é o card inteiro, e não só o texto: o <a> se estica sobre o
-   <li>. Só quem tem href — o card pendente é um <div> e não vira alvo. */
+/* O <a> se estica sobre o <li> inteiro. Só quem tem href: o card pendente é
+   um <div>. */
 .atalho-alvo[href]::after{
   content: "";
   position: absolute;
@@ -714,8 +676,7 @@ a.callout .link-arrow{
   border-radius: var(--radius-sm);
 }
 
-/* Linha da categoria. O padding à direita é o espaço do coração — sem ele, uma
-   categoria longa passa por baixo do botão. */
+/* O padding à direita é o espaço do coração. */
 .atalho-topo{
   display: flex;
   align-items: center;
@@ -745,9 +706,8 @@ a.callout .link-arrow{
   overflow-wrap: anywhere;
 }
 
-/* Duas linhas e reticências: os cards de uma fileira ficam com alturas
-   parecidas e a descrição não decide o tamanho da grade. O texto inteiro
-   continua no destino — aqui ele é chamada, não conteúdo. */
+/* Duas linhas e reticências, senão a descrição decide a altura da fileira.
+   O texto inteiro está no destino; aqui é chamada. */
 .atalho-desc{
   font-size: var(--fs-xs);
   line-height: 1.5;
@@ -764,13 +724,12 @@ a.callout .link-arrow{
   font-size: var(--fs-xs);
 }
 
-/* O coração é um marcador local: fica no localStorage deste navegador e não
-   muda o conteúdo da página para mais ninguém (ver js/atalhos.js). */
+/* Marcador local: vive no localStorage deste navegador (ver js/atalhos.js). */
 .atalho-fav{
   position: absolute;
   top: 9px;
   right: 9px;
-  z-index: 1;                       /* acima do <a> esticado */
+  z-index: 1; /* acima do <a> esticado */
   display: grid;
   place-items: center;
   width: 30px;
@@ -791,10 +750,9 @@ a.callout .link-arrow{
 
 /* ---------- Formato de lista ----------
 
-   Mesma leitura das listas do portal (ícone, texto, chip): o card vira linha,
-   a categoria vira chip à direita e a descrição cai para uma linha só.
-   `display: contents` no topo entrega ícone e categoria direto ao grid da
-   linha — sem isso os dois ficariam presos na mesma coluna. */
+   O card vira linha, a categoria vira chip à direita e a descrição cai para
+   uma linha. `display: contents` no topo entrega ícone e categoria direto ao
+   grid da linha; sem isso os dois ficam presos na mesma coluna. */
 .atalhos-grade[data-vista="lista"]{
   grid-template-columns: 1fr;
   gap: 10px;
@@ -805,15 +763,13 @@ a.callout .link-arrow{
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 2px 14px;
-  padding: 14px 48px 14px 18px;     /* a direita reserva o coração */
+  padding: 14px 48px 14px 18px; /* a direita reserva o coração */
 }
 .atalhos-grade[data-vista="lista"] .atalho-topo{ display: contents; }
-/* Cada pedaço do texto tem a SUA linha na coluna do meio — título, descrição e
-   o "a definir" do item pendente. Sem as três declaradas, o "a definir" caía
-   na mesma célula da descrição e os dois saíam impressos um por cima do outro.
-   Ícone e chip atravessam as três com span 3, e não com 1 / -1: as linhas aqui
-   nascem do conteúdo, e -1 conta a partir da grade explícita, que não existe.
-   Card sem descrição apenas não usa a linha que sobra. */
+/* Título, descrição e o "a definir" do item pendente têm cada um a SUA linha:
+   sem as três declaradas, o "a definir" caía na célula da descrição e os dois
+   saíam um por cima do outro. Ícone e chip usam `span 3` e não `1 / -1`, pelo
+   mesmo motivo da seta lá em cima. */
 .atalhos-grade[data-vista="lista"] .atalho-topo svg{ grid-column: 1; grid-row: 1 / span 3; align-self: center; }
 .atalhos-grade[data-vista="lista"] .atalho-titulo{ grid-column: 2; grid-row: 1; }
 .atalhos-grade[data-vista="lista"] .atalho-desc{
@@ -828,12 +784,10 @@ a.callout .link-arrow{
   margin: 0;
 }
 
-/* Em linha o coração acompanha a altura da linha, como o chip: no topo ele
-   ficaria alto demais num card de uma linha só. */
+/* Acompanha a altura da linha: no topo ficaria alto demais num card de uma. */
 .atalhos-grade[data-vista="lista"] .atalho-fav{ top: 50%; transform: translateY(-50%); }
 
-/* Mesmo chip do .link-format: em linha, a categoria em caixa alta solta ficava
-   com cara de segundo título. */
+/* Mesmo chip do .link-format: solta, a caixa alta virava um segundo título. */
 .atalhos-grade[data-vista="lista"] .atalho-tipo{
   grid-column: 3;
   grid-row: 1 / span 3;

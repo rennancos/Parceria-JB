@@ -62,10 +62,8 @@
   border-bottom: 1px solid var(--line);
 }
 
-/* O espaço até as fotos é esta margem. A grade abaixo tem padding-top: 62px,
-   mas a foto sobe -55px dentro do card, então sobram só 7px reais — daí os 32px
-   aqui. Antes esse respiro vinha de um `<br></br>` no index.html, que o parser
-   transformava em duas quebras. */
+/* A grade tem padding-top de 62px, mas a foto sobe -55px dentro do card:
+   sobram 7px reais, daí os 32px aqui. */
 .team-featured-title{
   margin: 0 0 var(--sp-5);
   text-align: center;
@@ -76,8 +74,8 @@
   color: var(--ink-soft);
 }
 
-/* Mesmo padding-top da grade normal: abre espaço para a foto, que sobe -55px.
-   Os destaques são poucos, então a grade é centralizada em vez de esticada. */
+/* Mesmo padding-top da grade normal, para a foto que sobe -55px. Centralizada
+   em vez de esticada porque os destaques são poucos. */
 .team-featured-grid{
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 280px));
@@ -86,7 +84,6 @@
   padding-top: 62px;
 }
 
-/* Borda e anel em azul da paleta separam o destaque da grade comum. */
 .team-card.is-featured{
   border-color: var(--accent);
   box-shadow: 0 8px 24px rgba(137,168,178,0.22);
@@ -140,9 +137,8 @@
   box-shadow: var(--shadow-card);
 }
 
-/* Foto sobreposta ao topo do card.
-   É flex + centralizada nos dois eixos: a imagem ocupa a área interna inteira,
-   sem encostar na borda do anel e sem depender do formato do arquivo. */
+/* Foto sobreposta ao topo do card, centralizada nos dois eixos para não
+   encostar na borda do anel, qualquer que seja o formato do arquivo. */
 .team-photo-wrapper{
   position: absolute;
   top: -55px;
@@ -159,9 +155,9 @@
   box-shadow: 0 0 0 5px var(--team-ring);
 }
 
-/* Iniciais (data-initials vem do JS) são o fundo padrão do avatar: valem
-   enquanto a foto não carrega e ficam de vez se o arquivo não existir.
-   O JS marca .is-loaded quando a imagem carrega de verdade. */
+/* Iniciais (data-initials, do JS) são o fundo padrão: valem enquanto a foto
+   não carrega e ficam de vez se o arquivo não existir. O JS põe .is-loaded
+   quando a imagem carrega de verdade. */
 .team-photo-wrapper::after{
   content: attr(data-initials);
   position: absolute;
@@ -172,18 +168,16 @@
   border-radius: 28px;
   background: var(--bg-2);
   color: var(--ink-soft);
-  /* As iniciais são proporcionais ao avatar (132px de caixa), não à página:
-     `em` do próprio elemento seguiria o texto do card e desalinharia do
-     círculo. Daí o único tamanho em px que não vem da escala fluida. */
+  /* Proporcional ao avatar (132px), não à página: `em` seguiria o texto do
+     card e sairia do círculo. Único px fora da escala fluida. */
   font-size: 34px;
   font-weight: 600;
   letter-spacing: 0.02em;
 }
 .team-photo-wrapper.is-loaded::after{ content: none; }
 
-/* Retratos vêm em proporções diferentes (jpg de crachá, png quadrado):
-   `cover` + `object-position: center` recorta sempre pelo centro, então o
-   rosto fica no meio do círculo em qualquer arquivo. */
+/* Os retratos vêm em proporções diferentes (jpg de crachá, png quadrado):
+   recortar pelo centro deixa o rosto no meio do círculo em qualquer um. */
 .team-photo{
   position: relative;
   z-index: 1;
@@ -226,8 +220,8 @@
   color: var(--ink-soft);
 }
 
-/* margin-top: auto encosta os ícones na base, alinhando-os entre cards
-   mesmo quando um nome ou cargo ocupa duas linhas. */
+/* Encosta os ícones na base, alinhados entre cards mesmo com nome de duas
+   linhas. */
 .team-links{
   display: flex;
   justify-content: center;
@@ -300,9 +294,8 @@ a.team-link:focus-visible{
   a.team-link:hover{ transform: none; }
 }
 
-/* Aviso de "não há cliente de e-mail" (ver o fim de js/equipe.js). Aparece
-   sozinho, some sozinho: é resposta a uma ação, não estado da página — por
-   isso flutua no rodapé em vez de empurrar o layout. */
+/* Aviso de "não há cliente de e-mail" (fim de js/equipe.js). Flutua no rodapé
+   em vez de empurrar o layout: é resposta a uma ação, não estado da página. */
 .team-aviso{
   position: fixed;
   left: 50%;

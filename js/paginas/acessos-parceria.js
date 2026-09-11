@@ -62,7 +62,15 @@ PAGINAS['acessos-parceria'] = {
           categoria: 'Documentos',
           icone: 'parceria',
           href: 'https://tvglobocorp.sharepoint.com/sites/SAEM477/Documentos%20Compartilhados/Forms/AllItems.aspx'
+        }, 
+         {
+          titulo: 'Transporte Noturno',
+          descricao: 'Solicitação de transporte',
+          categoria: 'Solicitação',
+          icone: 'chamado',
+          href: 'https://maistransportes.g.globo/#/login'
         }
+        
       ]
     },
     {
@@ -230,6 +238,223 @@ PAGINAS['acessos-parceria'] = {
           categoria: 'Portal',
           icone: 'portal',
           href: 'https://portalrds.corp.tvglobo.com.br/RDWeb/Pages/en-US/Default.aspx'
+        },
+        {
+          titulo: 'Globo Service',
+          descricao: 'Painel de chamados no ServiceNow',
+          categoria: 'Dashboard',
+          icone: 'dashboard',
+          href: 'https://globoservice.service-now.com/nav_to.do?uri=%2F$pa_dashboard.do%3Fsysparm_dashboard%3D093c679f1b9e981094962170f54bcb5c'
+        },
+        {
+          titulo: 'Mapeamento das Ilhas Parque JB',
+          descricao: 'Ilhas do Parque, por sala e equipamento',
+          categoria: 'Planilha',
+          icone: 'planilha',
+          href: 'https://tvglobocorp.sharepoint.com/:x:/s/SAEM477/ERN3eshAN25IqsZ84uZvRaUBZu5HLjZWiEBKuO-InitjcQ'
+        },
+        {
+          titulo: 'Manual de Ramais, Contatos, Serviços e Sistemas',
+          descricao: 'Ramais e responsáveis por serviço',
+          categoria: 'Planilha',
+          icone: 'planilha',
+          href: 'https://tvglobocorp.sharepoint.com/:x:/r/sites/SAEM477/_layouts/15/Doc.aspx?sourcedoc=%7BB1002CA6-F228-442A-8460-EB251998A21E%7D&file=Manual%20de%20Ramais%20Contatos%2C%20Servi%C3%A7os%20e%20Sistemas%20(1).xlsx&action=default&mobileredirect=true'
+        },
+        {
+          titulo: 'Cronograma Restart Servidores MAM',
+          descricao: 'Restarts periódicos dos servidores do MAM',
+          categoria: 'Planilha',
+          icone: 'planilha',
+          href: 'https://tvglobocorp.sharepoint.com/:x:/r/sites/SAEM477/Documentos%20Compartilhados/MAM%20-%20DOCUMENTA%C3%87%C3%83O%20E%20ARQUIVOS/RESTARTS%20PERI%C3%93DICOS/Cronograma%20Restart%20Servidores%20MAM%20JORN%202023.xlsx?d=w124359abc1ec4f3e83cf4fba9f373f97'
+        },
+        {
+          titulo: 'Media Central SP',
+          descricao: 'Praça de São Paulo',
+          categoria: 'Sistema',
+          icone: 'sistema',
+          href: 'https://mcs-sp.servicos.corp.tvglobo.com.br/'
+        },
+        {
+          titulo: 'Media Central BSA',
+          descricao: 'Praça de Brasília',
+          categoria: 'Sistema',
+          icone: 'sistema',
+          href: 'https://mcs-bsa.servicos.corp.tvglobo.com.br/'
+        },
+        {
+          titulo: 'Media Recife',
+          descricao: 'Praça do Recife',
+          categoria: 'Sistema',
+          icone: 'sistema',
+          href: 'https://mcs-recife.servicos.corp.tvglobo.com.br/'
+        },
+        {
+          titulo: 'MAM',
+          descricao: 'Visualizador do MAM',
+          categoria: 'Sistema',
+          icone: 'sistema',
+          href: 'https://srvvmpamamcor05.servicos.corp.tvglobo.com.br:9901/WSMViewerWS/WSM.aspx'
+        },
+        {
+          titulo: 'Media Producer',
+          descricao: 'Ingest de mídia',
+          categoria: 'Sistema',
+          icone: 'sistema',
+          href: 'https://srvvmpamammp01.servicos.corp.tvglobo.com.br/media-producer#!ingest'
+        },
+        {
+          titulo: 'Media Services',
+          descricao: 'Fila de processamento (Master Queue)',
+          categoria: 'Sistema',
+          icone: 'sistema',
+          href: 'https://srvvmpamamms01.servicos.corp.tvglobo.com.br/#!Master%20Queue'
+        },
+        {
+          titulo: 'Scheduler',
+          descricao: 'Agendamentos do MAM',
+          categoria: 'Sistema',
+          icone: 'sistema',
+          href: 'http://srvvmpamamscv.servicos.corp.tvglobo.com.br/'
+        },
+        {
+          titulo: 'Control Center',
+          descricao: 'Serviços do MAM',
+          categoria: 'Sistema',
+          icone: 'sistema',
+          href: 'https://srvvmpamamcor01.servicos.corp.tvglobo.com.br:9911/controlcenter/web/#services'
+        },
+        {
+          titulo: 'Colaborativo',
+          descricao: 'Material colaborativo',
+          categoria: 'Sistema',
+          icone: 'sistema',
+          href: 'https://novo.colaborativo.apps.g.globo/'
+        },
+        {
+          titulo: 'Uploader',
+          descricao: 'Envio de material',
+          categoria: 'Sistema',
+          icone: 'sistema',
+          href: 'https://uploader.apps.g.globo/landing'
+        },
+        {
+          titulo: 'GMUSIC',
+          descricao: 'Biblioteca de música',
+          categoria: 'Sistema',
+          icone: 'sistema',
+          href: 'https://app.gmusic.g.globo/GMUSIC'
+        },
+        {
+          titulo: 'Actus Media Platform',
+          descricao: 'Monitoramento de canais',
+          categoria: 'Monitoramento',
+          icone: 'monitoramento',
+          href: 'https://mediamonitor.rj.g.globo/actus5/channels'
+        },
+        {
+          titulo: 'Câmera Conectada Clust 1',
+          descricao: 'Cluster 1',
+          categoria: 'Sistema',
+          icone: 'sistema',
+          href: 'https://bit.ly/3SlDeC4'
+        },
+        {
+          titulo: 'Câmera Conectada Clust 2',
+          descricao: 'Cluster 2',
+          categoria: 'Sistema',
+          icone: 'sistema',
+          href: 'https://bit.ly/3QepSFL'
+        },
+        {
+          titulo: 'Dashboard Status das Ilhas',
+          descricao: 'Ilhas do Jornalismo no Grafana',
+          categoria: 'Dashboard',
+          icone: 'dashboard',
+          href: 'https://10.181.53.230:3000/d/QvW5TERVk/ilhas-jornalismo-novo?orgId=1&refresh=10s'
+        },
+        {
+          titulo: 'Vantage - JOB STATUS',
+          descricao: 'Status dos jobs do Vantage',
+          categoria: 'Dashboard',
+          icone: 'dashboard',
+          href: 'http://10.181.53.20/Vantage/'
+        },
+        {
+          titulo: 'Dash - De onde é esse IP?',
+          descricao: 'Consulta de IP da rede',
+          categoria: 'Dashboard',
+          icone: 'dashboard',
+          href: 'https://ipsm.servicos.corp.tvglobo.com.br'
+        },
+        {
+          titulo: 'Kubernetes',
+          descricao: 'Painel do cluster',
+          categoria: 'VM',
+          icone: 'vm',
+          href: 'https://srvvmpapamcmx01.servicos.corp.tvglobo.com.br:30143/#!/login'
+        },
+        {
+          titulo: 'Troca de senha Corp',
+          descricao: 'Troca da senha de rede',
+          categoria: 'Segurança',
+          icone: 'escudo',
+          href: 'https://acesso.g.globo/plugins/pluginPage.jsf?pn=pluginTrocaSenha'
+        },
+        {
+          titulo: 'Aspera Shares',
+          descricao: 'Transferência de arquivos',
+          categoria: 'Sistema',
+          icone: 'sistema',
+          href: 'https://share.hdc.globoi.com/login'
+        },
+        {
+          titulo: 'Aspera Console',
+          descricao: 'Console do Aspera',
+          categoria: 'Sistema',
+          icone: 'sistema',
+          href: 'https://console.hdc.globoi.com/aspera/console'
+        },
+        {
+          titulo: 'Losys Web',
+          descricao: 'Losys',
+          categoria: 'Sistema',
+          icone: 'sistema',
+          href: 'https://losys-rj.tvg.tv.br/login'
+        },
+        {
+          titulo: 'Criar GMM',
+          descricao: 'Abertura de GMM pelo gmm.g.globo',
+          categoria: 'Solicitação',
+          icone: 'chamado',
+          href: 'https://gmm.g.globo/'
+        },
+        {
+          titulo: 'Poupa Tempo',
+          descricao: 'Serviços internos',
+          categoria: 'Portal',
+          icone: 'portal',
+          href: 'https://poupatempo.apps.g.globo/'
+        },
+        {
+          titulo: 'Sharepoint CDESIGN',
+          descricao: 'Documentos do CDesign e do GC',
+          categoria: 'Documentos',
+          icone: 'documento',
+          href: 'https://tvglobocorp.sharepoint.com/sites/SuporteCDesign/Documentos%20Compartilhados/Forms/AllItems.aspx?id=%2Fsites%2FSuporteCDesign%2FDocumentos%20Compartilhados%2FGeneral'
+        },
+        {
+          titulo: 'Mapeamento virtual - ZERO DENSITY / NCAM',
+          descricao: 'Equipamentos e rede do virtual',
+          categoria: 'Planilha',
+          icone: 'planilha',
+          href: 'https://tvglobocorp-my.sharepoint.com/:x:/r/personal/washington_machado_g_globo/Documents/Microsoft%20Teams%20Chat%20Files/EQUIPAMENTO+REDE%20VIRTUAL%20ZD_NCAM.xlsx?d=we46806619e644671922d3de11d5a8ed1&csf=1&web=1&e=eHP7s7'
+        },
+        {
+          titulo: 'Switches & IPs Virtual Production',
+          descricao: 'Lista de IPs dos switches',
+          categoria: 'Planilha',
+          icone: 'planilha',
+          href: 'https://tvglobocorp.sharepoint.com/:x:/r/sites/PSM-EquipeRodrigoFerreira/_layouts/15/Doc.aspx?sourcedoc=%7B85941D97-FBD5-47BB-89D4-741C3078D02C%7D&file=SWITCHES%20(Lista%20de%20IPS)%20-%20ATUALIZADO_04-08.xlsx&action=default&mobileredirect=true'
         },
         {
           titulo: '',

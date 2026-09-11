@@ -84,6 +84,7 @@ test('ordem real do HTML funciona em file:// e tolera hashes malformados', () =>
   const pagina = { hidden: true, innerHTML: '', querySelector: () => null };
   env.contexto.document.getElementById = id => id === 'view-home' ? home : id === 'view-pagina' ? pagina : null;
   env.contexto.fetch = () => { throw Error('file:// não deve consultar a API'); };
+  env.contexto.document.title = 'Portal ParceriaJB';   // o que o <title> do index.html deixa
   const html = fs.readFileSync(path.join(raiz, 'index.html'), 'utf8');
   const scripts = [...html.matchAll(/<script src="([^"]+)"/g)].map(m => m[1]);
   env.carregar(...scripts);
@@ -99,5 +100,7 @@ test('ordem real do HTML funciona em file:// e tolera hashes malformados', () =>
   assert.equal(pagina.hidden, true);
   navegar('#manuais');
   assert.equal(pagina.hidden, false);
-  assert.match(env.contexto.document.title, /Documentação/);
+  assert.match(pagina.innerHTML, /<h1 tabindex="-1">Documentação</);
+  // A aba não acompanha a navegação: o router não escreve document.title.
+  assert.equal(env.contexto.document.title, 'Portal ParceriaJB');
 });

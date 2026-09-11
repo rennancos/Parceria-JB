@@ -21,7 +21,12 @@
   const viewHome = document.getElementById('view-home');
   const viewPagina = document.getElementById('view-pagina');
   const linksMenu = document.querySelectorAll('nav a[data-pagina]');
-  const TITULO_BASE = 'Parceria JB';
+
+  /* O título da aba NÃO acompanha a navegação: é sempre o <title> do
+     index.html. Escrever em document.title a cada troca de página já foi o
+     comportamento daqui, e saía como "Documentação — Parceria JB"; a marca
+     fixa é escolha da equipe. Quem quiser de volta, é uma linha em mostrar()
+     — e o teste em tests/unit/conteudo.test.cjs cobra o silêncio de hoje. */
 
   if (!viewHome || !viewPagina) return;
 
@@ -82,13 +87,11 @@
       viewPagina.innerHTML = window.renderizarPagina(dados);
       viewHome.hidden = true;
       viewPagina.hidden = false;
-      document.title = `${dados.titulo} — ${TITULO_BASE}`;
       if (focar) focarTitulo();
     } else {
       viewPagina.hidden = true;
       viewPagina.innerHTML = '';   // não deixa conteúdo oculto tabulável
       viewHome.hidden = false;
-      document.title = `${TITULO_BASE} — Portal`;
     }
 
     marcarMenu(chave);

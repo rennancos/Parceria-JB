@@ -45,10 +45,10 @@ function criarJanela(){
     minWidth: 380,          // o portal é responsivo até bem estreito
     minHeight: 480,
     show: false,
-    // Vale só até a página carregar: daí o <title> do index.html (e o que o
-    // js/router.js escreve a cada troca de página) assume. Por isso é o nome
-    // do produto, e não uma cópia do título da home.
-    title: 'Parceria JB',
+    // Vale só até a página carregar: daí o <title> do index.html assume, e ele
+    // é fixo (ver js/router.js). São o mesmo texto de propósito — a janela não
+    // pode piscar um nome antes de a página mostrar outro.
+    title: 'Portal ParceriaJB',
     // O executável instalado já carrega este ícone (electron-builder o embute no
     // .exe), mas `npm run app` roda pelo electron.exe: sem esta linha a janela de
     // desenvolvimento aparece com o átomo do Electron, e não com a marca.

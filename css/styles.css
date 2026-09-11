@@ -382,14 +382,100 @@ main{
   background: var(--accent);
 }
 
+/* ---------- Abertura da home ---------- */
+
+.home-abertura{ margin-bottom: var(--sp-6); }
+.home-abertura h1{
+  font-size: var(--fs-3xl);
+  font-weight: 680;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--sp-4);
+}
+
+/* Botão desenhado como campo. É <button> e não <input> porque quem recebe o
+   texto é a janela da busca: dois campos disputariam foco e valor. O
+   data-busca no markup basta para js/busca.js ligá-lo. */
+.home-busca{
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  width: min(560px, 100%);
+  padding: 14px var(--sp-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-2);
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: var(--fs-base);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+.home-busca:hover{ background: var(--card); border-color: var(--accent-soft); }
+.home-busca:focus-visible{ outline: 2px solid var(--accent-1); outline-offset: 2px; }
+.home-busca svg{ flex: none; width: 19px; height: 19px; }
+.home-busca-texto{ flex: 1; min-width: 0; }
+.home-busca-tecla{
+  flex: none;
+  padding: 3px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-xs);
+  background: var(--tile);
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: var(--fs-2xs);
+  font-weight: 650;
+}
+
+/* Fica oculta até js/home.js achar favorito gravado. */
+.home-favoritos{
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+.home-favoritos-rotulo{
+  font-size: var(--fs-2xs);
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ink-soft);
+}
+.home-favoritos-lista{
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.home-favorito{
+  display: inline-block;
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--tile);
+  color: var(--ink);
+  font-size: var(--fs-xs);
+  text-decoration: none;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+.home-favorito:hover{ background: var(--card-hover); border-color: var(--accent-soft); }
+.home-favorito:focus-visible{ outline: 2px solid var(--accent-1); outline-offset: 2px; }
+
 /* ---------- Cards da home ---------- */
 
+/* Quatro colunas para o destaque ocupar 2x2 e os outros quatro fecharem o
+   quadrado à direita. Com três colunas sobrava um vão do tamanho de um card. */
 .cards{
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--sp-4);
   width: 100%;
 }
+
 
 .card{
   display: flex;
@@ -443,6 +529,7 @@ main{
 }
 
 .card-eyebrow{
+  text-wrap: balance;
   font-size: var(--fs-2xs);
   font-weight: 650;
   text-transform: uppercase;
@@ -463,23 +550,29 @@ main{
   margin: 0;
 }
 
-.card-cta{
-  display: flex;
+/* Depois de `.card h2` e `.card p` de propósito: as duas têm o mesmo peso de
+   seletor, então quem decide é a ordem. */
+/* Faixa larga sobre a fileira dos outros quatro. Deitado, e não ocupando 2x2:
+   em pé ele fica com a altura de duas linhas e o conteúdo de uma, e sobra um
+   vão no meio do card. */
+.card-destaque{
+  grid-column: 1 / -1;
+  flex-direction: row;
   align-items: center;
-  gap: 6px;
-  margin-top: var(--sp-4);
-  padding-top: var(--sp-3);
-  border-top: 1px solid var(--line);
-  color: var(--accent-1);
-  font-size: var(--fs-xs);
-  font-weight: 650;
+  /* Sem isto o space-between do .card joga o ícone e o texto para pontas
+     opostas da faixa, com um vão de 500px entre eles. */
+  justify-content: flex-start;
+  gap: var(--sp-4);
+  min-height: 0;
 }
-.card-cta svg{
-  width: 14px;
-  height: 14px;
-  transition: transform 0.18s ease;
-}
-.card:hover .card-cta svg{ transform: translateX(3px); }
+
+/* Menos que os .14em da marca: com eles, "CENTRAL DE CONTEÚDO" quebra em duas
+   linhas e o título daquele card desce sozinho na fileira. */
+.cards .card-eyebrow{ letter-spacing: 0.1em; }
+.card-destaque .card-icon{ width: 54px; height: 54px; margin-bottom: 0; }
+.card-destaque .card-icon svg{ width: 26px; height: 26px; }
+.card-destaque h2{ font-size: var(--fs-2xl); margin-bottom: 6px; }
+.card-destaque p{ font-size: var(--fs-base); max-width: 54ch; }
 
 /* ---------- Rodapé ---------- */
 
@@ -597,19 +690,27 @@ footer{
   }
   .card{ min-height: 0; }
 
+  /* Estreito demais para o ícone ao lado do texto. */
+  .card-destaque{ flex-direction: column; align-items: flex-start; }
+  .card-destaque h2{ font-size: var(--fs-xl); }
+
+  /* Sem teclado físico o atalho não serve. */
+  .home-busca-tecla{ display: none; }
+
   .footer-nav{ gap: 8px 20px; }
 }
 
 @media (prefers-reduced-motion: reduce){
   .card,
   .card-icon,
-  .card-cta svg,
   .menu-panel,
   .scrim,
   .icon-btn,
   .top-nav a,
   .menu-panel nav a,
-  .menu-action{ transition: none; }
+  .menu-action,
+  .home-busca,
+  .home-favorito{ transition: none; }
 
   .card:hover{ transform: none; }
 }

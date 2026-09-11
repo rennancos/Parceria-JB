@@ -91,13 +91,27 @@
     <!-- Home. Fica no markup; js/router.js só a esconde quando uma página
          interna está aberta. -->
     <div class="view" id="view-home">
-    <div class="intro legacy-home">
-      <h1>Bem-vindo ao portal Parceria JB</h1>
-      <p>Tudo o que você precisa para começar, consultar e trabalhar em um só lugar.</p>
+    <!-- Abertura da home. O botão da busca carrega data-busca: js/busca.js liga
+         qualquer elemento com esse atributo à mesma janela do ícone do topo. -->
+    <div class="home-abertura">
+      <h1>Parceria JB</h1>
+
+      <button class="home-busca" type="button" data-busca>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span class="home-busca-texto">Buscar documentos, acessos e pessoas</span>
+        <kbd class="home-busca-tecla">Ctrl K</kbd>
+      </button>
+
+      <!-- Preenchido por js/home.js com os favoritos do localStorage. Some
+           inteiro enquanto ninguém marcou nada. -->
+      <div class="home-favoritos" data-home-favoritos hidden>
+        <span class="home-favoritos-rotulo">Seus atalhos</span>
+        <ul class="home-favoritos-lista"></ul>
+      </div>
     </div>
 
     <div class="cards">
-      <a class="card" href="#primeiros-passos">
+      <a class="card card-destaque" href="#primeiros-passos">
         <div class="card-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
         </div>
@@ -105,10 +119,6 @@
           <p class="card-eyebrow">Comece por aqui</p>
           <h2>Primeiros passos</h2>
           <p>Um guia rápido para se orientar na parceria: acessos, contatos e o essencial para começar bem.</p>
-        </div>
-        <div class="card-cta">
-          Acessar
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </div>
       </a>
 
@@ -121,10 +131,6 @@
           <h2>Documentação</h2>
           <p>Processos, políticas, materiais de referência e os manuais das áreas, por link ou em arquivo.</p>
         </div>
-        <div class="card-cta">
-          Acessar
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </div>
       </a>
 
       <a class="card" href="#acessos-parceria">
@@ -135,10 +141,6 @@
           <p class="card-eyebrow">Acessos rápidos</p>
           <h2>Acessos Parceria</h2>
           <p>Links estratégicos, portais e materiais prioritários para uso frequente.</p>
-        </div>
-        <div class="card-cta">
-          Acessar
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </div>
       </a>
 
@@ -156,10 +158,6 @@
           <h2>ParcerIA</h2>
           <p>Documentos, arquivos e materiais compartilhados da parceria disponíveis em um só lugar.</p>
         </div>
-        <div class="card-cta">
-          Acessar
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </div>
       </a>
 
       <!-- Destino externo: não tem entrada em PAGINAS (não é página do portal),
@@ -173,10 +171,6 @@
           <p class="card-eyebrow">Portal corporativo</p>
           <h2>Central das Parcerias</h2>
           <p>O sistema corporativo das parcerias, com os registros e serviços da área. Abre em outra aba.</p>
-        </div>
-        <div class="card-cta">
-          Acessar
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </div>
       </a>
     </div>
@@ -261,6 +255,7 @@
      de desenhar (e a cada pagina:render), e depois do motor da busca porque
      reaproveita a normalização de acentos dele. -->
 <script src="js/atalhos.js"></script>
+<script src="js/home.js"></script>
 
 <!-- Edição pela própria página. Depois do router de propósito: depende do
      renderizador e do router já existirem. Sem o servidor Node no ar (file://

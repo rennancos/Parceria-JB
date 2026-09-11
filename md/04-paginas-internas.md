@@ -120,7 +120,7 @@ Os arquivos ficam em `docs/`, ao lado do `index.html` (ver [docs/LEIA-ME.md](../
 
 **Bloco de `links` com `chave`** — é o caso dos três de Documentação — deixa de ser editado aqui: os `itens` do arquivo viram semente, e quem manda passa a ser o acervo do servidor, editado pela própria página. A `chave` sai como `data-bloco` no `<ul>` e precisa existir também em `BLOCOS`, no topo de `servidor/dados.js`. Ver [09-edicao-pela-pagina.md](09-edicao-pela-pagina.md). Sem o serviço no ar, a semente daqui é o que aparece.
 
-`icone` é uma chave da tabela `ICONES` em `paginas.js` (`portal`, `chamado`, `agenda`, `parceria`, `pessoas`, `pasta`, `mapa`, `arquivo`, `planilha`, `imagem`, `escudo`, `documento`, `pdf`, `externo`) e sobrepõe o ícone do formato. Chave inválida ou ausente cai no ícone do formato e, sem formato, no de arquivo — sem quebrar nada. Para linkar outra página interna, use o hash dela: `href: '#documentacao'`.
+`icone` é uma chave da tabela `ICONES` em `paginas.js` (`portal`, `chamado`, `agenda`, `parceria`, `pessoas`, `pasta`, `mapa`, `arquivo`, `planilha`, `imagem`, `escudo`, `documento`, `pdf`, `externo`, `sistema`, `monitoramento`, `dashboard`, `catalogo`, `fluxo`, `vm`) e sobrepõe o ícone do formato. Chave inválida ou ausente cai no ícone do formato e, sem formato, no de arquivo — sem quebrar nada. Para linkar outra página interna, use o hash dela: `href: '#documentacao'`.
 
 O campo opcional `aviso` desenha o bloco tracejado no fim da página — remova quando o conteúdo real entrar.
 

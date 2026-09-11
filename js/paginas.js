@@ -130,7 +130,18 @@ window.PAGINAS = {};
     documento:  svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/>'),
     pdf:        svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 18v-4h1.6a1.2 1.2 0 0 1 0 2.4H8"/><path d="M13 18v-4h1a1.7 1.7 0 0 1 0 4z"/>'),
     mapa:       svg('<path d="m9 4-6 2v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/>'),
-    externo:    svg('<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>')
+    externo:    svg('<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>'),
+
+    /* Destinos que antes dividiam o ícone de `portal` e por isso se liam como
+       a mesma coisa na grade: o sistema onde se trabalha, o que vigia o
+       ambiente, o que só mostra número, o que se consulta e o que descreve um
+       caminho. Servidor, pulso, ponteiro, livro e dois nós ligados. */
+    sistema:       svg('<rect x="2" y="3" width="20" height="7" rx="2"/><rect x="2" y="14" width="20" height="7" rx="2"/><path d="M6 6.5h.01M6 17.5h.01"/>'),
+    monitoramento: svg('<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>'),
+    dashboard:     svg('<path d="M3 18a9 9 0 1 1 18 0"/><path d="m12 18 4.2-5.2"/><path d="M3 18h2M19 18h2M12 7V5"/>'),
+    catalogo:      svg('<path d="M4 4h13a2 2 0 0 1 2 2v14H6a2 2 0 0 1-2-2z"/><path d="M4 18a2 2 0 0 1 2-2h13"/><path d="M9 8h6M9 11h4"/>'),
+    fluxo:         svg('<rect x="2" y="4" width="7" height="6" rx="1.5"/><rect x="15" y="14" width="7" height="6" rx="1.5"/><path d="M5.5 10v5a2 2 0 0 0 2 2H15"/><path d="m12.5 14.5 2.5 2.5-2.5 2.5"/>'),
+    vm:            svg('<path d="m12 2.5 8.5 4.75v9.5L12 21.5l-8.5-4.75v-9.5z"/><path d="m12 12 8.5-4.75M12 12v9.5M12 12 3.5 7.25"/>')
   };
 
   const ICONE_VOLTAR = svg('<path d="M19 12H5M11 18l-6-6 6-6"/>');
@@ -370,7 +381,7 @@ window.PAGINAS = {};
 
   // Cards visíveis antes do "Mostrar mais". O bloco pode declarar outro valor
   // em `limite`; 0 (ou negativo) desliga o botão e mostra a lista inteira.
-  const ATALHOS_LIMITE = 8;
+  const ATALHOS_LIMITE = 6;
 
   /* O botão "Mostrar mais" e o aviso de busca vazia nascem com `hidden`: quem
      decide se eles aparecem é js/atalhos.js, depois de contar quantos cards

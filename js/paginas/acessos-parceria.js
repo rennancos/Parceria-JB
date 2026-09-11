@@ -87,8 +87,8 @@ PAGINAS['acessos-parceria'] = {
         {
           titulo: 'iGlobo - MACS Manager',
           descricao: 'Visualizador do JAMF',
-          categoria: 'Equipamentos',
-          icone: 'portal',
+          categoria: 'Monitoramento',
+          icone: 'monitoramento',
           href: 'https://proud-bay-06cd27f0f.7.azurestaticapps.net/login'
         },
         {
@@ -106,54 +106,133 @@ PAGINAS['acessos-parceria'] = {
           href: 'https://keepersecurity.com/vault/#'
         },
         {
-          titulo: 'Dash SPLASHTOP',
+          titulo: 'SPLASHTOP',
           descricao: 'Acesso ao dash do SPLASHTOP, acessa via VPN',
-          categoria: 'Monitoramento',
-          icone: 'portal',
+          categoria: 'Dashboard',
+          icone: 'dashboard',
           href: 'http://10.3.44.126:8888/'
         },
         {
           titulo: 'Media Central Hardnews',
           descricao: 'HN',
           categoria: 'Sistema',
-          icone: 'portal',
+          icone: 'sistema',
           href: 'https://mcs-hardnews-jb.servicos.corp.tvglobo.com.br'
         },
         {
           titulo: 'Media Central Magazine',
           descricao: 'MAG',
           categoria: 'Sistema',
-          icone: 'portal',
+          icone: 'sistema',
           href: 'https://mcs-magazine-jb.servicos.corp.tvglobo.com.br'
         }, 
         {
           titulo: 'Viz',
           descricao: 'PAM ION',
           categoria: 'Sistema',
-          icone: 'portal',
+          icone: 'sistema',
           href: 'https://viz1.corpg.i.globo/auth/realms/Vizrt/protocol/openid-connect/auth?client_id=VizOneStudio&redirect_uri=https%3A%2F%2Fviz1.corpg.i.globo%2Fstudio%2F&response_type=code&scope=openid&state=d1e5bdff760d4a8b919d5142188710e4&code_challenge=UlEScpiR0FDXvTdHWZu0QD-xqBFOS3yGEdoWmINzCEU&code_challenge_method=S256&response_mode=fragment'
         },
         {
           titulo: 'NewsHUB',
           descricao: 'NewsHUB V2',
           categoria: 'Sistema',
-          icone: 'portal',
+          icone: 'sistema',
           href: 'https://newshub.apps.g.globo/login'
         },
         {
           titulo: 'Crawl G1',
           descricao: 'Tarjas Gnews',
           categoria: 'Sistema',
-          icone: 'portal',
+          icone: 'sistema',
           href: 'https://crawl-g1.apps.g.globo/login'
         },
         {
           titulo: 'Busca Almoxarifado GLOBO',
-          descricao: 'Catálogo de Materiais Globo ',
+          descricao: 'Catálogo de Materiais Globo',
           categoria: 'Catálogo',
-          icone: 'catalago',
+          icone: 'catalogo',
           href: 'https://apps.powerapps.com/play/e/default-a7cdc447-3b29-4b41-b73e-8a2cb54b06c6/a/fe6a7ede-4fc3-4664-88e7-c5ee6cf27df3?tenantId=a7cdc447-3b29-4b41-b73e-8a2cb54b06c6&source=portal&screenColor=rgba(251%2C%20101%2C%2060%2C%201)'
-        }
+        },
+        {
+          titulo: 'Acesso ao Splashtop',
+          descricao: 'Acesso remoto a computadores',
+          categoria: 'Sistema',
+          icone: 'sistema',
+          href: 'https://www.splashtop.com/pt-br/downloads'
+        },
+        {
+          titulo: 'EF',
+          descricao: 'Acesso remoto a computadores',
+          categoria: 'Portal',
+          icone: 'portal',
+          href: 'https://ef-gcp.globoi.com'
+        },
+        {
+          titulo: 'Aplicativo Acervo',
+          descricao: 'Chamados p/ squad Acervo',
+          categoria: 'Portal',
+          icone: 'portal',
+          href: 'https://apps.powerapps.com/play/e/default-a7cdc447-3b29-4b41-b73e-8a2cb54b06c6/a/77fb377f-085a-4416-b540-15db381da248?tenantId=a7cdc447-3b29-4b41-b73e-8a2cb54b06c6&amp;hint=27202b3e-1ad2-487b-b850-3ce68ecde62c&amp;sourcetime=1710769000697&amp;source=portal&source=teamsLinkUnfurling'
+        },
+        {
+          titulo: 'Grafana - Dash de Publicação na EF',
+          descricao: 'Dash de Publicação na EF',
+          categoria: 'Dashboard',
+          icone: 'dashboard',
+          href: 'https://www.splashtop.com/pt-br/downloads'
+        },
+        {
+          titulo: 'Fluxo de Publicação na EF',
+          descricao: 'Publicação na EF',
+          categoria: 'Fluxo',
+          icone: 'fluxo',
+          href: 'https://tvglobocorp.sharepoint.com/:p:/s/SAEM477/EeXj9MRZ7atBtwIaX4wpyNwBR-4FMzPkl2srLYm4_H1DDw?e=eEKgT1&nav=eyJzSWQiOjI1NywiY0lkIjowfQ'
+        },
+        {
+          titulo: 'Vcenter MAM',
+          descricao: 'Máquinas Virtuais Jornalismo',
+          categoria: 'VM',
+          icone: 'vm',
+          href: 'https://vcentermj.servicos.corp.tvglobo.com.br/websso/SAML2/SSO/vsphere.local?SAMLRequest=zVRdb9MwFP0rkd8Tu243mNV0GisTkzZWloIQL8hxb1qjxA6%2BTtL9e5y0hWqCqXvjMc69x%2BcrmV5uqzJqwaG2JiWjhJEIjLIrbdYp%2Bby8id%2BSy9kUZVXW4qrxG%2FMIPxtAH4U9g2J4kZLGGWElahRGVoDCK5Fd3d8JnjBRO%2ButsiWJrhDB%2BXDRtTXYVOAycK1WcGtWsE1JuHoekLWRfiCz8b5GQWmrwHhw1Y8Eh3mLibKuTny7Lm1uw0OV5I52kCNa2t%2FLaZY90BbrDThISqtkuP3GOgWDhJQUskQg0e08Jd%2BVAlmcjQrFeC5VwS7O4Lzg48mIg%2BLnF3kYw4VE1C38WURsAm300viUcMbPY8ZjzpaciTET7E0yHrFvJFrstb%2FTZufoS0bluyEUH5bLRbx4yJYDQKtX4D6G6ZSc5oSYTMYk%2BnLINECTQ4IDb3d6dvKQGJm9Mo1G0x7%2FkEoFXq6kl1N6TGRHi9eil3c7X9hSq6cjdvz0apWl7a4dSB9s8q6BIe9K%2BpcB%2BhO9iothVNS9ZeiDPhJli57Tp0aWutDgXt3Gf%2BgndK9ZhG9gpXtr8VjwyXE8R9mDtGFlx7WnWnUy9D8woqg2UEmk0nsXD8CUsxGnbELfb4PivipI9iBb1L8xuq5Lun'
+        },
+        {
+          titulo: 'RRD',
+          descricao: 'Acervo Globo',
+          categoria: 'Portal',
+          icone: 'portal',
+          href: 'https://rrd.acervo.globoi.com'
+        },
+        {
+          titulo: 'PCD',
+          descricao: 'Acervo Globo',
+          categoria: 'Portal',
+          icone: 'portal',
+          href: 'https://pcd.acervo.globoi.com/Index.htm'
+        },
+        {
+          titulo: 'Decupador',
+          descricao: 'Acervo Globo',
+          categoria: 'Portal',
+          icone: 'portal',
+          href: 'https://decupador.globoi.com'
+        },
+        {
+          titulo: 'JIRA',
+          descricao: 'Cards da Parceria JB',
+          categoria: 'Portal',
+          icone: 'portal',
+          href: 'https://globo.atlassian.net/jira/software/c/projects/PJ/boards/2908'
+        },
+        {
+          titulo: 'PORTAL RDS',
+          descricao: 'Plataforma de conectividade',
+          categoria: 'Portal',
+          icone: 'portal',
+          href: 'https://portalrds.corp.tvglobo.com.br/RDWeb/Pages/en-US/Default.aspx'
+        },
+        {},
+        {}
       ]
     },
     {

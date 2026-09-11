@@ -381,7 +381,7 @@ window.PAGINAS = {};
 
   // Cards visíveis antes do "Mostrar mais". O bloco pode declarar outro valor
   // em `limite`; 0 (ou negativo) desliga o botão e mostra a lista inteira.
-  const ATALHOS_LIMITE = 6;
+  const ATALHOS_LIMITE = 8;
 
   /* O botão "Mostrar mais" e o aviso de busca vazia nascem com `hidden`: quem
      decide se eles aparecem é js/atalhos.js, depois de contar quantos cards

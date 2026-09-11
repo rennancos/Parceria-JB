@@ -231,7 +231,13 @@ PAGINAS['acessos-parceria'] = {
           icone: 'portal',
           href: 'https://portalrds.corp.tvglobo.com.br/RDWeb/Pages/en-US/Default.aspx'
         },
-        {},
+        {
+          titulo: '',
+          descricao: 'Plataforma de conectividade',
+          categoria: 'Portal',
+          icone: 'portal',
+          href: 'https://portalrds.corp.tvglobo.com.br/RDWeb/Pages/en-US/Default.aspx'
+        },
         {}
       ]
     },

@@ -26,6 +26,7 @@ e desde que o servidor passou a usar lista de permitidos, esta pasta também
 | [10-aplicativo-windows.md](10-aplicativo-windows.md) | O portal como `.exe`: gerar o instalador, versionar, publicar atualização |
 | [11-busca.md](11-busca.md) | A busca do portal: o que indexa, como ordena e as armadilhas do componente |
 | [12-arquitetura-integracao-ia.md](12-arquitetura-integracao-ia.md) | Onde a futura IA se encaixa: contrato, rota, variáveis e o passo a passo de quem for integrá-la |
+| [13-deploy-na-vm.md](13-deploy-na-vm.md) | Publicar o portal na VM 10.181.40.13: serviço Windows, IIS opcional, DNS/certificado e backup |
 
 Para mexer em conteúdo, **04** e **05** bastam. Para aparência, **06**.
 

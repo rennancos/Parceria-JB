@@ -18,11 +18,49 @@ O que muda em relação a um deploy Node comum:
 ## 1. Preparo da VM
 
 ```powershell
-node -v                   # precisa ser >= 18 (engines do package.json)
+node -v                    # precisa ser >= 18 (engines do package.json)
 (Get-Command node).Source  # anote: é este caminho que vai no NSSM
 ```
 
-Só isso. Sem pnpm, sem build.
+Sem pnpm e sem build — mas **o Node não vem na imagem padrão da VM**. Se o `node -v`
+falhar com `CommandNotFoundException`, descarte primeiro o PATH desatualizado, que é o
+caso mais comum quando a instalação foi feita em outra sessão:
+
+```powershell
+$env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' +
+            [Environment]::GetEnvironmentVariable('Path','User')
+node -v
+```
+
+Se continuar faltando, instale. Prefira o winget: deixa o Node no PATH da máquina e
+num caminho previsível.
+
+```powershell
+winget install OpenJS.NodeJS.LTS --accept-source-agreements --accept-package-agreements
+# resultado: C:\Program Files\nodejs\node.exe
+```
+
+Sem winget na imagem, use o ZIP portátil. Não exige MSI nem instalador, e serve igual
+para o NSSM, que aponta para o `node.exe` de qualquer forma:
+
+```powershell
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$dist = Invoke-RestMethod 'https://nodejs.org/dist/index.json' -UseBasicParsing
+$lts  = ($dist | Where-Object { $_.lts -ne $false } | Select-Object -First 1).version
+
+Invoke-WebRequest "https://nodejs.org/dist/$lts/node-$lts-win-x64.zip" `
+  -OutFile "$env:TEMP\node.zip" -UseBasicParsing
+Expand-Archive "$env:TEMP\node.zip" -DestinationPath C:\apps -Force
+Rename-Item "C:\apps\node-$lts-win-x64" C:\apps\nodejs
+# resultado: C:\apps\nodejs\node.exe
+```
+
+Download que falha com erro de conexão ou 407 é bloqueio de proxy corporativo, não
+erro de comando: baixe o ZIP da sua estação e copie pela sessão RDP, ou peça o Node no
+mesmo chamado da infra do passo 7.
+
+**Anote o caminho do `node.exe`** — `C:\Program Files\nodejs\` pelo winget,
+`C:\apps\nodejs\` pelo ZIP. É ele que vai no `nssm install` do passo 5.
 
 ## 2. Trazer o código
 
@@ -56,10 +94,24 @@ Reiniciar o serviço desloga todo mundo — sessões vivem em memória, é só e
 
 ## 5. Serviço do Windows (NSSM)
 
-```powershell
-choco install nssm -y
+O Chocolatey costuma faltar na imagem pelo mesmo motivo que o Node. Se `choco` não
+existir, baixe o NSSM avulso — é um `.exe` solto, sem instalador:
 
-# troque o caminho se (Get-Command node).Source apontou para outro lugar
+```powershell
+choco install nssm -y      # se o choco existir na imagem
+
+# senão, NSSM avulso:
+Invoke-WebRequest https://nssm.cc/release/nssm-2.24.zip -OutFile "$env:TEMP\nssm.zip" -UseBasicParsing
+Expand-Archive "$env:TEMP\nssm.zip" -DestinationPath C:\apps -Force
+Set-Alias nssm C:\apps\nssm-2.24\win64\nssm.exe   # vale só nesta sessão
+```
+
+O alias morre com o terminal; num terminal novo, chame o caminho completo ou refaça o
+`Set-Alias`. O serviço, uma vez criado, não depende disso.
+
+Agora o serviço, com o caminho do `node.exe` que você anotou no passo 1:
+
+```powershell
 nssm install ParceriaJB "C:\Program Files\nodejs\node.exe" "servidor\servidor.js"
 nssm set ParceriaJB AppDirectory "C:\apps\parceriajb"
 nssm set ParceriaJB AppEnvironmentExtra PORTA=8000

@@ -30,6 +30,20 @@ docs/*
 !docs/LEIA-ME.md
 !docs/manutencao.md
 
+# docs/fornecedores/ é a única subpasta versionada. São três linhas porque o
+# Git não desce numa pasta excluída: `docs/*` esconde a pasta inteira, e sem
+# liberá-la antes nenhuma exceção lá dentro seria sequer avaliada. Liberada a
+# pasta, `docs/fornecedores/*` restabelece o mesmo whitelist do bloco acima —
+# só entra o que for nomeado aqui, e um PDF novo largado na pasta não sobe
+# por engano num `git add .`.
+# Nenhum upload da equipe cai aqui: nomeSeguro() (servidor/dados.js) achata o
+# nome com path.basename e reduz a [a-z0-9-], então POST /api/arquivos sempre
+# grava direto em docs/, nunca numa subpasta. Esta pasta é material de apoio
+# versionado, não conteúdo de produção — por isso pode entrar no repositório.
+!docs/fornecedores/
+docs/fornecedores/*
+!docs/fornecedores/contatos-fornecedores.pdf
+
 # ---------- Sistema operacional ----------
 # desktop.ini e Thumbs.db são gerados pelo Windows/OneDrive nesta pasta.
 Thumbs.db

@@ -251,30 +251,18 @@ window.PAGINAS = {};
      Deixar isso no renderizador (e não nos dados) garante que nenhuma ficha
      saia com rótulo diferente ou campo faltando. */
   const CAMPOS_FABRICANTE = [
-    { chave: 'fabricante',           rotulo: 'Fabricante' },
-    { chave: 'contatoFabricante',    rotulo: 'Contato do fabricante' },
-    { chave: 'representante',        rotulo: 'Representante' },
-    { chave: 'contatoRepresentante', rotulo: 'Contato do representante' },
-    { chave: 'site',                 rotulo: 'Site' },
-    { chave: 'idTicket',             rotulo: 'ID Ticket' },
-    { chave: 'serviceDesk',          rotulo: 'Possui Service Desk?' },
-    { chave: 'plataforma',           rotulo: 'Plataforma de atendimento' },
-    { chave: 'observacao',           rotulo: 'Observação para suporte' },
-    { chave: 'contrato',             rotulo: 'Nº do contrato' },
-    { chave: 'expiracao',            rotulo: 'Data de expiração do contrato' },
-    { chave: 'cobertura',            rotulo: 'Cobertura contratada' },
-    { chave: 'sla',                  rotulo: 'SLA contratado' },
-    { chave: 'prioridades',          rotulo: 'Matriz de prioridades' },
-    { chave: 'setor',                rotulo: 'Setor' }
+    { chave: 'fabricante',  rotulo: 'Fabricante' },
+    { chave: 'representante', rotulo: 'Representante' },
+    { chave: 'email',       rotulo: 'E-mail' },
+    { chave: 'telefone',    rotulo: 'Telefone' },
+    { chave: 'horario',     rotulo: 'Atendimento' }
   ];
 
   // Campo em branco vira "a definir" — visível como pendência, nunca como dado.
   function valorFabricante(chave, valor){
     if (!valor) return '<span class="field-vazio">a definir</span>';
     const texto = String(valor).trim();
-    if (chave === 'site' && /^https?:\/\//i.test(texto)) {
-      return `<a href="${esc(texto)}" target="_blank" rel="noopener noreferrer">${esc(texto)}</a>`;
-    }
+    if (chave === 'email') return texto.split(/\r?\n/).map((email) => `<a href="mailto:${esc(email.trim())}">${esc(email.trim())}</a>`).join('<br>');
     return texto.split(/\r?\n/).map((linha) => esc(linha.trim())).filter(Boolean).join('<br>');
   }
 
@@ -287,7 +275,7 @@ window.PAGINAS = {};
 
     return `
       <div class="panel">
-        <h3>${esc(item.nome)}</h3>
+        <h3>${esc(item.sistema || item.nome || 'Fabricante')}</h3>
         <dl class="field-list">${linhas}</dl>
       </div>`;
   }

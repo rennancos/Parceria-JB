@@ -238,6 +238,7 @@ window.PAGINAS = {};
      grade (ver css/pagina.css). */
   function sistema(item){
     const corpo =
+      `<span class="sys-icon" aria-hidden="true">${ICONES.sistema}</span>` +
       `<span class="sys-name">${esc(item.sistema)}</span>` +
       (item.perfil ? `<span class="sys-role">${esc(item.perfil)}</span>` : '');
 

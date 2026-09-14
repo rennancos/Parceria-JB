@@ -241,28 +241,47 @@ a.callout .link-arrow{
   padding: 0;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
-  gap: 8px;
+  gap: 10px;
 }
 .sys-list li{
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: baseline;
-  gap: 3px 10px;
-  padding: 12px 16px;
+  gap: 4px 10px;
+  padding: 14px 16px;
   border: 1px solid var(--panel-line);
   border-radius: var(--radius-sm);
   background: var(--panel);
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
+.sys-list li:hover{
+  border-color: var(--accent-soft);
+  background: var(--card-hover);
+}
+.sys-icon{
+  grid-row: 1 / span 2;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-xs);
+  background: var(--tile);
+  color: var(--accent-1);
+}
+.sys-icon svg{ width: 16px; height: 16px; }
 
 /* Sistema com destino usa a MESMA faixa dos passos (`a.callout`, acima). Aqui
    só o encaixe na grade: o <li> abre mão de borda, fundo e padding porque quem
    desenha o card vira a faixa, senão sobram duas caixas aninhadas. */
 .sys-list li:has(> .callout){
+  display: flex;
   padding: 0;
   border: 0;
   background: none;
   align-items: stretch;
 }
+.sys-list li:has(> .callout):hover{ background: none; }
 
 /* `margin` porque a faixa nasce com 12px de afastamento do texto do passo, que
    aqui não existe, e `flex` para a área clicável ser o card, não só o texto.
@@ -275,7 +294,7 @@ a.callout .link-arrow{
   margin: 0;
   flex: 1;
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 3px 12px;
   /* 14px à esquerda, e não os 15px da faixa do passo: somados aos 3px da barra
      dourada dão os mesmos 17px do card estático (1px de borda + 16px de
@@ -283,13 +302,14 @@ a.callout .link-arrow{
   padding: 12px 16px 12px 14px;
 }
 
-.sys-list .callout .sys-name{ grid-area: 1 / 1; }
-.sys-list .callout .sys-role{ grid-area: 2 / 1; }
+.sys-list .callout .sys-icon{ grid-area: 1 / 1 / span 2; }
+.sys-list .callout .sys-name{ grid-area: 1 / 2; }
+.sys-list .callout .sys-role{ grid-area: 2 / 2; }
 
 /* `margin: 0` desfaz o `margin-left: auto` de `a.callout`, que no grid não tem
    o que empurrar: quem posiciona a seta agora é a coluna. */
 .sys-list .callout .link-arrow{
-  grid-column: 2;
+  grid-column: 3;
   grid-row: 1;
   margin: 0;
   align-self: center;
@@ -303,10 +323,12 @@ a.callout .link-arrow{
   font-size: var(--fs-sm);
   font-weight: 650;
   letter-spacing: -0.005em;
+  align-self: end;
 }
 .sys-role{
   font-size: var(--fs-xs);
   color: var(--ink-soft);
+  align-self: start;
   /* O perfil pode ser uma frase de duas linhas. `pretty` evita a última linha
      com uma palavra só; onde o navegador não suporta, quebra como antes. */
   text-wrap: pretty;

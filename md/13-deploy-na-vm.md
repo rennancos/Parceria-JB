@@ -55,27 +55,41 @@ Rename-Item "C:\apps\node-$lts-win-x64" C:\apps\nodejs
 # resultado: C:\apps\nodejs\node.exe
 ```
 
-Download que falha com erro de conexão ou 407 é bloqueio de proxy corporativo, não
-erro de comando: baixe o ZIP da sua estação e copie pela sessão RDP, ou peça o Node no
-mesmo chamado da infra do passo 7.
+Download que falha com erro de conexão ou 407 não é erro de comando: é proxy
+corporativo ou, no estado atual desta VM, ausência de rede (passo 6). Nos dois casos o
+caminho é o mesmo: baixe o ZIP da sua estação e copie pela sessão RDP, ou peça o Node
+no mesmo chamado da infra do passo 7.
 
 **Anote o caminho do `node.exe`** — `C:\Program Files\nodejs\` pelo winget,
 `C:\apps\nodejs\` pelo ZIP. É ele que vai no `nssm install` do passo 5.
 
 ## 2. Trazer o código
 
+**O código já está na VM**, em `E:\projetosjb\Parceria-JB-main`. O `E:` é volume local
+da máquina, não unidade de rede — é o que permite apontar o serviço para lá no passo 5.
+Unidade de rede não serviria: mapeamento de letra é por sessão de logon, e o serviço do
+NSSM roda como LocalSystem, fora de qualquer sessão. Se um dia algum caminho aqui passar
+a morar em share, troque a letra por UNC (`\\servidor\share\...`) em vez de mapear.
+
+Confira o que está lá antes de seguir:
+
 ```powershell
-mkdir C:\apps\parceriajb
-cd C:\apps\parceriajb
-git clone https://github.com/rennancos/Parceria-JB.git .
+cd E:\projetosjb\Parceria-JB-main
+dir servidor\servidor.js        # tem que existir
+git remote -v                   # vazio = veio por cópia, não por clone
 ```
 
-Repo privado: use deploy key ou PAT **read-only** criado para esta máquina, não a sua
-credencial pessoal.
+Se `git remote -v` não devolver nada, a pasta foi copiada pela sessão RDP e **não é um
+clone** — o `git pull` do passo 9 não vai funcionar. Isso é o esperado enquanto a VM não
+tem rede; veja o passo 9 para como atualizar nesse estado.
+
+Quando a rede sair e você quiser clonar de verdade, repo privado pede deploy key ou PAT
+**read-only** criado para esta máquina, não a sua credencial pessoal.
 
 ## 3. Subir na mão e conferir
 
 ```powershell
+cd E:\projetosjb\Parceria-JB-main
 node servidor/servidor.js --porta 8000
 # outro terminal:
 curl http://127.0.0.1:8000/api/sessao     # 200 {"autenticado":false}
@@ -113,7 +127,7 @@ Agora o serviço, com o caminho do `node.exe` que você anotou no passo 1:
 
 ```powershell
 nssm install ParceriaJB "C:\Program Files\nodejs\node.exe" "servidor\servidor.js"
-nssm set ParceriaJB AppDirectory "C:\apps\parceriajb"
+nssm set ParceriaJB AppDirectory "E:\projetosjb\Parceria-JB-main"
 nssm set ParceriaJB AppEnvironmentExtra PORTA=8000
 nssm set ParceriaJB AppExit Default Restart
 nssm start ParceriaJB
@@ -143,9 +157,15 @@ Test-NetConnection 10.181.40.13 -Port 8000    # TcpTestSucceeded precisa ser Tru
 ```
 
 Em 12/09/2026, de uma estação de desenvolvimento, a VM não respondia a ping nem em
-3389, 80, 443 ou 8000. Se esse teste falhar com o serviço de pé e a regra de firewall
-criada, o bloqueio é de rede, entre segmentos — e aí o chamado para a infra não é só
-DNS e certificado, é liberação de rota e porta até o 10.181.40.13.
+3389, 80, 443 ou 8000. **Em 15/09/2026 continua assim** — a máquina segue sem conexão
+de rede, e é por isso que o código foi parar lá por cópia e não por clone (passo 2).
+Se esse teste falhar com o serviço de pé e a regra de firewall criada, o bloqueio é de
+rede, entre segmentos — e aí o chamado para a infra não é só DNS e certificado, é
+liberação de rota e porta até o 10.181.40.13.
+
+Enquanto isso não sai, nada que dependa de rede na VM funciona: `git pull`, `winget`,
+download do Node ou do NSSM, e qualquer unidade de rede mapeada. Trate tudo por cópia
+via RDP até a liberação.
 
 **Opção B — IIS na frente, para ter HTTPS e hostname:**
 
@@ -180,16 +200,41 @@ todo mundo.
 
 ## 8. Backup (obrigatório)
 
-`servidor/dados/` (acervo e usuários) e `docs/` (DOC/PDF enviados pela página) são
-dados de produção e estão no `.gitignore` — não vêm do clone e não voltam de um
-`git pull`. Agende cópia dos dois.
+`E:\projetosjb\Parceria-JB-main\servidor\dados\` (acervo e usuários) e
+`E:\projetosjb\Parceria-JB-main\docs\` (DOC/PDF enviados pela página) são dados de
+produção e estão no `.gitignore` — não vêm do clone e não voltam de um `git pull`.
+Agende cópia dos dois.
+
+Backup em outra máquina depende da rede que ainda não saiu (passo 6). Até lá, cópia
+para outro volume local da própria VM já é melhor que nada, mas não conta como backup
+de verdade — anote como pendência no mesmo chamado da infra.
+
+Quando for agendar para um share, use **UNC no caminho de destino**, nunca letra
+mapeada: a Tarefa Agendada roda fora da sua sessão de logon e não enxerga mapeamento
+feito com `net use`. O mesmo vale para o serviço do NSSM (passo 5).
 
 ## 9. Atualizar depois
 
+**Com rede, e se a pasta for um clone de verdade** (`git remote -v` responde):
+
 ```powershell
-cd C:\apps\parceriajb
+cd E:\projetosjb\Parceria-JB-main
 git pull
 nssm restart ParceriaJB
 ```
 
-Sem build e sem install. `servidor/dados/` e `docs/` não são tocados.
+**Sem rede — situação de hoje.** Copie a pasta da sua estação pela sessão RDP e
+sincronize por cima, preservando os dados de produção:
+
+```powershell
+nssm stop ParceriaJB
+robocopy "<pasta que você colou pelo RDP>" E:\projetosjb\Parceria-JB-main /E /XD node_modules .git dados docs
+nssm start ParceriaJB
+```
+
+O `/XD` é o que importa: sem ele o `robocopy` passa por cima de `servidor\dados\`
+(acervo e usuários) e de `docs\` (DOC/PDF enviados pela página), que são os dados de
+produção do passo 8 e não existem na cópia que você trouxe. Excluir `.git` evita
+misturar histórico de duas origens; `node_modules` não é usado pelo servidor.
+
+Sem build e sem install nos dois casos.

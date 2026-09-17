@@ -116,6 +116,7 @@ a.panel:focus-visible{
 .page-section{
   margin-top: var(--sp-6);
 }
+.page-block{ min-width: 0; }
 .page-section > h2{
   font-size: var(--fs-xl);
   font-weight: 650;
@@ -469,6 +470,24 @@ a.callout .link-arrow{
   padding: 0;
   display: grid;
   gap: 10px;
+}
+
+/* A documentação tem blocos complementares; lado a lado reduz a coluna única
+   interminável sem alterar o renderer dos outros tipos de página. */
+.documentacao-documentos,
+.documentacao-manuais{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 var(--sp-4);
+}
+.documentacao-documentos > h2,
+.documentacao-documentos > h2 + p,
+.documentacao-manuais > h2,
+.documentacao-manuais > h2 + p{
+  grid-column: 1 / -1;
+}
+.documentacao-categorias .panel-grid{
+  grid-template-columns: repeat(4, minmax(min(100%, 220px), 1fr));
 }
 .link-list a,
 .link-list .link-pendente{
@@ -881,6 +900,13 @@ a.callout .link-arrow{
 }
 
 @media (max-width: 900px){
+  .documentacao-categorias .panel-grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .documentacao-documentos,
+  .documentacao-manuais{
+    display: block;
+  }
   .steps{ --recuo: 58px; --folga: 20px; --respiro: 18px; }
   .steps > li:not(:has(p)){ --respiro: 14px; }
   .steps > li::before{ left: 18px; }
@@ -901,6 +927,7 @@ a.callout .link-arrow{
   }
   .link-list .link-text{ flex: 1 1 60%; }
   .panel{ padding: var(--sp-4); }
+  .documentacao-categorias .panel-grid{ grid-template-columns: 1fr; }
   .notice{ padding: 16px 18px; }
 }
 

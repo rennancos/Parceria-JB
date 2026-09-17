@@ -25,6 +25,7 @@ PAGINAS['documentacao'] = {
 
   secoes: [
     {
+      classe: 'documentacao-categorias',
       titulo: 'Categorias',
       texto: 'O acervo é organizado nos blocos abaixo. Cada bloco reúne os documentos vigentes do tema.',
       tipo: 'paineis',
@@ -68,6 +69,7 @@ PAGINAS['documentacao'] = {
     },
 
     {
+      classe: 'documentacao-documentos',
       titulo: 'Documentos',
       texto: 'Cada item abre no formato em que é mantido: endereço do portal quando o conteúdo vive lá, arquivo quando é um documento fechado.',
       blocos: [
@@ -95,6 +97,7 @@ PAGINAS['documentacao'] = {
     },
 
     {
+      classe: 'documentacao-manuais',
       titulo: 'Manuais por área',
       texto: 'Cada área mantém os próprios manuais, com o passo a passo das ferramentas que opera.',
       blocos: [
@@ -122,9 +125,9 @@ PAGINAS['documentacao'] = {
               meta: 'Grafismo'
             },
             {
-              titulo: 'Comunicação',
+              titulo: 'MAM',
               texto: 'Intercom, canais de contato e procedimentos de comunicação durante a operação.',
-              meta: 'Comunicação'
+              meta: 'MAM'
             }
           ]
         },

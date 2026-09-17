@@ -434,15 +434,17 @@ window.PAGINAS = {};
   // dos itens não sobra nível, e ele é mais rótulo do que subdivisão.
   function bloco(dados, exibirTitulo = true){
     const layout = LAYOUTS[dados.tipo] || LAYOUTS.paineis;
-    return (exibirTitulo && dados.titulo ? `<p class="block-title">${esc(dados.titulo)}</p>` : '')
-      + layout(dados.itens || [], dados);
+    return `<div class="page-block">`
+      + (exibirTitulo && dados.titulo ? `<p class="block-title">${esc(dados.titulo)}</p>` : '')
+      + layout(dados.itens || [], dados)
+      + `</div>`;
   }
 
   function secao(dados, indice){
     const id = `secao-${indice}`;
 
     return `
-      <section class="page-section" aria-labelledby="${id}">
+      <section class="page-section${dados.classe ? ` ${esc(dados.classe)}` : ''}" aria-labelledby="${id}">
         <h2 id="${id}">${esc(dados.titulo)}</h2>
         ${dados.texto ? `<p>${esc(dados.texto)}</p>` : ''}
         ${blocosDaSecao(dados).map((b) => bloco(b, b !== dados)).join('')}

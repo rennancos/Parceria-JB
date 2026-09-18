@@ -16,7 +16,8 @@
     "app:manifesto": "node app/manifesto.js",
     "app:teste": "electron app/teste-atualizacao.js",
     "fotos": "node ferramentas/otimizar-fotos.js",
-    "icone": "node ferramentas/gerar-icone.js"
+    "icone": "node ferramentas/gerar-icone.js",
+    "ia:smoke": "node ferramentas/smoke-ia.js"
   },
   "devDependencies": {
     "electron": "^44.4.3",

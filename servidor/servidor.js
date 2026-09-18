@@ -259,8 +259,12 @@ async function tratarApi(req, res, url){
     if (rota === '/api/ai/settings'){
       if (metodo === 'GET')
         return responderJson(res, 200, { configuracao: iaCred.obter(sessao.login), provedores: iaReg.publico() });
-      if (metodo === 'PUT')
+      if (metodo === 'PUT'){
+        // Salvar com credencial nova dispara chamada externa (validação): mesmo
+        // freio de /test e /chat, senão vira caminho paralelo sem limite.
+        seguranca.limitarIa(sessao.login);
         return responderJson(res, 200, { configuracao: await salvarConfigIa(sessao.login, await lerJson(req)) });
+      }
     }
 
     if (rota === '/api/ai/settings/test' && metodo === 'POST'){
@@ -274,8 +278,10 @@ async function tratarApi(req, res, url){
     }
 
     const comProvedor = rota.match(/^\/api\/ai\/providers\/([a-z0-9-]{1,32})\/models$/);
-    if (comProvedor && metodo === 'GET')
+    if (comProvedor && metodo === 'GET'){
+      seguranca.limitarIa(sessao.login);   // também faz chamada externa (listar modelos)
       return responderJson(res, 200, await modelosDoProvedorIa(sessao.login, comProvedor[1]));
+    }
 
     if (rota === '/api/ai/chat' && metodo === 'POST'){
       seguranca.limitarIa(sessao.login);

@@ -181,6 +181,19 @@ test('IA BYOK numa raiz descartável, só com o provedor mock', async (t) => {
     assert.equal(ult.status, 429);
   });
 
+  // M1. PUT /settings e /providers/:p/models compartilham o mesmo freio de /test.
+  await t.test('M1 · PUT e /models também respeitam o rate limit', async () => {
+    auth.criarUsuario({ login: 'limitado', nome: 'L', papel: 'equipe', senha: 'senha-ficticia-123' });
+    const tL = auth.entrar('limitado', 'senha-ficticia-123').token;
+    await pedir('/api/ai/settings', { metodo: 'PUT', token: tL, corpo: JSON.stringify({ provider: 'mock', chave: 'mock-ok-L', selectedModel: 'mock-rapido' }) });
+    let ult;
+    for (let i = 0; i < 30; i++)
+      ult = await pedir('/api/ai/settings/test', { metodo: 'POST', token: tL, corpo: JSON.stringify({ provider: 'mock', chave: 'mock-ok-L' }) });
+    assert.equal(ult.status, 429);
+    assert.equal((await pedir('/api/ai/settings', { metodo: 'PUT', token: tL, corpo: JSON.stringify({ provider: 'mock', chave: 'mock-ok-L', selectedModel: 'mock-rapido' }) })).status, 429);
+    assert.equal((await pedir('/api/ai/providers/mock/models', { token: tL })).status, 429);
+  });
+
   // 15. Streaming pode ser cancelado (cliente desiste no meio).
   await t.test('15 · stream cancelado no meio não derruba o servidor', async () => {
     await new Promise((resolve) => {
@@ -198,6 +211,18 @@ test('IA BYOK numa raiz descartável, só com o provedor mock', async (t) => {
     // servidor segue vivo depois do cancelamento
     const vivo = await pedir('/api/ai/providers', { token: tEd });
     assert.equal(vivo.status, 200);
+  });
+
+  // B2. Chave mestra trocada torna a credencial indecifrável → erro tratado
+  // (409), não 500 cru, e sem vazar nada da credencial.
+  await t.test('B2 · chave mestra trocada → chaveDe lança 409 tratado, sem vazar', () => {
+    const original = process.env.PAJB_IA_MASTER_KEY;
+    process.env.PAJB_IA_MASTER_KEY = CHAVE_B;
+    try {
+      assert.throws(() => cred.chaveDe('editor'), (e) => e.status === 409 && !/mock-ok/.test(e.message));
+    } finally {
+      process.env.PAJB_IA_MASTER_KEY = original;
+    }
   });
 
   // 9. Exclusão remove a credencial.

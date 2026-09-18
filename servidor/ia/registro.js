@@ -53,9 +53,10 @@ const PROVEDORES = {
   }
 };
 
-/* Mock para testes: NÃO aparece no catálogo público a menos que PAJB_IA_MOCK=1.
-   Existe para os testes não consumirem API paga (requisito 17) e para exercitar
-   validação/stream/cancelamento sem rede. */
+/* Mock para testes: NÃO aparece no catálogo a menos que PAJB_IA_MOCK=1, e
+   NUNCA em produção — mesmo com a variável setada por engano, NODE_ENV=production
+   o ignora. Existe para os testes não consumirem API paga (requisito 17) e para
+   exercitar validação/stream/cancelamento sem rede. */
 const MOCK = {
   rotulo: 'Mock (teste)',
   instrucoesUrl: '',
@@ -65,7 +66,7 @@ const MOCK = {
 
 function catalogo(){
   const c = Object.assign({}, PROVEDORES);
-  if (process.env.PAJB_IA_MOCK === '1') c.mock = MOCK;
+  if (process.env.PAJB_IA_MOCK === '1' && process.env.NODE_ENV !== 'production') c.mock = MOCK;
   return c;
 }
 

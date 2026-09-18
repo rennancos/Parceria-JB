@@ -90,6 +90,9 @@ dist/
 # do package.json (fast-uri, @xmldom/xmldom — ver md/auditoria-seguranca.md).
 # Confira `pnpm why` depois de um install novo antes de gerar instalador.
 pnpm-lock.yaml
+# Testes locais da revisão de segurança, ignorados a pedido do mantenedor.
+/tests/unit/inicializacao.test.cjs
+/tests/unit/entrada-segura.test.cjs
 build/
 *.log
 npm-debug.log*
@@ -118,6 +121,7 @@ md/auditoria-estrutura-frontend.md
 md/auditoria-seguranca.md
 md/jotbird-document.md
 md/relatorio-preparacao-ia.md
+md/CODEX-SECURITY-TASKS.md
 
 # Config do markdownlint: preferência de editor de quem escreve os .md,
 # não regra do projeto. Vale em qualquer pasta.

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Modelo: substituir portal.example, configurar certificado/bindings e ARR.
+     Instalar em pasta exclusiva do site IIS, fora da raiz do repositório. -->
+<configuration>
+  <system.webServer>
+    <rewrite>
+      <rules>
+        <rule name="Recusar escrita sem TLS" stopProcessing="true">
+          <match url=".*" />
+          <conditions logicalGrouping="MatchAll">
+            <add input="{HTTPS}" pattern="^OFF$" />
+            <add input="{REQUEST_METHOD}" pattern="^(GET|HEAD)$" negate="true" />
+          </conditions>
+          <action type="CustomResponse" statusCode="403" statusReason="HTTPS required" statusDescription="Use HTTPS." />
+        </rule>
+        <rule name="Leitura HTTP para HTTPS" stopProcessing="true">
+          <match url="(.*)" />
+          <conditions>
+            <add input="{HTTPS}" pattern="^OFF$" />
+          </conditions>
+          <action type="Redirect" url="https://portal.example/{R:1}" appendQueryString="true" redirectType="Permanent" />
+        </rule>
+        <rule name="Proxy HTTPS para Node local" stopProcessing="true">
+          <match url="(.*)" />
+          <conditions>
+            <add input="{HTTPS}" pattern="^ON$" />
+          </conditions>
+          <action type="Rewrite" url="http://127.0.0.1:8000/{R:1}" appendQueryString="true" />
+        </rule>
+      </rules>
+    </rewrite>
+  </system.webServer>
+</configuration>

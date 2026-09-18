@@ -7,8 +7,8 @@
   "scripts": {
     "test": "node --test tests/unit/*.test.cjs",
     "test:browser": "node --test tests/browser.cjs",
-    "dev": "serve --listen 8000 .",
-    "start": "serve --listen 8000 .",
+    "dev": "node servidor/servidor.js",
+    "start": "node servidor/servidor.js",
     "servidor": "node servidor/servidor.js",
     "usuarios": "node servidor/usuarios.js",
     "app": "electron .",
@@ -19,18 +19,18 @@
     "icone": "node ferramentas/gerar-icone.js"
   },
   "devDependencies": {
-    "electron": "^39.8.10",
-    "electron-builder": "^26.0.0",
-    "serve": "^14.2.4"
+    "electron": "^44.4.3",
+    "electron-builder": "^26.15.3"
   },
   "packageManager": "pnpm@9.12.0",
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "pnpm": {
     "overrides": {
       "fast-uri": "^3.1.7",
-      "@xmldom/xmldom": "^0.8.15"
+      "@xmldom/xmldom": "^0.8.15",
+      "js-yaml": "^4.3.2"
     }
   }
 }

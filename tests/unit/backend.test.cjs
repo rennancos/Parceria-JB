@@ -18,6 +18,11 @@ fs.mkdirSync(path.join(falsa, 'css'), { recursive: true });
 for (const nome of fs.readdirSync(path.join(raiz, 'servidor')).filter(f => f.endsWith('.js'))){
   fs.copyFileSync(path.join(raiz, 'servidor', nome), path.join(falsa, 'servidor', nome));
 }
+// servidor.js agora depende de servidor/ia/ (integração BYOK): espelhar o subdir.
+fs.mkdirSync(path.join(falsa, 'servidor', 'ia'), { recursive: true });
+for (const nome of fs.readdirSync(path.join(raiz, 'servidor', 'ia')).filter(f => f.endsWith('.js'))){
+  fs.copyFileSync(path.join(raiz, 'servidor', 'ia', nome), path.join(falsa, 'servidor', 'ia', nome));
+}
 fs.mkdirSync(path.join(falsa, 'md'), { recursive: true });
 fs.mkdirSync(path.join(falsa, 'docs'), { recursive: true });
 fs.writeFileSync(path.join(falsa, 'index.html'), '<h1>portal falso</h1>');

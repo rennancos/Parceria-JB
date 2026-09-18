@@ -40,6 +40,8 @@ const path = require('path');
 const dados = require('./dados');
 const auth = require('./auth');
 const ia = require('./ia');
+const iaCred = require('./ia/credenciais');
+const iaReg = require('./ia/registro');
 const { ErroDeUso } = require('./erros');
 const seguranca = require('./seguranca');
 
@@ -166,7 +168,10 @@ async function tratarApi(req, res, url){
     if (metodo === 'GET'){
       // Leitura é aberta: quem já está na rede e abriu o portal enxerga a
       // página inteira de qualquer jeito. O que exige login é escrever.
-      return responderJson(res, 200, { itens: dados.listar(), blocos: dados.BLOCOS });
+      const itens = dados.listar();
+      // Visitantes leem o acervo sem receber logins ou metadados de autoria.
+      const publicos = itens.map(({ criadoPor, atualizadoPor, criadoEm, atualizadoEm, ...item }) => item);
+      return responderJson(res, 200, { itens: sessao ? itens : publicos, blocos: dados.BLOCOS });
     }
 
     if (metodo === 'POST'){
@@ -239,7 +244,163 @@ async function tratarApi(req, res, url){
     }));
   }
 
+  /* IA BYOK (multi-provedor, credencial por usuário). Prefixo /api/ai/ para não
+     colidir com o assistente antigo /api/ia/. Tudo exige sessão; o dono da
+     credencial é SEMPRE sessao.login, nunca um id vindo do corpo/URL. A chave
+     mestra ausente derruba só estas rotas (503), não o portal. Ver
+     servidor/ia/registro.js e docs/ai/AI-ARCHITECTURE.md. */
+  if (rota.startsWith('/api/ai/')){
+    auth.exigir(sessao, ['equipe', 'dev']);
+    if (!iaCred.disponivel()) throw new ErroDeUso('Integração de IA não configurada neste servidor.', 503);
+
+    if (rota === '/api/ai/providers' && metodo === 'GET')
+      return responderJson(res, 200, { provedores: iaReg.publico() });
+
+    if (rota === '/api/ai/settings'){
+      if (metodo === 'GET')
+        return responderJson(res, 200, { configuracao: iaCred.obter(sessao.login), provedores: iaReg.publico() });
+      if (metodo === 'PUT')
+        return responderJson(res, 200, { configuracao: await salvarConfigIa(sessao.login, await lerJson(req)) });
+    }
+
+    if (rota === '/api/ai/settings/test' && metodo === 'POST'){
+      seguranca.limitarIa(sessao.login);
+      return responderJson(res, 200, await testarCredencialIa(await lerJson(req)));
+    }
+
+    if (rota === '/api/ai/settings/credential' && metodo === 'DELETE'){
+      iaCred.remover(sessao.login);
+      return responderJson(res, 200, { ok: true });
+    }
+
+    const comProvedor = rota.match(/^\/api\/ai\/providers\/([a-z0-9-]{1,32})\/models$/);
+    if (comProvedor && metodo === 'GET')
+      return responderJson(res, 200, await modelosDoProvedorIa(sessao.login, comProvedor[1]));
+
+    if (rota === '/api/ai/chat' && metodo === 'POST'){
+      seguranca.limitarIa(sessao.login);
+      return tratarChatIa(req, res, sessao);
+    }
+  }
+
   responderJson(res, 404, { erro: 'Rota não encontrada.' });
+}
+
+/* ---------- IA BYOK: regras das rotas /api/ai ---------- */
+
+// Testar conexão: chama a operação oficial barata (listar modelos, que também
+// valida) e devolve só o resultado sanitizado + os modelos permitidos que a
+// chave realmente tem. NÃO salva nada — nem credencial inválida (requisito 4).
+async function testarCredencialIa({ provider, chave }){
+  if (!iaReg.ehProvedor(provider)) throw new ErroDeUso('Provedor não suportado.', 400);
+  if (typeof chave !== 'string' || !chave.trim() || chave.length > 512)
+    throw new ErroDeUso('Informe uma credencial válida.', 400);
+  try {
+    const vivos = await iaReg.adapter(provider).listarModelos(chave.trim());
+    const permitidos = iaReg.meta(provider).modelos;
+    return { status: 'valida', modelos: vivos.map((m) => m.id).filter((id) => permitidos.includes(id)) };
+  } catch (erro) {
+    if (erro instanceof ErroDeUso && erro.status === 401)
+      return { status: 'invalida', mensagem: 'Credencial recusada pelo provedor.' };
+    return { status: 'indisponivel', mensagem: 'Não foi possível validar agora. Tente de novo.' };
+  }
+}
+
+// Salvar configuração. Com chave nova: valida ANTES de gravar (nunca grava
+// inválida). Sem chave nova: só troca modelo/enabled da credencial existente.
+async function salvarConfigIa(login, corpo){
+  const provider = corpo && corpo.provider;
+  if (!iaReg.ehProvedor(provider)) throw new ErroDeUso('Provedor não suportado.', 400);
+  const modelo = String(corpo.selectedModel || '').trim();
+  if (!iaReg.modeloPermitido(provider, modelo)) throw new ErroDeUso('Modelo não permitido para este provedor.', 400);
+
+  const temChaveNova = typeof corpo.chave === 'string' && corpo.chave.trim();
+  if (temChaveNova){
+    const chave = corpo.chave.trim();
+    if (chave.length > 512) throw new ErroDeUso('Credencial longa demais.', 400);
+    try {
+      await iaReg.adapter(provider).listarModelos(chave);
+    } catch (erro) {
+      if (erro instanceof ErroDeUso && erro.status === 401) throw new ErroDeUso('Credencial recusada pelo provedor.', 400);
+      throw new ErroDeUso('Não foi possível validar a credencial agora. Tente de novo.', 502);
+    }
+    const salvo = iaCred.salvar(login, { provider, chave, selectedModel: modelo });
+    return 'enabled' in corpo ? iaCred.atualizar(login, { enabled: corpo.enabled }) : salvo;
+  }
+
+  const atual = iaCred.obter(login);
+  if (!atual || atual.provider !== provider)
+    throw new ErroDeUso('Informe a credencial para este provedor.', 400);
+  return iaCred.atualizar(login, Object.assign({ selectedModel: modelo }, 'enabled' in corpo ? { enabled: corpo.enabled } : {}));
+}
+
+// Modelos permitidos que a credencial JÁ SALVA do usuário tem — para trocar de
+// modelo sem reenviar a chave.
+async function modelosDoProvedorIa(login, provider){
+  if (!iaReg.ehProvedor(provider)) throw new ErroDeUso('Provedor não suportado.', 400);
+  const atual = iaCred.obter(login);
+  const chave = iaCred.chaveDe(login);
+  if (!chave || !atual || atual.provider !== provider)
+    throw new ErroDeUso('Configure a credencial deste provedor primeiro.', 400);
+  const vivos = await iaReg.adapter(provider).listarModelos(chave);
+  const permitidos = iaReg.meta(provider).modelos;
+  return { modelos: vivos.map((m) => m.id).filter((id) => permitidos.includes(id)) };
+}
+
+function validarMensagensIa(bruto){
+  if (!Array.isArray(bruto) || !bruto.length) throw new ErroDeUso('Envie ao menos uma mensagem.', 400);
+  if (bruto.length > 40) throw new ErroDeUso('Conversa longa demais.', 400);
+  const papeis = ['user', 'assistant', 'system'];
+  return bruto.map((m) => {
+    const papel = papeis.includes(m && m.papel) ? m.papel : 'user';
+    const texto = String(m && m.texto || '').slice(0, 8000);
+    if (!texto) throw new ErroDeUso('Mensagem vazia.', 400);
+    return { papel, texto };
+  });
+}
+
+// Auditoria: SÓ metadados. Nunca a chave, nunca o conteúdo do prompt, nunca a
+// resposta (mesma postura de servidor/ia.js).
+function auditarIa({ login, provider, modelo, ms, status, erro }){
+  console.log('[ai]', new Date().toISOString(), login, provider, modelo, `${ms}ms`,
+    erro ? `erro=${erro}` : status);
+}
+
+async function tratarChatIa(req, res, sessao){
+  const corpo = await lerJson(req);
+  const cfg = iaCred.obter(sessao.login);
+  if (!cfg) throw new ErroDeUso('Configure um provedor de IA primeiro.', 400);
+  if (!cfg.enabled) throw new ErroDeUso('Sua integração de IA está desabilitada.', 409);
+
+  const mensagens = validarMensagensIa(corpo.mensagens);
+  const modelo = String(corpo.modelo || cfg.selectedModel || '').trim();
+  if (!iaReg.modeloPermitido(cfg.provider, modelo)) throw new ErroDeUso('Modelo não permitido.', 400);
+
+  const chave = iaCred.chaveDe(sessao.login);
+  const adapter = iaReg.adapter(cfg.provider);
+  const inicio = Date.now();
+  const querStream = corpo.stream === true && typeof adapter.streamTexto === 'function';
+
+  try {
+    if (querStream){
+      const controle = new AbortController();
+      // Cliente desistiu no meio: aborta a chamada ao provedor (requisito 15).
+      req.on('close', () => { if (!res.writableEnded) controle.abort(); });
+      res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store', 'X-Accel-Buffering': 'no' });
+      for await (const pedaco of adapter.streamTexto({ chave, modelo, mensagens, sinal: controle.signal }))
+        res.write(pedaco);
+      res.end();
+      auditarIa({ login: sessao.login, provider: cfg.provider, modelo, ms: Date.now() - inicio, status: 'ok' });
+      return;
+    }
+    const r = await adapter.gerarTexto({ chave, modelo, mensagens });
+    auditarIa({ login: sessao.login, provider: cfg.provider, modelo, ms: Date.now() - inicio, status: 'ok' });
+    return responderJson(res, 200, { resposta: r.texto, modelo });
+  } catch (erro) {
+    auditarIa({ login: sessao.login, provider: cfg.provider, modelo, ms: Date.now() - inicio, status: 'erro', erro: erro.name });
+    if (erro && erro.name === 'AbortError'){ if (!res.writableEnded) res.end(); return; }
+    throw erro instanceof ErroDeUso ? erro : new ErroDeUso('O provedor não conseguiu responder agora.', 502);
+  }
 }
 
 /* ---------- Estático ---------- */
@@ -353,8 +514,19 @@ function porta(){
 
 if (require.main === module){
   const p = porta();
-  servidor.listen(p, () => {
-    console.log(`Portal Parceria JB em http://localhost:${p}`);
+  const host = process.env.PAJB_HOST || '127.0.0.1';
+  if (!require('node:net').isIP(host)) throw new Error('PAJB_HOST deve ser um endereço IP.');
+  if (process.env.NODE_ENV === 'production'){
+    if (!seguranca.ORIGEM_PUBLICA.startsWith('https:'))
+      throw new Error('Produção exige proxy HTTPS e PAJB_ORIGEM_PUBLICA=https://seu-host.');
+    if (!['127.0.0.1', '::1'].includes(host))
+      throw new Error('Em produção, PAJB_HOST deve ser loopback; publique o portal pelo proxy HTTPS local.');
+  }
+  servidor.listen(p, host, () => {
+    if (!seguranca.ORIGEM_PUBLICA.startsWith('https:')){
+      console.warn('[WARN] Sessões podem trafegar sem TLS. Em produção, use proxy HTTPS e configure PAJB_ORIGEM_PUBLICA=https://seu-host.');
+    }
+    console.log(`Portal Parceria JB em http://${host.includes(':') ? `[${host}]` : host}:${p}`);
     console.log('Para cadastrar quem edita:  node servidor/usuarios.js incluir');
   });
 }

@@ -41,7 +41,8 @@ test('segurança da atualização com servidor descartável', async t => {
     const fonte = path.join(process.env.PAJB_TESTE_FONTE || path.resolve(__dirname, '../..'), 'app/atualizacao.js');
     const contexto = { module: { exports: {} }, Buffer, URL, AbortController, console,
       process: { env: { PAJB_ORIGEM: origem } },
-      setTimeout: (fn, ms) => setTimeout(fn, ms === 10000 ? 100 : ms), clearTimeout,
+      // Acelera só o cenário lento; o primeiro fetch pode levar mais de 100 ms.
+      setTimeout: (fn, ms) => setTimeout(fn, ms === 10000 && modo === 'lento' ? 100 : ms), clearTimeout,
       require: nome => nome === 'electron' ? { app: { isPackaged: empacotado, getPath: () => pasta, getVersion: () => '1.0.0' }, net: { fetch } } : require(nome) };
     vm.runInNewContext(fs.readFileSync(fonte, 'utf8'), contexto, { filename: fonte });
     return contexto.module.exports;

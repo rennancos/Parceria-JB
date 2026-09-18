@@ -12,13 +12,14 @@ O que muda em relação a um deploy Node comum:
   testes e para empacotar o app Electron — nada disso roda na VM.
 - **Não há Entra ID / Azure AD.** Quem edita é cadastrado por CLI
   (`servidor/usuarios.js`, scrypt, sessão em memória). Não há Redirect URI a ajustar.
-- **A variável de porta é `PORTA`**, não `PORT`. Não existe `HOST`: o servidor escuta
-  em todas as interfaces.
+- **A variável de porta é `PORTA`**, não `PORT`. `PAJB_HOST` usa `127.0.0.1`
+  por padrão. Em `NODE_ENV=production`, o CLI exige origem pública HTTPS e
+  recusa endereços fora de loopback: o IIS local publica o serviço.
 
 ## 1. Preparo da VM
 
 ```powershell
-node -v                    # precisa ser >= 18 (engines do package.json)
+node -v                    # precisa ser >= 22; prefira LTS suportado
 (Get-Command node).Source  # anote: é este caminho que vai no NSSM
 ```
 
@@ -128,27 +129,35 @@ Agora o serviço, com o caminho do `node.exe` que você anotou no passo 1:
 ```powershell
 nssm install ParceriaJB "C:\Program Files\nodejs\node.exe" "servidor\servidor.js"
 nssm set ParceriaJB AppDirectory "E:\projetosjb\Parceria-JB-main"
-nssm set ParceriaJB AppEnvironmentExtra PORTA=8000
+nssm set ParceriaJB AppEnvironmentExtra PORTA=8000 PAJB_HOST=127.0.0.1 NODE_ENV=production PAJB_ORIGEM_PUBLICA=https://parceriajb.<zona-interna>
 nssm set ParceriaJB AppExit Default Restart
 nssm start ParceriaJB
 
 Get-Service ParceriaJB
 ```
 
+Ajuste o hostname de exemplo antes de executar. `AppEnvironmentExtra` substitui
+a lista de variáveis do serviço: preserve quaisquer variáveis de IA já
+configuradas, sem imprimi-las ou registrá-las em logs.
+
 Aponte para `node.exe` direto, não para `pnpm.cmd`: o wrapper `.cmd` cria um processo
 filho que o NSSM não consegue parar nem reiniciar direito. E `pnpm start` aqui roda
-`serve` (site estático **sem** API) — não é o que você quer no serviço.
+o mesmo backend protegido, mas não é necessário no serviço.
 
 ## 6. Como o time acessa
 
-**Opção A — direto, funciona hoje:**
+**Opção A — HTTP direto, somente para diagnóstico local com contas fictícias:**
 
 ```powershell
-New-NetFirewallRule -DisplayName "Portal PAJB" -Direction Inbound -Protocol TCP -LocalPort 8000 -Action Allow
+node -e "require('./servidor/servidor').servidor.listen(8000, '127.0.0.1')"
 ```
 
-Time acessa `http://10.181.40.13:8000`. Sem TLS, sem hostname, sem chamado. Rede
-interna, portal interno — é uma escolha defensável enquanto o resto não sai.
+Esse acesso é HTTP sem TLS: credenciais e sessões ficam expostas a quem conseguir
+interceptar o tráfego. Não use contas reais nesse modo. Em produção, inclusive na
+LAN, use o proxy HTTPS da opção B e configure `PAJB_ORIGEM_PUBLICA` com a origem
+HTTPS. Não mantenha regra de firewall liberando acesso direto ao backend em
+produção. No CLI normal, o aviso `[WARN]` no boot sinaliza origem HTTPS ausente;
+ele não ativa TLS nem verifica o certificado do proxy.
 
 **Teste da estação de alguém do time antes de anunciar o link**, não só da VM:
 
@@ -183,13 +192,40 @@ assim que a porta fica só para o proxy local.
 Com HTTPS no ar, adicione a origem pública ao serviço:
 
 ```powershell
-nssm set ParceriaJB AppEnvironmentExtra PORTA=8000 PAJB_ORIGEM_PUBLICA=https://parceriajb.<zona-interna>
+nssm set ParceriaJB AppEnvironmentExtra PORTA=8000 PAJB_HOST=127.0.0.1 NODE_ENV=production PAJB_ORIGEM_PUBLICA=https://parceriajb.<zona-interna>
 nssm restart ParceriaJB
 ```
 
 Só a origem, sem caminho e sem barra final — o servidor recusa subir se vier
 diferente. É ela que valida o `Origin` das escritas e dá o atributo `Secure` ao
 cookie de sessão; atrás de proxy o `Host` sozinho não serve, porque vem do cliente.
+
+O modelo [infra/iis/web.config.example](../infra/iis/web.config.example) encaminha
+HTTPS ao backend, redireciona somente GET/HEAD de HTTP e recusa os demais métodos
+sem TLS. Troque `portal.example` pelo hostname aprovado, instale URL Rewrite/ARR,
+ative o proxy e configure binding 443 com certificado válido. Use uma pasta
+separada para o site IIS, contendo o `web.config`; não publique a raiz do
+repositório como arquivos estáticos. O modelo não instala certificado nem altera
+a VM sozinho. Referência: [proxy reverso IIS/ARR](https://learn.microsoft.com/en-us/iis/extensions/url-rewrite-module/reverse-proxy-with-url-rewrite-v2-and-application-request-routing).
+
+Validação em homologação autorizada: certificado confiável no hostname final,
+GET HTTP redirecionado, POST HTTP recusado, login HTTPS com cookie Secure,
+arquivos internos bloqueados e porta 8000 inacessível de outra máquina.
+
+Se uma regra anterior liberava a porta 8000, restrinja esse acesso ao proxy antes
+de publicar o portal. Configurar a variável HTTPS não fecha a porta HTTP do Node.
+
+O limitador atual usa o endereço do socket e ignora `X-Forwarded-For` de propósito.
+No acesso direto, o limite é por origem de rede; atrás do IIS, os clientes
+compartilham o limite do proxy (20 tentativas de login por cinco minutos). Antes
+de habilitar esse deploy, valide a capacidade esperada e o controle de tentativas
+no proxy. Não habilite confiança em XFF sem restringir o acesso direto ao backend
+e garantir que o proxy sobrescreva esse header. Nenhuma confiança em proxy foi
+adicionada ao código nesta revisão.
+
+Não foram adicionados limites gerais de leitura/escrita: a escrita já exige
+sessão e o escopo atual é interno. Antes de ampliar a exposição, reavalie cotas
+de upload e limites de requisições, inclusive para a IA, conforme o uso medido.
 
 ## 7. DNS e certificado (chamado para a infra)
 

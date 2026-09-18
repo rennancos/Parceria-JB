@@ -1,0 +1,98 @@
+/* Catálogo de provedores de IA e o contrato que todo adapter cumpre.
+
+   BYOK (Bring Your Own Key): cada usuário informa a PRÓPRIA credencial, escolhe
+   um modelo permitido e paga pela própria conta. O portal não tem chave global,
+   crédito compartilhado nem conta de IA. Ver docs/ai/AI-ARCHITECTURE.md.
+
+   Esta é a ÚNICA porta para os adapters: controllers e rotas nunca fazem
+   require('./openai') direto — pedem por aqui, e é aqui que a allowlist decide
+   se o provedor existe. O projeto não usa TypeScript, então o "interface
+   AIProvider" do pedido vira este contrato JSDoc + o formato que cada
+   servidor/ia/<provedor>.js exporta.
+
+   CONTRATO — todo adapter exporta:
+     validarCredencial(chave)  -> Promise<ResultadoValidacao>
+     listarModelos(chave)      -> Promise<AIModelo[]>   (op oficial barata: valida E lista)
+     gerarTexto(pedido)        -> Promise<AIResposta>
+     streamTexto?(pedido)      -> AsyncIterable<string>  (opcional)
+
+   @typedef {{status:'valida'|'invalida'|'indisponivel', mensagem?:string}} ResultadoValidacao
+   @typedef {{id:string}} AIModelo
+   @typedef {{papel:'user'|'assistant'|'system', texto:string}} AIMensagem
+   @typedef {{chave:string, modelo:string, mensagens:AIMensagem[], sinal?:AbortSignal}} AIPedido
+   @typedef {{texto:string, modelo:string}} AIResposta
+
+   ALLOWLIST DE MODELOS: a lista `modelos` de cada provedor é o que o portal
+   PERMITE. O que a chave do usuário realmente pode usar vem do provedor
+   (listarModelos); o portal mostra a interseção. Modelo novo entra editando
+   só este arquivo. GitHub NÃO está aqui: em 30/07/2026 o GitHub Models foi
+   descontinuado e o Copilot não tem API pública/chave reutilizável — não há
+   integração BYOK oficial (ver docs/ai/AI-PROVIDERS.md). */
+'use strict';
+
+const { ErroDeUso } = require('../erros');
+
+const PROVEDORES = {
+  openai: {
+    rotulo: 'OpenAI',
+    instrucoesUrl: 'https://platform.openai.com/api-keys',
+    modelos: ['gpt-4o-mini', 'gpt-4o', 'gpt-4.1-mini', 'gpt-4.1'],
+    adapter: () => require('./openai')
+  },
+  anthropic: {
+    rotulo: 'Anthropic Claude',
+    instrucoesUrl: 'https://console.anthropic.com/settings/keys',
+    modelos: ['claude-haiku-4-5', 'claude-sonnet-5', 'claude-opus-5'],
+    adapter: () => require('./anthropic')
+  },
+  gemini: {
+    rotulo: 'Google Gemini',
+    instrucoesUrl: 'https://aistudio.google.com/apikey',
+    modelos: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash'],
+    adapter: () => require('./gemini')
+  }
+};
+
+/* Mock para testes: NÃO aparece no catálogo público a menos que PAJB_IA_MOCK=1.
+   Existe para os testes não consumirem API paga (requisito 17) e para exercitar
+   validação/stream/cancelamento sem rede. */
+const MOCK = {
+  rotulo: 'Mock (teste)',
+  instrucoesUrl: '',
+  modelos: ['mock-rapido', 'mock-esperto'],
+  adapter: () => require('./mock')
+};
+
+function catalogo(){
+  const c = Object.assign({}, PROVEDORES);
+  if (process.env.PAJB_IA_MOCK === '1') c.mock = MOCK;
+  return c;
+}
+
+function ehProvedor(id){
+  return Object.prototype.hasOwnProperty.call(catalogo(), id);
+}
+
+function meta(id){
+  const p = catalogo()[id];
+  if (!p) throw new ErroDeUso('Provedor não suportado.', 400);
+  return p;
+}
+
+function adapter(id){
+  return meta(id).adapter();
+}
+
+function modeloPermitido(id, modelo){
+  return meta(id).modelos.includes(modelo);
+}
+
+// O que a interface pode mostrar: id, rótulo, link oficial e a allowlist de
+// modelos. Nunca credencial, nunca URL de endpoint (essa mora no adapter).
+function publico(){
+  return Object.entries(catalogo()).map(([id, p]) => ({
+    id, rotulo: p.rotulo, instrucoesUrl: p.instrucoesUrl, modelos: p.modelos
+  }));
+}
+
+module.exports = { catalogo, ehProvedor, meta, adapter, modeloPermitido, publico };

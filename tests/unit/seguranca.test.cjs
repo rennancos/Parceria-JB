@@ -13,6 +13,10 @@ test('segurança HTTP com dados descartáveis', async t => {
   const origem = process.env.PAJB_TESTE_FONTE || path.resolve(__dirname, '../..');
   for (const f of fs.readdirSync(path.join(origem, 'servidor')).filter(f => f.endsWith('.js')))
     fs.copyFileSync(path.join(origem, 'servidor', f), path.join(base, 'servidor', f));
+  // servidor.js agora depende de servidor/ia/ (integração BYOK): espelhar o subdir.
+  fs.mkdirSync(path.join(base, 'servidor', 'ia'));
+  for (const f of fs.readdirSync(path.join(origem, 'servidor', 'ia')).filter(f => f.endsWith('.js')))
+    fs.copyFileSync(path.join(origem, 'servidor', 'ia', f), path.join(base, 'servidor', 'ia', f));
   for (const dir of ['docs', 'css', 'js', 'privado']) fs.mkdirSync(path.join(base, dir));
   fs.writeFileSync(path.join(base, 'index.html'), '<h1>fixture</h1>');
   fs.writeFileSync(path.join(base, 'privado', 'interno.pdf'), 'fixture privada');
@@ -76,6 +80,28 @@ test('segurança HTTP com dados descartáveis', async t => {
     assert.equal(doc.criadoPor, 'editor');
     assert.equal((await pedir(`/api/documentos/${doc.id}`, { metodo: 'DELETE', headers })).status, 403);
     assert.equal((await pedir(`/api/documentos/${doc.id}`, { metodo: 'DELETE', headers: { ...headers, Cookie: `pajb_sessao=${tokenDev}` } })).status, 200);
+  });
+  await t.test('acervo aberto omite autoria; equipe e dev preservam metadados e persistência', async () => {
+    const criado = await pedir('/api/documentos', { metodo: 'POST', headers, corpo: item });
+    assert.equal(criado.status, 201);
+    const original = JSON.parse(criado.corpo).item;
+    const campos = ['criadoPor', 'atualizadoPor', 'criadoEm', 'atualizadoEm'];
+    const esperado = { ...original };
+    for (const campo of campos) delete esperado[campo];
+    for (const cookie of ['', 'pajb_sessao=invalida']){
+      const aberto = await pedir('/api/documentos', { headers: { Cookie: cookie } });
+      assert.equal(aberto.status, 200);
+      const publico = JSON.parse(aberto.corpo).itens.find(i => i.id === original.id);
+      assert.deepEqual(publico, esperado);
+      for (const campo of campos) assert.equal(Object.hasOwn(publico, campo), false);
+    }
+    for (const tokenAutenticado of [token, tokenDev]){
+      const resposta = await pedir('/api/documentos', { headers: { Cookie: `pajb_sessao=${tokenAutenticado}` } });
+      assert.equal(resposta.status, 200);
+      assert.deepEqual(JSON.parse(resposta.corpo).itens.find(i => i.id === original.id), original);
+    }
+    const gravado = JSON.parse(fs.readFileSync(path.join(base, 'servidor/dados/documentos.json')));
+    assert.deepEqual(gravado.itens.find(i => i.id === original.id), original);
   });
   await t.test('entrada malformada: JSON null, cookie e URL retornam 4xx', async () => {
     assert.equal((await pedir('/api/documentos', { metodo: 'POST', headers, corpo: 'null' })).status, 400);

@@ -20,7 +20,9 @@ pnpm dev       # http://localhost:8000
 
 Duplo clique em `index.html` também funciona. O [md/01-como-rodar.md](md/01-como-rodar.md) explica o que muda na prática: `localStorage`, teste em celular e fidelidade ao resultado final.
 
-Para ter também a API pela qual a equipe edita os documentos sem abrir código:
+`dev`, `start` e `servidor` usam o mesmo backend protegido: site e API em
+`127.0.0.1:8000`, sem publicar a raiz inteira do repositório. Node 22 ou superior
+é necessário; prefira uma versão LTS suportada. Para cadastrar quem edita:
 
 ```bash
 pnpm servidor   # site + API num processo só, sem dependência nenhuma
@@ -44,7 +46,7 @@ npm run app:build   # gera dist/Parceria-JB-Setup-<versão>.exe
 
 **2. Conteúdo é dado, não markup.** Texto das páginas e lista de pessoas vivem em `.js` como objetos e arrays; o HTML é gerado a partir deles. Quem edita conteúdo nunca toca em tag.
 
-**3. Tem que funcionar em `file://`.** Isso proíbe `fetch()` de arquivo local e `<script type="module">`, e é a razão de os dados serem `.js` e não `.json`, e de o servidor local ser um estático burro em vez do Vite.
+**3. Tem que funcionar em `file://`.** Isso proíbe `fetch()` de arquivo local e `<script type="module">`, e é a razão de os dados serem `.js` e não `.json`. O backend entrega esses arquivos sem transformação ou bundler.
 
 ## Estrutura
 

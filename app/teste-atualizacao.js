@@ -18,6 +18,13 @@
    Roda no Electron (precisa do `net` e do `app`), mas não abre janela. */
 'use strict';
 
+// Se o console que recebe a saída fechar antes do fim (terminal fechado, app
+// aberto sem console, saída canalizada para um leitor que sumiu), o write no
+// stdout falha com EPIPE. Sem esta guarda, no processo principal do Electron
+// isso vira exceção não tratada e abre o diálogo "A JavaScript error occurred".
+process.stdout.on('error', (e) => { if (e.code === 'EPIPE') process.exit(0); });
+process.stderr.on('error', (e) => { if (e.code === 'EPIPE') process.exit(0); });
+
 const { app } = require('electron');
 const http = require('http');
 const fs = require('fs');

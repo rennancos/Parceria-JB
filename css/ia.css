@@ -1,0 +1,70 @@
+/* Configurações de IA (#configuracoes-ia). Reaproveita .ed-campo/.ed-btn de
+   edicao.css; aqui só o que é próprio desta página. */
+
+.ia-config{
+  display: grid;
+  gap: 20px;
+  max-width: 640px;
+  margin-top: 8px;
+}
+
+.ia-status{
+  padding: 14px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-2);
+  display: grid;
+  gap: 6px;
+}
+.ia-status-linha{ margin: 0; font-size: var(--fs-sm); color: var(--ink-soft); }
+.ia-chip{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  padding: 1px 7px;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+}
+
+.ia-form{ display: grid; gap: 14px; }
+.ia-cred-linha{ display: flex; gap: 8px; }
+.ia-cred-linha .ia-cred{ flex: 1; }
+
+.ia-ajuda{ margin: 0; font-size: var(--fs-xs); color: var(--ink-soft); }
+.ia-nota{
+  margin: 0;
+  font-size: var(--fs-xs);
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+.ia-acoes{ display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+.ia-msg{ margin: 0; font-size: var(--fs-sm); color: var(--ink); min-height: 1.2em; }
+
+.ia-chat{
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+  display: grid;
+  gap: 10px;
+}
+.ia-chat h2{ font-size: var(--fs-md); margin: 0; }
+.ia-chat-in{
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: max(1rem, var(--fs-base));
+  resize: vertical;
+}
+.ia-chat-out{
+  white-space: pre-wrap;         /* preserva quebras; é texto puro, não HTML */
+  word-break: break-word;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--bg-2);
+  min-height: 1.5em;
+  font-size: var(--fs-sm);
+}

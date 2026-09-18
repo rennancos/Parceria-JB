@@ -56,4 +56,19 @@ function limitarLogin(req){
   if (++limite.tentativas > 20) throw new ErroDeUso('Muitas tentativas. Tente em 5 min.', 429);
 }
 
-module.exports = { ORIGEM_PUBLICA, protegerResposta, exigirOrigem, semLinks, limitarLogin };
+// Freio por usuário para as rotas de IA (test/chat), que gastam a conta do
+// próprio usuário e falam com serviço externo. Mesma estrutura de limitarLogin,
+// mas a chave é o login da sessão (não o IP): 30 chamadas por minuto.
+const usuariosIa = new Map();
+function limitarIa(login){
+  const agora = Date.now();
+  for (const [quem, limite] of usuariosIa) if (limite.ate <= agora) usuariosIa.delete(quem);
+  if (!usuariosIa.has(login)){
+    if (usuariosIa.size >= 10000) throw new ErroDeUso('Muitas requisições. Tente mais tarde.', 429);
+    usuariosIa.set(login, { n: 0, ate: agora + 60 * 1000 });
+  }
+  const limite = usuariosIa.get(login);
+  if (++limite.n > 30) throw new ErroDeUso('Muitas requisições ao assistente. Aguarde um minuto.', 429);
+}
+
+module.exports = { ORIGEM_PUBLICA, protegerResposta, exigirOrigem, semLinks, limitarLogin, limitarIa };

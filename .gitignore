@@ -4,13 +4,23 @@
 .env.*
 !.env.example
 
-# Chaves e credenciais avulsas, se alguma aparecer na pasta
+# Chaves e credenciais avulsas largadas na pasta do projeto. As extensões
+# valem em qualquer nível: um .pem nunca é código.
 *.pem
 *.key
 *.p12
 *.pfx
-credenciais*
-secrets*
+
+# `credenciais*` e `secrets*` são ANCORADOS na raiz (a barra da frente), e é
+# de propósito. Sem ela o padrão casa em qualquer nível e pega código pelo
+# nome: foi assim que servidor/ia/credenciais.js ficou fora de um commit —
+# `git add` não reclamou, e o servidor parou de iniciar na máquina seguinte,
+# porque servidor.js faz require('./ia/credenciais').
+# Aqui a regra cobre o caso que ela existe para cobrir: o arquivo de segredo
+# largado na raiz. Segredo de verdade já tem dono em outro lugar — .env acima
+# e servidor/dados/ abaixo.
+/credenciais*
+/secrets*
 
 # ---------- Dados do servidor ----------
 # usuarios.json tem hash de senha; documentos.json é o conteúdo que a equipe
@@ -93,13 +103,16 @@ pnpm-lock.yaml
 # Testes locais da revisão de segurança, ignorados a pedido do mantenedor.
 /tests/unit/inicializacao.test.cjs
 /tests/unit/entrada-segura.test.cjs
-build/
+# Ancorado: é a pasta de saída de build na raiz, não uma `build/` que apareça
+# dentro de js/ ou servidor/ com código dentro.
+/build/
 *.log
 npm-debug.log*
 
 # A pasta de onde a VM serve o instalador e o versao.json. Existe só na VM;
-# se alguém criar uma cópia local para testar, ela não sobe junto.
-download/
+# se alguém criar uma cópia local para testar, ela não sobe junto. Ancorada na
+# raiz: é esta pasta específica, não qualquer `download/` do projeto.
+/download/
 
 # ---------- Dados pessoais ----------
 # As fotos são de pessoas reais. Descomente a linha abaixo se o repositório

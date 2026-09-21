@@ -12,7 +12,6 @@
 
 ## Estrutura
 
-- **`md/jotbird-document.md` e `js/paginas/primeiros-passos.js` são cópias manuais um do outro.** Nada avisa quando saem de sincronia.
 - **A ordem dos `<script>` em `index.html` é uma dependência implícita.** `paginas.js` → `js/paginas/*.js` → `router.js` → `documentos.js`. Trocar a ordem quebra silenciosamente: a página some do menu, ou os botões de edição não aparecem — sem erro no console.
 - **O conteúdo das páginas não existe sem JavaScript.** Só a home é HTML de verdade; com JS desligado, o menu não leva a lugar nenhum. É aceitável para um portal interno, mas inviabiliza indexação por buscador.
 - **A grade de cards depende de posicionamento explícito.** `.cards .card:nth-child(1..4)` fixa coluna e linha de cada um. As regras vivem em `@media (min-width: 901px)` de propósito — ver [03-home.md](03-home.md) para o porquê. Acrescentar ou remover um card exige ajustar essas linhas à mão.
@@ -26,7 +25,7 @@
 
 ## Backend e aplicativo
 
-Da [auditoria do backend](auditoria-estrutura-backend.md#recomendações-futuras). As quatro foram tratadas; o que sobrou está abaixo, o resto em "O que já foi resolvido":
+ O restante da manutenção está listado abaixo, depois dos itens resolvidos:
 
 - **`ORIGEM` do verificador de atualização segue vazio,** e por isso o app nunca procura versão nova. Preencher depende de decidir **HTTPS ou assinatura de código** — em HTTP puro, manifesto e instalador viajam pelo mesmo canal e o SHA-256 não protege contra quem controla os dois. É decisão de infraestrutura, não de código. Ver [10-aplicativo-windows.md](10-aplicativo-windows.md).
 

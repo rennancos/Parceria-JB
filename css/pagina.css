@@ -8,7 +8,7 @@
   margin-bottom: 22px;
   padding: 7px 14px 7px 10px;
   border: 1px solid var(--line-strong);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-xs);
   background: var(--bg-2);
   color: var(--ink-soft);
   font-size: var(--fs-xs);
@@ -69,7 +69,7 @@
   border: 1px solid var(--panel-line);
   border-radius: var(--radius);
   background: var(--panel);
-  box-shadow: var(--shadow-panel);
+  box-shadow: none;
   color: var(--ink);
   text-decoration: none;
 }
@@ -106,7 +106,7 @@ a.panel:focus-visible{
   align-items: center;
   margin-top: 14px;
   padding: 4px 10px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-xs);
   background: var(--chip);
   color: var(--ink-soft);
   font-size: var(--fs-2xs);
@@ -934,4 +934,26 @@ a.callout .link-arrow{
 @media (prefers-reduced-motion: reduce){
   a.panel, .back-link, .link-list a, .link-list .link-pendente{ transition: none; }
   a.panel:hover{ transform: none; }
+}
+
+/* ---------- Toque ----------
+   `pointer: coarse` é o dedo, não a largura: pega celular e tablet sem mexer
+   em nada no desktop, inclusive numa janela estreita de mouse. O alvo cresce
+   por ::after, então o desenho do botão continua do tamanho que era — só a
+   área que responde ao toque vai a 44px (Apple HIG; o mínimo do WCAG 2.5.8 é
+   24px e já era atendido). */
+@media (pointer: coarse){
+  /* 13px faria o Safari do iPhone dar zoom ao focar. No desktop, onde não há
+     esse comportamento, o campo segue na escala fluida como desenhado. */
+  .atalhos-campo input{ font-size: max(1rem, var(--fs-sm)); }
+
+  .atalho-fav::after{
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    transform: translate(-50%, -50%);
+  }
 }

@@ -140,6 +140,6 @@ O `data-pagina` é o que o router usa para marcar o item ativo — sem ele o lin
 
 ## De onde vem o conteúdo
 
-**Primeiros passos** é a única página com conteúdo real: `js/paginas/primeiros-passos.js` transpõe o [jotbird-document.md](jotbird-document.md) ("Guia de Primeiros Passos"). **Não há geração automática** — o markdown é a fonte para pessoas, o `.js` é o que a página lê. Ao atualizar o guia, atualize os dois.
+`js/paginas/primeiros-passos.js` contém o conteúdo da página diretamente. Não há geração automática.
 
 As outras três continuam com um esqueleto plausível, escrito a partir das descrições dos cards. Em Documentação os itens previstos já estão listados como "a definir", faltando só o `href`.

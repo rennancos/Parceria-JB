@@ -1,36 +1,4 @@
-/* Servidor do portal: entrega os arquivos estáticos E a API de edição.
-
-   Um processo só, de propósito. Poderia ser IIS/nginx para o estático e Node
-   para a API, mas aí seriam duas coisas para configurar, dois lugares para
-   errar caminho e um proxy no meio. Aqui é `node servidor/servidor.js` e o
-   portal inteiro responde na porta escolhida.
-
-   O que ele NÃO faz: build, cache elaborado, HTTPS. É um portal interno, na
-   rede da Parceria JB, com dezenas de acessos por dia — o simples resolve.
-
-     node servidor/servidor.js                # porta 8000
-     node servidor/servidor.js --porta 80     # produção na VM
-
-   ---------------------------------------------------------------------------
-   API (tudo em /api, o resto é arquivo)
-
-     GET    /api/sessao            quem sou eu
-     POST   /api/sessao            entrar   { login, senha }
-     DELETE /api/sessao            sair
-
-     GET    /api/documentos        acervo (aberto: quem acessa o portal, lê)
-     POST   /api/documentos        incluir           equipe, dev
-     PUT    /api/documentos/:id    editar            equipe, dev
-     DELETE /api/documentos/:id    excluir           SÓ dev
-     POST   /api/arquivos?nome=…   subir DOC/PDF     equipe, dev
-
-     POST   /api/ia/consulta      perguntar ao assistente     equipe, dev
-
-   A regra de papel é aplicada aqui, não no navegador — ver servidor/auth.js.
-
-   A rota da IA existe e responde 503 enquanto PAJB_IA_URL estiver vazia — que
-   é hoje. Ela não segura nenhuma outra rota: um assistente fora do ar não tira
-   o portal do ar. Ver servidor/ia.js e md/12-arquitetura-integracao-ia.md. */
+/* Entrega os arquivos estáticos e a API de edição do portal. */
 'use strict';
 
 const http = require('http');

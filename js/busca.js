@@ -1,10 +1,6 @@
-/* Interface da busca: diálogo, teclado e navegação. O índice é reconstruído
-   a cada abertura e quando a edição confirma alterações no acervo. */
+/* Interface da busca e navegação dos resultados. */
 (function(){
   'use strict';
-  /* Tudo de que este arquivo depende, num lugar só. `window.PAGINAS` fica de
-     fora de propósito: é lido a cada remontagem, porque as páginas registram
-     nele durante a carga e a edição troca os itens depois. */
   const { buscar, destacar, termosDe } = window.Portal.buscaMotor;
   const { montar: montarIndice } = window.Portal.buscaIndice;
   const { pessoas } = window.Portal.equipe;
@@ -19,12 +15,6 @@
     passos: 'Passo', paineis: 'Item', sistemas: 'Sistema', atalhos: 'Atalho',
     fabricantes: 'Fabricante', notas: 'Nota',
   };
-
-  /* ---------- Interface ----------
-
-     A janela é construída aqui, e não no index.html: mantém o markup da home
-     enxuto e garante que a busca não deixe rastro no DOM se este arquivo não
-     carregar (o botão simplesmente volta a não fazer nada, como antes). */
 
   let janela, campo, lista, resumo;
   let indice = [];
@@ -297,20 +287,10 @@
   });
 
   document.addEventListener('keydown', (evento) => {
-    if ((evento.ctrlKey || evento.metaKey) && evento.key.toLowerCase() === 'k'){
+    if (evento.key === '?'){
       evento.preventDefault();
       if (aberta()) fechar(); else abrir();
       return;
-    }
-
-    // "/" também abre, mas só fora de campo de texto — senão a barra nunca
-    // chegaria ao que a pessoa está digitando.
-    const emCampo = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || '')
-      || document.activeElement?.isContentEditable;
-
-    if (evento.key === '/' && !emCampo && !aberta()){
-      evento.preventDefault();
-      abrir();
     }
   });
 

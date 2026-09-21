@@ -160,7 +160,7 @@ Erros conhecidos de auth/dados retornam `{erro: string}` com status 4xx; inesper
 - **Build em caminho com espaços:** a execução nesta revisão falhou antes de iniciar electron-builder. `spawnSync(builder, ..., {shell:true})` recebeu o caminho da CLI dentro de `DEV PAJB`, e o shell tentou executar apenas o trecho anterior ao espaço. Registrado em `app/empacotar.js`; não corrigido nesta tarefa.
 - **Fotos:** `migrarMasters()` também move WebP quando não há original com o mesmo nome. A extensão não distingue master de saída. Arquivos com o mesmo nome-base e extensões diferentes produzem o mesmo destino WebP.
 - **Contatos:** a detecção do cliente de e-mail usa foco/visibilidade como heurística, não confirmação do sistema operacional; a cópia usa `execCommand` como fallback legado. A CLI oculta senha com `_writeToOutput`, API privada do readline.
-- **Conteúdo pendente:** alguns links de Acessos/Sharepoint ainda são `#`, portanto navegam à home; não há integração Graph/SSO implementada. Globo Service é acessado por links, sem sincronização ou autenticação delegada no portal. `md/jotbird-document.md` e Primeiros passos não têm geração automática e podem divergir.
+ - **Conteúdo pendente:** alguns links de Acessos/Sharepoint ainda são `#`, portanto navegam à home; não há integração Graph/SSO implementada. Globo Service é acessado por links, sem sincronização ou autenticação delegada no portal.
 - **Documentação histórica:** há referências antigas a black mode/localStorage em arquivos de `md/` e comentários do aplicativo. O runtime atual tem tema fixo em `css/tokens.css`, sem alternância ou persistência de tema em `js/script.js`. Conferir o código antes de aplicar instruções antigas.
 
 Esses riscos foram registrados, sem correção funcional nesta tarefa. A presença de um comentário preventivo não comprova que o comportamento já esteja protegido por teste.
@@ -190,7 +190,6 @@ Backup deve abranger `servidor/dados/` e `docs/` de forma consistente, com o ser
 | `PAJB_ORIGEM` | `atualizacao.js`, somente em desenvolvimento e lida ao carregar o módulo |
 | `ORIGEM_PADRAO` | `atualizacao.js`; vazia desliga consulta de atualização; produção ignora PAJB_ORIGEM |
 | `CHROME_PATH` | `tests/helpers/navegador.cjs`; caminho do Chrome/Edge |
-| `CHROME` | Driver em `.claude/skills/run-pa-jb-portal/driver.mjs`; variável diferente da suíte |
 | `PAJB_BASELINE` | `tests/browser.cjs`; diretório de referência para comparação opcional de CSS |
 | `ELECTRON_RUN_AS_NODE` | Afeta o runtime Electron; quando herdada do terminal pode impedir os scripts do app de iniciar corretamente |
 | `package.json` | Scripts, versão e dependências de desenvolvimento; Node >=18 declarado |

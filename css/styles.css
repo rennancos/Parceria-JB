@@ -79,13 +79,7 @@ img{
   content: "";
   position: absolute;
   inset: 0;
-  background-image: repeating-linear-gradient(
-    -35deg,
-    var(--stripe) 0px,
-    var(--stripe) 1px,
-    transparent 1px,
-    transparent 34px
-  );
+  background: var(--stripe);
   pointer-events: none;
 }
 .backdrop::after{
@@ -95,7 +89,7 @@ img{
   right: 0;
   width: 60%;
   height: 100%;
-  background: radial-gradient(closest-side, var(--glow), transparent 70%);
+  background: var(--glow);
   pointer-events: none;
 }
 
@@ -196,7 +190,7 @@ header{
   overflow-y: auto;
   background: var(--bg);
   border-left: 1px solid var(--line-strong);
-  box-shadow: -18px 0 40px rgba(34,51,58,0.16);
+  box-shadow: -12px 0 24px rgba(0,0,0,.18);
   transform: translateX(100%);
   visibility: hidden;
   transition: transform 0.25s ease, visibility 0.25s ease;
@@ -455,7 +449,7 @@ main{
   display: inline-block;
   padding: 5px 12px;
   border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-xs);
   background: var(--tile);
   color: var(--ink);
   font-size: var(--fs-xs);
@@ -467,11 +461,9 @@ main{
 
 /* ---------- Cards da home ---------- */
 
-/* Quatro colunas para o destaque ocupar 2x2 e os outros quatro fecharem o
-   quadrado à direita. Com três colunas sobrava um vão do tamanho de um card. */
 .cards{
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--sp-4);
   width: 100%;
 }
@@ -486,7 +478,7 @@ main{
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--card);
-  box-shadow: var(--shadow-panel);
+  box-shadow: none;
   text-decoration: none;
   color: var(--ink);
   position: relative;
@@ -517,7 +509,7 @@ main{
   background: var(--tile);
   color: var(--accent-1);
   margin-bottom: 22px;
-  box-shadow: var(--shadow-tile);
+  box-shadow: none;
   transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
 }
 .card-icon svg{ width: 22px; height: 22px; }
@@ -556,11 +548,11 @@ main{
    em pé ele fica com a altura de duas linhas e o conteúdo de uma, e sobra um
    vão no meio do card. */
 .card-destaque{
-  grid-column: 1 / -1;
-  flex-direction: row;
-  align-items: center;
-  /* Sem isto o space-between do .card joga o ícone e o texto para pontas
-     opostas da faixa, com um vão de 500px entre eles. */
+  grid-column: span 2;
+  background: var(--card-hover);
+  border-color: var(--accent);
+  flex-direction: column;
+  align-items: flex-start;
   justify-content: flex-start;
   gap: var(--sp-4);
   min-height: 0;
@@ -690,8 +682,7 @@ footer{
   }
   .card{ min-height: 0; }
 
-  /* Estreito demais para o ícone ao lado do texto. */
-  .card-destaque{ flex-direction: column; align-items: flex-start; }
+  .card-destaque{ grid-column: span 1; }
   .card-destaque h2{ font-size: var(--fs-xl); }
 
   /* Sem teclado físico o atalho não serve. */
@@ -735,3 +726,35 @@ footer{
   background: var(--accent);
 }
 
+/* ---------- Toque ----------
+   Ver a nota do mesmo bloco em css/pagina.css: alvo de 44px por ::after, sem
+   alterar o desenho, e só onde o ponteiro é o dedo.
+
+   O .menu-toggle é o caso que mais pesa: abaixo de 900px a .top-nav some e os
+   .icon-secondary também, então esse botão de 36px vira a única navegação do
+   portal no celular. */
+@media (pointer: coarse){
+  .icon-btn{ position: relative; }
+  .icon-btn::after{
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    transform: translate(-50%, -50%);
+  }
+  /* 36px de botão + 8px de gap = 44: com o alvo em 44 os vizinhos encostam sem
+     se sobrepor. O gap de 6px do bloco de 900px faria um roubar 2px do outro. */
+  .icons{ gap: 8px; }
+
+  /* Links do rodapé têm 19px de altura: o ::after leva a área a 43px. O
+     row-gap sobe junto porque com 10px as áreas de duas linhas se cruzariam. */
+  .footer-nav{ row-gap: 24px; }
+  .footer-nav a{ position: relative; }
+  .footer-nav a::after{
+    content: "";
+    position: absolute;
+    inset: -12px 0;
+  }
+}

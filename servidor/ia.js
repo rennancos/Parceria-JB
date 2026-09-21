@@ -1,34 +1,9 @@
-/* Ponte para o serviço de IA da equipe — o único lugar do portal que sabe que
-   ele existe.
-
-   O serviço de IA é um PROJETO SEPARADO, ainda não entregue. Este arquivo não
-   implementa IA nenhuma: ele fixa o contrato, a configuração e o que acontece
-   quando o serviço não responde. Quando o projeto chegar, o passo normal é
-   preencher PAJB_IA_URL e nada mais — `mapear` abaixo é o único ponto que pode
-   precisar de ajuste, se o formato de resposta de lá for outro.
-
-   POR QUE PASSA PELO BACKEND, e não do navegador direto para a IA: a CSP do
-   portal declara `connect-src 'self'` (servidor/seguranca.js). O navegador é
-   proibido de falar com outra origem, então não existe a opção de espalhar a
-   URL da IA pelo js/. Aqui também é onde o token fica fora do alcance do
-   DevTools — segredo em js/ é público, ver .env.example.
-
-   O QUE VAI PARA A IA: pergunta, contexto e `usuario: { login, papel }`.
-   NUNCA o cookie de sessão, a senha, o hash ou o salt. A identidade é lida da
-   sessão pelo servidor (auth.sessaoDe), nunca do corpo da requisição — o
-   navegador não escolhe em nome de quem pergunta.
-
-   INDISPONIBILIDADE É O ESTADO NORMAL, não a exceção: hoje o serviço não
-   existe, e depois de existir ele vai cair, demorar e entrar em manutenção.
-   Por isso todo erro daqui é um ErroDeUso, que servidor.js devolve como {erro}
-   com status 4xx/5xx. O resto do portal (home, equipe, acessos, busca,
-   documentos) não passa por este arquivo e não sente nada. */
+/* Integração opcional com o serviço de IA. A chamada sai pelo backend. */
 'use strict';
 
 const { ErroDeUso } = require('./erros');
 
-/* Configuração — só variável de ambiente, nada no código. Lida uma vez: trocar
-   o endereço da IA é reiniciar o serviço, igual à porta. */
+/* Configuração lida na inicialização do processo. */
 const URL_IA = (process.env.PAJB_IA_URL || '').trim();
 const TOKEN = (process.env.PAJB_IA_TOKEN || '').trim();
 const TIMEOUT = Number(process.env.PAJB_IA_TIMEOUT_MS) > 0

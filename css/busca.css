@@ -68,7 +68,10 @@
   background: none;
   color: var(--ink);
   font: inherit;
-  font-size: var(--fs-md);
+  /* Nunca abaixo de 16px, pelo mesmo motivo do .ed-campo (css/edicao.css):
+     campo com fonte menor faz o Safari do iPhone dar zoom sozinho ao focar. A
+     escala fluida para em 15px aqui, e este é o campo mais usado no celular. */
+  font-size: max(1rem, var(--fs-md));
   outline: none; /* o anel fica na janela inteira, abaixo */
 }
 
@@ -153,7 +156,7 @@
   flex: none;
   margin-top: 2px;
   padding: 2px 8px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-xs);
   background: var(--tile);
   color: var(--ink-soft);
   font-size: var(--fs-2xs);
@@ -270,5 +273,20 @@ body.busca-aberta{ overflow: hidden; }
   .team-card.is-encontrado{
     animation: none;
     box-shadow: 0 0 0 3px var(--accent-1), var(--shadow-card-lg);
+  }
+}
+
+/* ---------- Toque ----------
+   Ver a nota do mesmo bloco em css/pagina.css. */
+@media (pointer: coarse){
+  .busca-fechar{ position: relative; }
+  .busca-fechar::after{
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    transform: translate(-50%, -50%);
   }
 }

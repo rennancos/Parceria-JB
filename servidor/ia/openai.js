@@ -10,6 +10,7 @@
 
 const { ErroDeUso } = require('../erros');
 const { chamar } = require('./rede');
+const { falhaDoProvedor, validarPor, idsDe } = require('./comum');
 
 const BASE = 'https://api.openai.com/v1';
 
@@ -17,28 +18,11 @@ function autorizacao(chave){
   return { Authorization: `Bearer ${chave}`, 'Content-Type': 'application/json' };
 }
 
-// Erro do provedor -> ErroDeUso sanitizado. 401/403 = credencial; resto = 502.
-function traduzirFalha(res){
-  if (res.status === 401 || res.status === 403) return new ErroDeUso('Credencial recusada pelo provedor.', 401);
-  return new ErroDeUso('O provedor de IA não conseguiu responder agora.', 502);
-}
-
 async function listarModelos(chave){
   const res = await chamar(`${BASE}/models`, { headers: autorizacao(chave) });
-  if (!res.ok) throw traduzirFalha(res);
+  if (!res.ok) throw falhaDoProvedor(res);
   const dados = await res.json();
-  const lista = Array.isArray(dados && dados.data) ? dados.data : [];
-  return lista.map((m) => ({ id: String(m && m.id || '') })).filter((m) => m.id);
-}
-
-async function validarCredencial(chave){
-  try {
-    await listarModelos(chave);
-    return { status: 'valida' };
-  } catch (erro) {
-    if (erro instanceof ErroDeUso && erro.status === 401) return { status: 'invalida', mensagem: erro.message };
-    return { status: 'indisponivel', mensagem: 'Não foi possível validar agora.' };
-  }
+  return idsDe(dados && dados.data);
 }
 
 async function gerarTexto({ chave, modelo, mensagens, sinal }){
@@ -49,7 +33,7 @@ async function gerarTexto({ chave, modelo, mensagens, sinal }){
   const res = await chamar(`${BASE}/chat/completions`, {
     method: 'POST', headers: autorizacao(chave), body: JSON.stringify(corpo)
   }, sinal);
-  if (!res.ok) throw traduzirFalha(res);
+  if (!res.ok) throw falhaDoProvedor(res);
   const dados = await res.json();
   const texto = dados && dados.choices && dados.choices[0]
     && dados.choices[0].message && dados.choices[0].message.content;
@@ -57,4 +41,4 @@ async function gerarTexto({ chave, modelo, mensagens, sinal }){
   return { texto: String(texto), modelo };
 }
 
-module.exports = { validarCredencial, listarModelos, gerarTexto };
+module.exports = { validarCredencial: validarPor(listarModelos), listarModelos, gerarTexto };

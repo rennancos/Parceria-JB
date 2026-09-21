@@ -1,16 +1,6 @@
-/* Catálogo de provedores de IA e o contrato que todo adapter cumpre.
+/* Catálogo de provedores e contrato dos adapters.
 
-   BYOK (Bring Your Own Key): cada usuário informa a PRÓPRIA credencial, escolhe
-   um modelo permitido e paga pela própria conta. O portal não tem chave global,
-   crédito compartilhado nem conta de IA. Ver docs/ai/AI-ARCHITECTURE.md.
-
-   Esta é a ÚNICA porta para os adapters: controllers e rotas nunca fazem
-   require('./openai') direto — pedem por aqui, e é aqui que a allowlist decide
-   se o provedor existe. O projeto não usa TypeScript, então o "interface
-   AIProvider" do pedido vira este contrato JSDoc + o formato que cada
-   servidor/ia/<provedor>.js exporta.
-
-   CONTRATO — todo adapter exporta:
+   Cada adapter exporta:
      validarCredencial(chave)  -> Promise<ResultadoValidacao>
      listarModelos(chave)      -> Promise<AIModelo[]>   (op oficial barata: valida E lista)
      gerarTexto(pedido)        -> Promise<AIResposta>
@@ -22,12 +12,7 @@
    @typedef {{chave:string, modelo:string, mensagens:AIMensagem[], sinal?:AbortSignal}} AIPedido
    @typedef {{texto:string, modelo:string}} AIResposta
 
-   ALLOWLIST DE MODELOS: a lista `modelos` de cada provedor é o que o portal
-   PERMITE. O que a chave do usuário realmente pode usar vem do provedor
-   (listarModelos); o portal mostra a interseção. Modelo novo entra editando
-   só este arquivo. GitHub NÃO está aqui: em 30/07/2026 o GitHub Models foi
-   descontinuado e o Copilot não tem API pública/chave reutilizável — não há
-   integração BYOK oficial (ver docs/ai/AI-PROVIDERS.md). */
+   A lista `modelos` limita o que o portal pode oferecer. */
 'use strict';
 
 const { ErroDeUso } = require('../erros');

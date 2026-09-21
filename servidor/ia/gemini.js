@@ -12,13 +12,12 @@
 
 const { ErroDeUso } = require('../erros');
 const { chamar } = require('./rede');
+const { falhaDoProvedor, validarPor, idsDe } = require('./comum');
 
 const BASE = 'https://generativelanguage.googleapis.com/v1beta';
 
-function traduzirFalha(res){
-  if (res.status === 400 || res.status === 401 || res.status === 403) return new ErroDeUso('Credencial recusada pelo provedor.', 401);
-  return new ErroDeUso('O provedor de IA não conseguiu responder agora.', 502);
-}
+/* 400 entra na lista: o Gemini responde 400 (e não 401) para chave inválida. */
+const STATUS_DE_CREDENCIAL = [400, 401, 403];
 
 function idCurto(nome){
   return String(nome || '').replace(/^models\//, '');
@@ -26,24 +25,14 @@ function idCurto(nome){
 
 async function listarModelos(chave){
   const res = await chamar(`${BASE}/models?key=${encodeURIComponent(chave)}`);
-  if (!res.ok) throw traduzirFalha(res);
+  if (!res.ok) throw falhaDoProvedor(res, STATUS_DE_CREDENCIAL);
   const dados = await res.json();
   const lista = Array.isArray(dados && dados.models) ? dados.models : [];
-  return lista
-    .filter((m) => !Array.isArray(m.supportedGenerationMethods)
-      || m.supportedGenerationMethods.includes('generateContent'))
-    .map((m) => ({ id: idCurto(m && m.name) }))
-    .filter((m) => m.id);
-}
-
-async function validarCredencial(chave){
-  try {
-    await listarModelos(chave);
-    return { status: 'valida' };
-  } catch (erro) {
-    if (erro instanceof ErroDeUso && erro.status === 401) return { status: 'invalida', mensagem: erro.message };
-    return { status: 'indisponivel', mensagem: 'Não foi possível validar agora.' };
-  }
+  return idsDe(
+    lista.filter((m) => !Array.isArray(m.supportedGenerationMethods)
+      || m.supportedGenerationMethods.includes('generateContent')),
+    (m) => idCurto(m && m.name)
+  );
 }
 
 async function gerarTexto({ chave, modelo, mensagens, sinal }){
@@ -61,7 +50,7 @@ async function gerarTexto({ chave, modelo, mensagens, sinal }){
   const res = await chamar(url, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo)
   }, sinal);
-  if (!res.ok) throw traduzirFalha(res);
+  if (!res.ok) throw falhaDoProvedor(res, STATUS_DE_CREDENCIAL);
   const dados = await res.json();
   const cand = dados && Array.isArray(dados.candidates) ? dados.candidates[0] : null;
   const partes = cand && cand.content && Array.isArray(cand.content.parts) ? cand.content.parts : [];
@@ -70,4 +59,4 @@ async function gerarTexto({ chave, modelo, mensagens, sinal }){
   return { texto, modelo };
 }
 
-module.exports = { validarCredencial, listarModelos, gerarTexto };
+module.exports = { validarCredencial: validarPor(listarModelos), listarModelos, gerarTexto };

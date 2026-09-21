@@ -14,9 +14,9 @@ Enquanto estes pontos não fecharem, o portal não substitui o que a equipe usa 
 
 ### Conteúdo das três páginas restantes
 
-Só "Primeiros passos" tem material real. Documentação (que agora abriga os manuais), Acessos Parceria e Sharepoint estão com esqueleto escrito a partir das descrições dos cards.
+Só "Primeiros passos" tem material real. Documentação, Acessos Parceria e Sharepoint estão com um esqueleto baseado nas descrições dos cards.
 
-O caminho é o mesmo já percorrido: alguém escreve o guia em markdown (como o [jotbird-document.md](jotbird-document.md)), e ele é transposto para `js/paginas/<pagina>.js`. Os seis tipos de bloco existentes cobrem bastante coisa — ver [04-paginas-internas.md](04-paginas-internas.md). Se algum conteúdo não couber em nenhum, é sinal de que falta um tipo novo, não de que o conteúdo está errado.
+O conteúdo é escrito diretamente em `js/paginas/<pagina>.js`. Os seis tipos de bloco existentes cobrem os casos atuais; a descrição está em [04-paginas-internas.md](04-paginas-internas.md).
 
 **Ordem sugerida:** Acessos Parceria primeiro (é o que mais gente consulta no dia a dia), depois Documentação (manuais junto) e Sharepoint.
 
@@ -135,7 +135,7 @@ Itens que não aparecem para o usuário, mas evitam retrabalho.
 
 ### Backend e empacotamento — quatro itens da auditoria
 
-**Registrados, sem implementação.** Detalhe e linha de código em [auditoria-estrutura-backend.md](auditoria-estrutura-backend.md#recomendações-futuras); o resumo em uma linha está em [07-pendencias.md](07-pendencias.md).
+Os itens restantes estão resumidos em [07-pendencias.md](07-pendencias.md).
 
 1. ~~**Corrigir o lançamento do build.**~~ **Feito** — `app/empacotar.js` chama o CLI pelo `process.execPath`, sem shell; `npm run app:build` volta a gerar instalador.
 2. ~~**Revogar sessões entre processos.**~~ **Feito** — `sessaoDe` compara o salt do disco com o do login, então trocar a senha ou remover o usuário pela CLI derruba a sessão na requisição seguinte.
@@ -154,13 +154,6 @@ Duas fragilidades conhecidas não dão erro no console quando quebram:
 Um script que rode `node --check` em todos os `.js` e confira se cada arquivo de `js/paginas/` aparece no `index.html` na posição certa resolve os dois. É pequeno, roda offline e **não vira build** — só um verificador que a pessoa chama quando quer.
 
 ### Sincronia entre o markdown e o `.js`
-
-Hoje `jotbird-document.md` e `primeiros-passos.js` são cópias manuais um do outro, e nada avisa quando divergem. Duas saídas:
-
-- **Aceitar e documentar** (situação atual). Simples, mas confia em disciplina.
-- **Gerar o `.js` a partir do `.md`** com um script offline. Elimina a divergência, mas exige um dialeto restrito de markdown que mapeie nos tipos de bloco — e passa a ser mais uma peça para manter. Só vale se o número de páginas com fonte em markdown crescer.
-
-Com uma página, o custo do gerador não se paga. Com quatro ou cinco, provavelmente sim.
 
 ### Fonte Inter
 

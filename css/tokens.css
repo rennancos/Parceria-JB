@@ -1,26 +1,25 @@
-/* Fonte de verdade do tema atual (escuro), dimensões e estados compartilhados.
-   Carregado antes dos demais estilos. Não há alternância de tema no portal. */
+/* Cores, medidas e estados compartilhados. */
 :root{
-  --bg: #141414;
-  --bg-2: #1C1C1B;
-  --card: #22211F;
-  --card-hover: #2A2926;
-  --tile: #302E2A;
-  --ink: #F2EFE8;
-  --ink-soft: #AAA69E;
-  --line: rgba(242,239,232,.12);
-  --line-strong: rgba(242,239,232,.22);
-  --header-bg: rgba(20,20,20,.90);
-  --accent-1: #D8B98B;
-  --accent: #B99668;
-  --accent-soft: #D0B184;
-  --on-accent: #191713;
-  --stripe: rgba(242,239,232,.035);
-  --glow: rgba(185,150,104,.10);
-  --shadow-card: 0 1px 2px rgba(0,0,0,.30), 0 8px 24px rgba(0,0,0,.18);
-  --shadow-card-lg: 0 1px 2px rgba(0,0,0,.34), 0 16px 36px rgba(0,0,0,.24);
-  --shadow-tile: 0 1px 2px rgba(0,0,0,.24);
-  --shadow-panel: 0 1px 2px rgba(0,0,0,.22), 0 4px 12px rgba(0,0,0,.12);
+  --bg: #111416;
+  --bg-2: #171a1d;
+  --card: #1b2024;
+  --card-hover: #20262b;
+  --tile: #252b30;
+  --ink: #ebe8e1;
+  --ink-soft: #9ca4aa;
+  --line: rgba(235,232,225,.12);
+  --line-strong: rgba(235,232,225,.22);
+  --header-bg: rgba(17,20,22,.94);
+  --accent-1: #e2b66d;
+  --accent: #c9974f;
+  --accent-soft: #d6aa68;
+  --on-accent: #191714;
+  --stripe: transparent;
+  --glow: transparent;
+  --shadow-card: 0 8px 20px rgba(0,0,0,.16);
+  --shadow-card-lg: 0 16px 36px rgba(0,0,0,.22);
+  --shadow-tile: none;
+  --shadow-panel: none;
   --team-card: var(--card);
   --team-card-hover: var(--card-hover);
   --team-ring: var(--accent);
@@ -31,24 +30,23 @@
 
   --danger: #A85A4E;
   --modal-backdrop: rgba(34, 51, 58, 0.45);
-  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-heading: Syne, "Arial Black", sans-serif;
-  --radius: 18px;
-  --radius-sm: 12px;
-  --radius-xs: 10px;
+  --font-body: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-heading: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --radius: 10px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
   --radius-pill: 999px;
 
-  /* Ritmo de espaçamento: margens de seção e padding dos cards saem daqui. */
-  --sp-1: 6px;
-  --sp-2: 10px;
-  --sp-3: 16px;
-  --sp-4: 24px;
-  --sp-5: 32px;
+  --sp-1: 8px;
+  --sp-2: 16px;
+  --sp-3: 24px;
+  --sp-4: 32px;
+  --sp-5: 40px;
   --sp-6: 48px;
-  --sp-7: 72px;
-  --sp-8: 96px;
+  --sp-7: 64px;
+  --sp-8: 80px;
 
-  --card-pad: 28px;
+  --card-pad: 24px;
 
   /* ---------- Escala de texto fluida ----------
      clamp(mínimo, base + inclinação, máximo), interpolando entre 360px e

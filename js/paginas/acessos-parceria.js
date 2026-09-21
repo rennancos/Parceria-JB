@@ -36,7 +36,7 @@ PAGINAS['acessos-parceria'] = {
           href: 'https://acesso.g.globo'
         },
         {
-          titulo: 'ParcerIA da parceria',
+          titulo: 'ParcerIA',
           descricao: 'Documentos e arquivos compartilhados',
           categoria: 'Documentos',
           icone: 'parceria',

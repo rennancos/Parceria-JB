@@ -957,3 +957,113 @@ a.callout .link-arrow{
     transform: translate(-50%, -50%);
   }
 }
+
+/* ---------- Fabricantes: lista e janela ----------
+   A seção lista só o nome do sistema; a ficha abre numa janela (js/fabricantes.js).
+   São 48 fornecedores, e com todas as fichas abertas a página não terminava. */
+
+.fab-lista{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+/* Mesmo desenho de .link-list, mas em <button>: o destino não é um endereço,
+   é uma janela. Por isso também o reset de aparência de botão. */
+.fab-item{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border: 1px solid var(--panel-line);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: var(--shadow-panel);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.fab-item:hover{
+  border-color: var(--accent);
+  background: var(--bg-2);
+}
+.fab-item:focus-visible{
+  outline: 2px solid var(--accent-1);
+  outline-offset: 2px;
+}
+
+.fab-texto{
+  flex: 1;
+  min-width: 0;          /* deixa o nome longo truncar em vez de esticar a linha */
+  display: grid;
+  gap: 2px;
+}
+.fab-nome{
+  font-size: var(--fs-md);
+  font-weight: 550;
+}
+.fab-resumo{
+  font-size: var(--fs-xs);
+  color: var(--ink-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* width/height explícitos pelo motivo da nota lá em cima: o svg() de
+   js/paginas.js não traz dimensão, e sem isto a seta estica até a altura do
+   container — 48 itens viravam 53 mil pixels de página. */
+.fab-item .link-arrow{
+  width: 18px;
+  height: 18px;
+  flex: none;
+  color: var(--ink-soft);
+}
+.fab-item:hover .link-arrow{ color: var(--accent-1); }
+
+/* ---------- Janela ---------- */
+
+.fab-janela{
+  width: min(520px, calc(100vw - 32px));
+  max-height: min(80vh, 760px);
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: var(--shadow-card-lg);
+  overflow: auto;
+}
+.fab-janela::backdrop{
+  background: var(--modal-backdrop);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+/* O cabeçalho acompanha a rolagem: numa ficha com número de série a lista é
+   longa, e o botão de fechar não pode sair de vista. */
+.fab-janela-head{
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 20px 20px 12px;
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+}
+.fab-janela-titulo{
+  flex: 1;
+  margin: 0;
+  font-size: var(--fs-lg);
+}
+.fab-janela .fab-fechar{ margin: -4px -4px 0 0; }
+
+.fab-janela-campos{
+  margin: 0;
+  padding: 16px 20px 20px;
+}

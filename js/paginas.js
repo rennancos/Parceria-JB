@@ -153,29 +153,71 @@ window.PAGINAS = {};
     { chave: 'representante', rotulo: 'Representante' },
     { chave: 'email',       rotulo: 'E-mail' },
     { chave: 'telefone',    rotulo: 'Telefone' },
-    { chave: 'horario',     rotulo: 'Atendimento' }
+    { chave: 'horario',     rotulo: 'Atendimento' },
+    { chave: 'site',        rotulo: 'Site' },
+    { chave: 'contrato',    rotulo: 'Contrato / ID' },
+    { chave: 'observacao',  rotulo: 'Observação' }
   ];
+
+  /* Só http(s) vira link, e `www.` ganha o https na frente. Endereço em outro
+     esquema sai como texto: um `javascript:` vindo do dado viraria execução a
+     um clique de distância. */
+  function linkDeSite(bruto){
+    const url = bruto.trim();
+    const href = /^https?:\/\//i.test(url) ? url
+      : /^www\./i.test(url) ? 'https://' + url
+      : null;
+    return href
+      ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(url)}</a>`
+      : esc(url);
+  }
 
   // Campo em branco vira "a definir" — visível como pendência, nunca como dado.
   function valorFabricante(chave, valor){
     if (!valor) return '<span class="field-vazio">a definir</span>';
     const texto = String(valor).trim();
     if (chave === 'email') return texto.split(/\r?\n/).map((email) => `<a href="mailto:${esc(email.trim())}">${esc(email.trim())}</a>`).join('<br>');
+    if (chave === 'site') return texto.split(/\r?\n/).map((u) => u.trim()).filter(Boolean).map(linkDeSite).join('<br>');
     return texto.split(/\r?\n/).map((linha) => esc(linha.trim())).filter(Boolean).join('<br>');
   }
 
-  function fabricante(item){
-    const linhas = CAMPOS_FABRICANTE.filter((campo) => item[campo.chave]).map((campo) => `
+  // A ficha montada: usada dentro da janela, não mais na página.
+  function fichaFabricante(item){
+    return CAMPOS_FABRICANTE.filter((campo) => item[campo.chave]).map((campo) => `
       <div>
         <dt>${campo.rotulo}</dt>
         <dd>${valorFabricante(campo.chave, item[campo.chave])}</dd>
       </div>`).join('');
+  }
 
+  /* Registro das fichas da página. A lista renderiza só o nome do sistema e
+     guarda o índice no botão; a ficha inteira é montada por js/fabricantes.js
+     no clique. São 48 fornecedores — abrir todos de uma vez dava uma página de
+     rolagem interminável, e é o que a janela resolve.
+
+     Zerado a cada renderizarPagina() para o índice não crescer a cada ida e
+     volta entre páginas. */
+  let FICHAS = [];
+
+  function itemFabricante(item){
+    const indice = FICHAS.push(item) - 1;
+    // Primeira linha do fabricante como resumo: dá para reconhecer a empresa
+    // sem abrir. O resto (e-mail, telefone, serial) só na janela.
+    const resumo = String(item.fabricante || '').split(/\r?\n/)[0].trim();
     return `
-      <div class="panel">
-        <h3>${esc(item.sistema || item.nome || 'Fabricante')}</h3>
-        <dl class="field-list">${linhas}</dl>
-      </div>`;
+      <li>
+        <button type="button" class="fab-item" data-ficha="${indice}">
+          <span class="fab-texto">
+            <span class="fab-nome">${esc(item.sistema || item.nome || 'Fabricante')}</span>
+            ${resumo ? `<span class="fab-resumo">${esc(resumo)}</span>` : ''}
+          </span>
+          ${ICONE_SETA}
+        </button>
+      </li>`;
+  }
+
+  function fabricante(itens){
+    return `<ul class="fab-lista">${itens.map(itemFabricante).join('')}</ul>`;
   }
 
    /* Um item de 'links' pode ser um endereço (portal, ParcerIA, outra página
@@ -325,7 +367,7 @@ window.PAGINAS = {};
     paineis:     (itens) => `<div class="panel-grid">${itens.map(painel).join('')}</div>`,
     notas:       (itens) => `<ul class="notes">${itens.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>`,
     sistemas:    (itens) => `<ul class="sys-list">${itens.map(sistema).join('')}</ul>`,
-    fabricantes: (itens) => `<div class="panel-grid">${itens.map(fabricante).join('')}</div>`
+    fabricantes: (itens) => fabricante(itens)
   };
 
   // O título do bloco é um <p>, não um heading: entre o <h2> da seção e os <h3>
@@ -355,6 +397,7 @@ window.PAGINAS = {};
   // troca de página: sem recarregar o documento, quem usa leitor de tela não
   // recebe nenhum aviso de que o conteúdo mudou.
   window.renderizarPagina = function(dados){
+    FICHAS = [];   // ver a nota em itemFabricante: índice novo a cada página
     return `
       <a class="back-link" href="#">${ICONE_VOLTAR}Voltar ao portal</a>
 
@@ -366,5 +409,12 @@ window.PAGINAS = {};
 
       ${(dados.secoes || []).map(secao).join('')}
       ${dados.aviso ? `<p class="notice">${esc(dados.aviso)}</p>` : ''}`;
+  };
+
+  /* O que js/fabricantes.js precisa para montar a janela: a ficha pelo índice
+     que o botão carrega, e o mesmo HTML de campos que a página usava antes. */
+  window.Portal.fabricantes = {
+    ficha: (indice) => FICHAS[Number(indice)] || null,
+    camposEmHtml: fichaFabricante
   };
 })();

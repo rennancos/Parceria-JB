@@ -37,12 +37,22 @@ Os cards espelham os itens do menu:
 | 1 | Primeiros passos | Comece por aqui | `#primeiros-passos` |
 | 2 | Documentação | Central de conteúdo | `#documentacao` |
 | 3 | Acessos Parceria | Acessos rápidos | `#acessos-parceria` |
-| 4 | ParcerIA | Nossa IA de pesquisa | externo (host em criação) |
+| 4 | ParcerIA | Nossa IA de pesquisa | externo (agente do Copilot Studio) |
 | 5 | Central das Parcerias | Portal corporativo | externo |
 
 Todos usam o mesmo acento no ícone (`--accent-1`): a distinção vem do texto, não da cor — ver `css/styles.css`, na regra `.card-icon`.
 
 **Manuais deixou de ser card e página**: virou seção dentro de Documentação — ver [04-paginas-internas.md](04-paginas-internas.md). **ParcerIA também deixou de ser página**: o arquivo `js/paginas/parceria.js` foi removido e o destino virou link externo.
+
+### ParcerIA: o destino
+
+O card aponta para o agente que a equipe montou no **Copilot Studio**, que responde sobre documentação e treinamentos a partir do e-mail, do Confluence e do Teams. O endereço aparece em quatro lugares de `index.html`: topo, menu, card da home e rodapé.
+
+É **link, não `<iframe>`**. O endereço é a interface do app do M365 Copilot, e a Microsoft não permite embuti-la. Para embutir seria preciso publicar o agente no canal "Site personalizado" do Copilot Studio, usar o endereço que ele gera e abrir `frame-src` na CSP de `servidor/seguranca.js` — que hoje é `default-src 'self'` sem `frame-src`, então bloqueia qualquer iframe externo. Mesmo assim não funcionaria com o portal aberto por `file://`, que é um caso de uso previsto.
+
+O agente exige login no tenant: quem não estiver autenticado cai na tela de entrada da Microsoft, não no agente.
+
+Atenção ao nome repetido: há outro item chamado "ParcerIA" em `js/paginas/acessos-parceria.js`, apontando para a biblioteca do SharePoint. São destinos diferentes com o mesmo rótulo.
 
 **Seção "Nossa equipe"** (`.team-section`, no fim do `main`) — cabeçalho centralizado com tag, título, subtítulo e um chip de contagem, seguido da grade de cards de pessoa. Detalhes em [05-equipe.md](05-equipe.md).
 

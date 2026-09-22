@@ -108,13 +108,7 @@ window.PAGINAS = {};
         ? comLink(`<span>${esc(item.destaque)}</span>`, 'callout')
         : `<p class="callout">${esc(item.destaque)}</p>`;
 
-    /* Grade de sistema + perfil pendurada no passo, com o MESMO renderizador do
-       bloco 'sistemas' — é a lista de acessos que se pede naquela etapa, e não
-       um assunto à parte. Como bloco irmão ela sairia fora do card e, pior,
-       partiria a lista em duas: o contador reseta a cada <ol class="steps">
-       (ver css/pagina.css), então os passos seguintes voltariam a numerar do 1. */
-    const grupos = !Array.isArray(item.grupos) || !item.grupos.length ? ''
-      : `<ul class="sys-list">${item.grupos.map(sistema).join('')}</ul>`;
+    const grupos = grupoDoPasso(item);
 
     return `
       <li data-onboarding-item data-search="${esc([item.titulo, item.texto, item.destaque].filter(Boolean).join(' '))}">
@@ -144,6 +138,40 @@ window.PAGINAS = {};
     return item.href
       ? `<li data-onboarding-item data-search="${esc(termos)}"><a class="callout" href="${esc(item.href)}"${alvoDe(item.href)}>${corpo}${ICONE_SETA}</a></li>`
       : `<li data-onboarding-item data-search="${esc(termos)}">${corpo}</li>`;
+  }
+
+  /* A partir de quantos itens a lista de grupos de um passo nasce recolhida.
+     Abaixo disso, esconder atrás de um clique só atrapalha; acima, a lista
+     deixa de ser "o que se pede nesta etapa" e vira anexo. As 27 contas de AD
+     ocupavam metade da página e empurravam os passos seguintes para fora. */
+  const LIMITE_GRUPO_RECOLHIDO = 10;
+
+  /* Grade de sistema + perfil pendurada no passo, com o MESMO renderizador do
+     bloco 'sistemas' — é a lista de acessos que se pede naquela etapa, e não um
+     assunto à parte. Como bloco irmão ela sairia fora do card e, pior, partiria
+     a lista em duas: o contador reseta a cada <ol class="steps"> (ver
+     css/pagina.css), então os passos seguintes voltariam a numerar do 1.
+
+     Lista longa entra recolhida e com a coluna mais estreita: os nomes são
+     curtos (SAEM, GSIUSRV_721) e não precisam de meia largura cada.
+
+     A classe `onboarding-group` é a MESMA dos setores de fabricante, de
+     propósito: é por ela que a busca abre o grupo quando o achado está lá
+     dentro e o esconde quando fica vazio (js/paginas/primeiros-passos-ui.js).
+     Um seletor novo aqui seria uma segunda regra para o mesmo comportamento. */
+  function grupoDoPasso(item){
+    if (!Array.isArray(item.grupos) || !item.grupos.length) return '';
+
+    const recolher = item.grupos.length > LIMITE_GRUPO_RECOLHIDO;
+    const lista = `<ul class="sys-list${recolher ? ' sys-list-compacta' : ''}">`
+      + item.grupos.map(sistema).join('')
+      + `</ul>`;
+    if (!recolher) return lista;
+
+    return `<details class="onboarding-group sys-grupo">`
+      + `<summary>${esc(item.grupoRotulo || 'Itens')} (${item.grupos.length})</summary>`
+      + `<div class="onboarding-group-body">${lista}</div>`
+      + `</details>`;
   }
 
   /* Fabricantes: a ficha tem sempre os mesmos quatro campos, na mesma ordem.
@@ -231,6 +259,10 @@ window.PAGINAS = {};
     return `
       <li data-onboarding-item data-search="${esc(termos)}">
         <button type="button" class="fab-item" data-ficha="${indice}">
+          ${/* O MESMO ladrilho dos cards de sistema (.sys-icon): o título do
+                card é item.sistema, e dois cards com o mesmo papel na mesma
+                página não deviam ter desenhos diferentes. */''}
+          <span class="sys-icon" aria-hidden="true">${ICONES.sistema}</span>
           <span class="fab-texto">
             <span class="fab-nome">${esc(item.sistema || item.nome || 'Fabricante')}</span>
             ${resumo ? `<span class="fab-resumo">${esc(resumo)}</span>` : ''}
@@ -446,7 +478,6 @@ window.PAGINAS = {};
           <a href="#secao-0">Acessos</a>
           <a href="#secao-1">Sistemas</a>
           <a href="#secao-2">Fabricantes</a>
-          <a href="#documentacao">Documentação</a>
         </nav>
         <label class="onboarding-search">
           <span>Buscar sistema, acesso, fabricante ou contato</span>

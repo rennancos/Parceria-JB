@@ -26,11 +26,13 @@ A página `Primeiros passos` foi reorganizada para funcionar como uma central de
 
 ## Mudanças visuais
 
-- Navegação rápida para acessos, sistemas, fabricantes e documentação.
+- Navegação rápida para acessos, sistemas e fabricantes — só âncoras desta página.
 - Busca local por sistema, acesso, fabricante, grupo, serviço e contato.
 - Steps de solicitação de acesso mantidos como lista numerada.
 - Sistemas exibidos em grid compacto.
 - Fabricantes agrupados por setor usando `<details>` e `<summary>`.
+- Card de fabricante com o mesmo desenho do card de sistema (ver abaixo).
+- Lista longa de grupos dentro de um passo nasce recolhida e em coluna estreita (ver abaixo).
 - Sidebar contextual sticky em desktop.
 - Sidebar ocultada em telas menores.
 - Grids reduzidos progressivamente em tablet e mobile.
@@ -82,6 +84,8 @@ O portal roteia por hash (`js/router.js`): `index.html#documentacao` abre a pág
 
 A correção está em `js/router.js`. No `hashchange`, antes de decidir a página, o router pergunta ao DOM se o hash corresponde a um `id` existente dentro da página já desenhada. Se corresponder, ele apenas rola até o elemento e não redesenha nada. Chave de página continua tendo prioridade sobre âncora, então `#documentacao` segue navegando.
 
+A nav tinha ainda um quarto botão, "Documentação", que saía da página — numa navegação anunciada como "Navegação desta página". Ele foi removido, e a grade passou de quatro para três colunas. A prioridade de chave de página sobre âncora continua coberta em `tests/browser.cjs`, agora pelo hash em vez de por um clique naquele botão.
+
 Efeitos:
 
 - Vale para qualquer página interna, não só esta.
@@ -103,6 +107,41 @@ O que mudou:
 - `css/pagina.css`: a regra do `hidden` passou a valer para a página toda (`.primeiros-passos [hidden]`). A regra do navegador para `[hidden]` é fraca demais — qualquer `display` de autor, como o grid de `.sys-list` ou o flex do `<summary>`, ganharia dela.
 
 Um detalhe de layout que veio junto: `.fab-item` usava `height: 100%`, o que só funcionava enquanto o `<li>` tinha um filho só. Com o `<dl>` irmão, os 100% passaram a valer a altura de botão + contato; o card inchava e o contato vazava para fora da caixa. O card virou uma coluna flex e o botão passou a crescer com `flex: 1 1 auto`.
+
+## Card de fabricante igual ao card de sistema
+
+Os dois cards fazem a mesma coisa na página — nome, uma linha de apoio e um destino clicável — mas estavam desenhados diferente: o de fabricante não tinha ícone, vinha em três colunas em vez de duas, com respiro e corpo de texto menores.
+
+Agora o card de fabricante usa o mesmo ladrilho `.sys-icon` dos cards de sistema, a mesma regra de colunas de `.sys-list` (`auto-fill` a partir de 360px, então as duas listas quebram juntas), o mesmo `padding`, o mesmo raio, o mesmo `hover` e a mesma tipografia. As media queries que fixavam 2 e 1 coluna para `.fab-lista` saíram, porque o `auto-fill` já resolve.
+
+A terceira coluna do card de fabricante é a seta, que no card de sistema só aparece na variante com link (`.sys-list .callout`).
+
+Medido no navegador, os dois cards hoje batem em `padding`, raio, cor de borda, fundo, sombra, corpo/peso/cor do nome e da linha de apoio, e caixa do ícone. `tests/browser.cjs` compara isso a cada execução, e a comparação falha se um dos dois perder o ícone — senão ela passaria de graça caso ambos perdessem.
+
+## Lista longa de grupos dentro de um passo
+
+O passo "Administração de AD" pendura 27 contas. Abertas e em duas colunas largas, ocupavam quase metade da página e empurravam os passos seguintes para fora da tela — e os nomes são curtos (`SAEM`, `GSIUSRV_721`), então sobrava espaço vazio à direita de cada card.
+
+Duas mudanças, as duas em `js/paginas.js` (`grupoDoPasso`) e `css/pagina.css`:
+
+1. **Recolhida.** Acima de `LIMITE_GRUPO_RECOLHIDO` (10) itens, a lista entra num `<details>` fechado, com a contagem no `<summary>` ("Contas e grupos (27)"). O rótulo vem de `grupoRotulo` nos dados; sem ele, o padrão é "Itens". Abaixo do limite nada muda: esconder três itens atrás de um clique só atrapalha.
+2. **Coluna estreita.** A lista recolhida ganha `sys-list-compacta`, que só baixa o mínimo da coluna. O card continua idêntico — mesma borda, mesmo padding, mesmo ícone, mesma tipografia.
+
+O `<details>` reusa a classe `onboarding-group` dos setores de fabricante **de propósito**: é por ela que a busca abre o grupo quando o achado está lá dentro e o esconde quando fica vazio. Um seletor próprio seria uma segunda regra para o mesmo comportamento.
+
+### Por que 200px
+
+A largura mínima da coluna foi medida no navegador, não escolhida no olho:
+
+| mínimo | colunas | linhas | altura | nomes quebrados |
+| --- | --- | --- | --- | --- |
+| 170px | 4 | 7 | 575px | 10 |
+| 190–240px | 3 | 9 | 639px | 1 |
+| 260px | 2 | 14 | 970px | 0 |
+
+Os 64px que 170px economiza não pagam dez nomes quebrados em duas linhas. Entre 190 e 240 o resultado é o mesmo, então 200 fica longe das duas viradas. O único nome que ainda quebra é `tech-infrasec-projetosmidia`, e ele quebra no hífen.
+
+Com o grupo fechado, o passo inteiro mede 181px em vez de 830px.
 
 ## Observação sobre integrações
 

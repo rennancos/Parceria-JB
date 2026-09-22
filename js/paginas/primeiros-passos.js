@@ -75,6 +75,7 @@ PAGINAS['primeiros-passos'] = {
             {
               titulo: 'Administração de AD',
               texto: 'Gerenciamento de contas',
+              grupoRotulo: 'Contas e grupos',
               href: 'https://globoservice.service-now.com/gse?id=sc_cat_item&sys_id=38bf37511b12d01097c0dca0f54bcb36&table=sc_cat_item&searchTerm=Administra%C3%A7%C3%A3o%20de%20grupo',
               grupos: [
                 { sistema: 'SAEM',                           perfil: '', href: '' },

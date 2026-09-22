@@ -237,6 +237,11 @@ test('portal no navegador real, com API simulada e dados descartáveis', { timeo
     }
     assert.ok(await vivaEm('.onboarding-sidebar a[href="#secao-2"]'), 'sidebar derrubou a página');
 
+    // "Navegação desta página" só aponta para esta página.
+    assert.deepEqual(
+      JSON.parse(await avaliar("JSON.stringify([...document.querySelectorAll('.onboarding-nav a')].map(a => a.getAttribute('href')))")),
+      ['#secao-0', '#secao-1', '#secao-2']);
+
     // A busca é só filtro de DOM: o texto digitado tem de sobreviver ao pulo.
     await avaliar("const i = document.querySelector('[data-onboarding-search]'); i.value = 'Avid'; i.dispatchEvent(new Event('input'));");
     const filtrados = await avaliar("[...document.querySelectorAll('[data-onboarding-item]')].filter(e => !e.hidden).length");
@@ -267,21 +272,81 @@ test('portal no navegador real, com API simulada e dados descartáveis', { timeo
 
     // Contêiner esvaziado pela busca sai da tela em vez de virar casca.
     assert.deepEqual(
-      JSON.parse(await avaliar(`JSON.stringify([...document.querySelectorAll('.onboarding-group')].filter(${VIS}).map(d => d.querySelector('summary').textContent))`)),
+      JSON.parse(await avaliar(`JSON.stringify([...document.querySelectorAll('.onboarding-group:has(.fab-lista)')].filter(${VIS}).map(d => d.querySelector('summary').textContent))`)),
       ['Todos os setores']);
     assert.equal(await avaliar(`[...document.querySelectorAll('.page-section')].filter(${VIS}).length`), 1);
 
-    // Campo limpo devolve a página inteira, e o contato volta a ser da janela.
+    /* Lista longa de grupos de um passo (as 27 contas de AD) nasce recolhida e
+       em coluna estreita. Ela reusa .onboarding-group de propósito, então a
+       busca tem de abri-la sozinha quando o achado está lá dentro. */
     await buscar('');
+    const grupoAD = '.sys-grupo';
+    assert.equal(await avaliar(`document.querySelector('${grupoAD}').open`), false,
+      'a lista longa de grupos não nasceu recolhida');
+    assert.match(await avaliar(`document.querySelector('${grupoAD} > summary').textContent`), new RegExp('[(][0-9]+[)]'),
+      'o resumo do grupo recolhido não traz a contagem');
+    const colunasDe = sel => avaliar(`getComputedStyle(document.querySelector(${JSON.stringify(sel)})).gridTemplateColumns.split(' ').length`);
+    assert.ok(await colunasDe('.sys-list-compacta') > await colunasDe('.sys-list:not(.sys-list-compacta)'),
+      'a lista recolhida devia ter mais colunas que a lista normal');
+    /* Largura fixa: a quebra de nome depende dela, e sem fixar o teste herda
+       o que o teste anterior deixou no emulador. 1280 é a maior da suíte. */
+    await browser.enviar('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
+    await new Promise(resolve => setTimeout(resolve, 200));
+    // Nome de conta não pode quebrar em duas linhas na coluna estreita.
+    assert.equal(await avaliar(`(() => {
+      const nomes = [...document.querySelectorAll('.sys-list-compacta .sys-name')];
+      const uma = parseFloat(getComputedStyle(nomes[0]).lineHeight);
+      return nomes.filter(n => n.getBoundingClientRect().height > uma * 1.4)
+        .filter(n => !n.textContent.includes('-')).length; })()`), 0,
+      'nome de conta quebrou em duas linhas na coluna compacta');
+    await browser.enviar('Emulation.clearDeviceMetricsOverride');
+
+    await buscar('GSIUSRV_726');
+    assert.equal(await avaliar(`document.querySelector('${grupoAD}').open`), true,
+      'a busca não abriu a lista recolhida onde estava o achado');
+    assert.equal(await avaliar("[...document.querySelectorAll('[data-onboarding-item]')].filter(e => !e.hidden).length"), 1);
+
+    /* Card de fabricante e card de sistema têm de continuar iguais: mesma
+       caixa, mesma tipografia, mesmo ladrilho de ícone. São o mesmo objeto na
+       mesma página, e já viveram com grade e respiro diferentes. */
+    await buscar('');
+    const desenho = JSON.parse(await avaliar(`(() => {
+      const caixa = e => { const c = getComputedStyle(e);
+        return [c.padding, c.borderRadius, c.borderColor, c.backgroundColor, c.boxShadow]; };
+      const texto = e => { const c = getComputedStyle(e); return [c.fontSize, c.fontWeight, c.color]; };
+      const sys = [...document.querySelectorAll('.sys-list:not(.sys-list-compacta) li')]
+        .find(e => !e.querySelector('.callout') && e.querySelector('.sys-role'));
+      const fab = document.querySelector('.fab-item');
+      const ler = (card, icone, nome, apoio) => {
+        const partes = { icone: card.querySelector(icone), nome: card.querySelector(nome), apoio: card.querySelector(apoio) };
+        const faltando = Object.keys(partes).filter(k => !partes[k]);
+        if (faltando.length) return { faltando };
+        return { card: caixa(card), icone: caixa(partes.icone), nome: texto(partes.nome), apoio: texto(partes.apoio) };
+      };
+      return JSON.stringify({
+        sistema: ler(sys, '.sys-icon', '.sys-name', '.sys-role'),
+        fabricante: ler(fab, '.sys-icon', '.fab-nome', '.fab-resumo'),
+        colunas: [document.querySelector('.sys-list:not(.sys-list-compacta)'), document.querySelector('.fab-lista')]
+          .map(e => getComputedStyle(e).gridTemplateColumns.split(' ').length)
+      }); })()`));
+    // Sem isto a comparação passaria "de graça" se os DOIS perdessem o ícone.
+    assert.deepEqual([desenho.sistema.faltando, desenho.fabricante.faltando], [undefined, undefined],
+      'card perdeu ícone, nome ou linha de apoio');
+    assert.deepEqual(desenho.fabricante, desenho.sistema,
+      'card de fabricante saiu do desenho do card de sistema');
+    assert.deepEqual(desenho.colunas[1], desenho.colunas[0],
+      'as duas listas deixaram de quebrar no mesmo número de colunas');
     assert.equal(await avaliar(`[...document.querySelectorAll('.fab-contato')].filter(${VIS}).length`), 0);
-    assert.equal(await avaliar(`[...document.querySelectorAll('.onboarding-group')].filter(${VIS}).length`), 8);
+    assert.equal(await avaliar(`[...document.querySelectorAll('.onboarding-group:has(.fab-lista)')].filter(${VIS}).length`), 8);
     assert.equal(await avaliar(`[...document.querySelectorAll('.page-section')].filter(${VIS}).length`), 3);
     // Escondido não pode continuar tabulável.
     assert.equal(await avaliar(`[...document.querySelectorAll('.fab-contato a')].filter(${VIS}).length`), 0);
 
-    // Chave de página ainda vence a âncora, e o data-ficha da janela de
-    // fabricantes continua casando com o índice do renderer.
-    await click('.onboarding-nav a[href="#documentacao"]');
+    /* Chave de página ainda vence a âncora, e o data-ficha da janela de
+       fabricantes continua casando com o índice do renderer. Pelo hash, e não
+       por um clique na nav: a nav só tem âncoras desta página, e o que se
+       testa aqui é o router, não o botão. */
+    await avaliar("location.hash = '#documentacao'");
     await esperar("document.querySelectorAll('.link-list').length > 0");
     assert.equal(await avaliar("!!document.querySelector('.primeiros-passos')"), false);
 

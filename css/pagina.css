@@ -444,6 +444,7 @@ a.callout .link-arrow{
 .steps h3,
 .steps p,
 .steps .sys-list,
+.steps .sys-grupo,
 .steps .callout{
   max-width: calc(var(--medida) - var(--recuo));
 }
@@ -462,6 +463,22 @@ a.callout .link-arrow{
 /* Grade de grupos pendurada num passo (`grupos` em js/paginas.js). Os 12px são
    os mesmos da faixa de destaque, para o respiro bater venham juntos ou não. */
 .steps .sys-list{ margin-top: 12px; }
+
+/* Lista longa recolhida: o afastamento passa para o <details>, senão sobra um
+   vão dentro do grupo aberto — o corpo já tem o respiro dele. */
+.steps .sys-grupo{ margin-top: 12px; }
+.steps .sys-grupo .sys-list{ margin-top: 0; }
+.primeiros-passos .steps .sys-grupo{ margin-top: 12px; }
+
+/* Coluna mais estreita para a lista recolhida. Card idêntico ao de sempre: só
+   o mínimo da coluna muda, e as 27 contas de AD caem de 14 linhas para 9.
+
+   Os 200px são medidos, não chutados: abaixo de 190px entra uma quarta coluna
+   e dez nomes passam a quebrar em duas linhas — o bloco fica 64px mais baixo,
+   mas fica ilegível; a partir de 260px volta para duas colunas e 970px. Entre
+   190 e 240 o resultado é o mesmo, então 200 fica longe das duas viradas.
+   Só "tech-infrasec-projetosmidia" ainda quebra, e quebra no hífen. */
+.sys-list-compacta{ grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); }
 
 /* Lista de links e arquivos (Documentação, Acessos, ParcerIA). */
 .link-list{
@@ -1109,9 +1126,12 @@ a.callout .link-arrow{
 .onboarding-sidebar a:hover{ color: var(--accent-1); }
 .onboarding-sidebar a:focus-visible,
 .onboarding-nav a:focus-visible{ outline: 2px solid var(--accent-1); outline-offset: 3px; }
+/* Três colunas para os três destinos, que são as três seções desta página.
+   O quarto botão levava para a Documentação, ou seja, para FORA da página —
+   numa nav anunciada como "Navegação desta página". */
 .onboarding-nav{
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin-top: var(--sp-4);
 }
@@ -1175,7 +1195,16 @@ a.callout .link-arrow{
 .onboarding-group > summary:hover{ border-color: var(--accent-soft); }
 .onboarding-group > summary:focus-visible{ outline: 2px solid var(--accent-1); outline-offset: 2px; }
 .onboarding-group-body{ padding-top: 10px; }
-.primeiros-passos .fab-lista{ grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+/* Card de fabricante desenhado como card de sistema (.sys-list / .sys-list li).
+   Os dois são a mesma coisa na mesma página — um destino clicável com nome e
+   uma linha de apoio — e viviam com grade, respiro e tipografia diferentes.
+   A terceira coluna é a seta, que no card de sistema só existe na variante com
+   link (.sys-list .callout). A regra de colunas é a mesma de .sys-list, então
+   as duas listas quebram juntas e as media queries de coluna saíram. */
+.primeiros-passos .fab-lista{
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
+  gap: 10px;
+}
 /* O card é uma coluna: botão em cima, contato da busca embaixo. O botão cresce
    para igualar a altura dos vizinhos da linha — antes isso era `height: 100%`,
    que só funcionava enquanto o <li> tinha um filho só. Com o <dl> irmão, os
@@ -1189,9 +1218,33 @@ a.callout .link-arrow{
   flex-direction: column;
   min-width: 0;
 }
-.primeiros-passos .fab-item{ flex: 1 1 auto; padding: 11px 13px; gap: 10px; }
-.primeiros-passos .fab-nome{ font-size: var(--fs-sm); }
-.primeiros-passos .fab-resumo{ font-size: var(--fs-2xs); }
+.primeiros-passos .fab-item{
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 10px;
+  padding: 14px 16px;
+  box-shadow: none;           /* .sys-list li não tem sombra */
+}
+.primeiros-passos .fab-item:hover{
+  border-color: var(--accent-soft);
+  background: var(--card-hover);
+}
+.primeiros-passos .fab-texto{ gap: 4px; }
+.primeiros-passos .fab-nome{
+  font-size: var(--fs-sm);
+  font-weight: 650;
+  letter-spacing: -0.005em;
+}
+/* Solta o corte com reticências do card estreito de antes e passa a quebrar
+   como .sys-role, que é o par deste texto no card de sistema. */
+.primeiros-passos .fab-resumo{
+  font-size: var(--fs-xs);
+  white-space: normal;
+  overflow: visible;
+  text-wrap: pretty;
+}
 /* A busca esconde com o atributo `hidden`, e a regra do navegador para ele é
    fraca demais: qualquer `display` de autor (o grid de .sys-list, o flex do
    <summary>) ganharia dela e o item continuaria na tela. Vale para os itens e
@@ -1227,10 +1280,7 @@ a.callout .link-arrow{
   .primeiros-passos > .onboarding-sidebar{ display: none; }
 }
 @media (max-width: 700px){
-  .onboarding-nav{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .primeiros-passos .fab-lista{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 480px){
-  .primeiros-passos .fab-lista{ grid-template-columns: 1fr; }
   .onboarding-nav a{ padding-inline: 10px; }
 }

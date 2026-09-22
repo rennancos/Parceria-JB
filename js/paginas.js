@@ -117,7 +117,7 @@ window.PAGINAS = {};
       : `<ul class="sys-list">${item.grupos.map(sistema).join('')}</ul>`;
 
     return `
-      <li>
+      <li data-onboarding-item data-search="${esc([item.titulo, item.texto, item.destaque].filter(Boolean).join(' '))}">
         <h3>${titulo}</h3>
         ${texto}
         ${destaque}
@@ -135,14 +135,15 @@ window.PAGINAS = {};
      aparência é mexer em um lugar. O CSS de `.sys-list` só ajusta o encaixe na
      grade (ver css/pagina.css). */
   function sistema(item){
+    const termos = [item.sistema, item.perfil].filter(Boolean).join(' ');
     const corpo =
       `<span class="sys-icon" aria-hidden="true">${ICONES.sistema}</span>` +
       `<span class="sys-name">${esc(item.sistema)}</span>` +
       (item.perfil ? `<span class="sys-role">${esc(item.perfil)}</span>` : '');
 
     return item.href
-      ? `<li><a class="callout" href="${esc(item.href)}"${alvoDe(item.href)}>${corpo}${ICONE_SETA}</a></li>`
-      : `<li>${corpo}</li>`;
+      ? `<li data-onboarding-item data-search="${esc(termos)}"><a class="callout" href="${esc(item.href)}"${alvoDe(item.href)}>${corpo}${ICONE_SETA}</a></li>`
+      : `<li data-onboarding-item data-search="${esc(termos)}">${corpo}</li>`;
   }
 
   /* Fabricantes: a ficha tem sempre os mesmos quatro campos, na mesma ordem.
@@ -181,6 +182,21 @@ window.PAGINAS = {};
     return texto.split(/\r?\n/).map((linha) => esc(linha.trim())).filter(Boolean).join('<br>');
   }
 
+  /* Campos que respondem "como falo com essa gente" — o que uma busca por
+     contato precisa devolver no próprio card. O resto da ficha (site, contrato,
+     observação) continua só na janela: é consulta, não resposta de busca. */
+  const CONTATO_FABRICANTE = ['representante', 'email', 'telefone'];
+
+  function contatoFabricante(item){
+    return CAMPOS_FABRICANTE
+      .filter((campo) => CONTATO_FABRICANTE.includes(campo.chave) && item[campo.chave])
+      .map((campo) => `
+        <div>
+          <dt>${campo.rotulo}</dt>
+          <dd>${valorFabricante(campo.chave, item[campo.chave])}</dd>
+        </div>`).join('');
+  }
+
   // A ficha montada: usada dentro da janela, não mais na página.
   function fichaFabricante(item){
     return CAMPOS_FABRICANTE.filter((campo) => item[campo.chave]).map((campo) => `
@@ -204,8 +220,16 @@ window.PAGINAS = {};
     // Primeira linha do fabricante como resumo: dá para reconhecer a empresa
     // sem abrir. O resto (e-mail, telefone, serial) só na janela.
     const resumo = String(item.fabricante || '').split(/\r?\n/)[0].trim();
+    const termos = [item.sistema, item.fabricante, item.representante, item.email, item.telefone].filter(Boolean).join(' ');
+    /* Vai para o HTML desde o começo, escondido no CSS, e só aparece enquanto
+       há busca ativa (js/paginas/primeiros-passos-ui.js). Procurar pelo nome de
+       um representante e receber de volta só o nome do sistema não responde
+       nada — o contato é o que se foi buscar. Escondido não ocupa rolagem nem
+       entra na ordem de tabulação, então a razão de a janela existir continua
+       de pé. */
+    const contato = contatoFabricante(item);
     return `
-      <li>
+      <li data-onboarding-item data-search="${esc(termos)}">
         <button type="button" class="fab-item" data-ficha="${indice}">
           <span class="fab-texto">
             <span class="fab-nome">${esc(item.sistema || item.nome || 'Fabricante')}</span>
@@ -213,6 +237,7 @@ window.PAGINAS = {};
           </span>
           ${ICONE_SETA}
         </button>
+        ${contato ? `<dl class="field-list fab-contato">${contato}</dl>` : ''}
       </li>`;
   }
 
@@ -372,22 +397,29 @@ window.PAGINAS = {};
 
   // O título do bloco é um <p>, não um heading: entre o <h2> da seção e os <h3>
   // dos itens não sobra nível, e ele é mais rótulo do que subdivisão.
-  function bloco(dados, exibirTitulo = true){
+  function bloco(dados, exibirTitulo = true, onboarding = false){
     const layout = LAYOUTS[dados.tipo] || LAYOUTS.paineis;
+    if (onboarding && dados.tipo === 'fabricantes') {
+      const aberto = dados.titulo === 'Todos os setores' ? ' open' : '';
+      return `<details class="onboarding-group"${aberto}>`
+        + `<summary>${esc(dados.titulo || 'Fabricantes')}</summary>`
+        + `<div class="onboarding-group-body">${layout(dados.itens || [], dados)}</div>`
+        + `</details>`;
+    }
     return `<div class="page-block">`
       + (exibirTitulo && dados.titulo ? `<p class="block-title">${esc(dados.titulo)}</p>` : '')
       + layout(dados.itens || [], dados)
       + `</div>`;
   }
 
-  function secao(dados, indice){
+  function secao(dados, indice, onboarding = false){
     const id = `secao-${indice}`;
 
     return `
       <section class="page-section${dados.classe ? ` ${esc(dados.classe)}` : ''}" aria-labelledby="${id}">
         <h2 id="${id}">${esc(dados.titulo)}</h2>
         ${dados.texto ? `<p>${esc(dados.texto)}</p>` : ''}
-        ${blocosDaSecao(dados).map((b) => bloco(b, b !== dados)).join('')}
+        ${blocosDaSecao(dados).map((b) => bloco(b, b !== dados, onboarding)).join('')}
       </section>`;
   }
 
@@ -398,7 +430,9 @@ window.PAGINAS = {};
   // recebe nenhum aviso de que o conteúdo mudou.
   window.renderizarPagina = function(dados){
     FICHAS = [];   // ver a nota em itemFabricante: índice novo a cada página
+    const onboarding = dados.classe === 'primeiros-passos';
     return `
+      <div class="pagina-conteudo${onboarding ? ' primeiros-passos' : ''}">
       <a class="back-link" href="#">${ICONE_VOLTAR}Voltar ao portal</a>
 
       <div class="intro">
@@ -407,8 +441,28 @@ window.PAGINAS = {};
         ${dados.descricao ? `<p>${esc(dados.descricao)}</p>` : ''}
       </div>
 
-      ${(dados.secoes || []).map(secao).join('')}
-      ${dados.aviso ? `<p class="notice">${esc(dados.aviso)}</p>` : ''}`;
+      ${onboarding ? `
+        <nav class="onboarding-nav" aria-label="Navegação desta página">
+          <a href="#secao-0">Acessos</a>
+          <a href="#secao-1">Sistemas</a>
+          <a href="#secao-2">Fabricantes</a>
+          <a href="#documentacao">Documentação</a>
+        </nav>
+        <label class="onboarding-search">
+          <span>Buscar sistema, acesso, fabricante ou contato</span>
+          <input type="search" data-onboarding-search placeholder="Buscar sistema, acesso ou fabricante..." autocomplete="off">
+        </label>
+        <p class="onboarding-status" data-onboarding-status role="status" aria-live="polite"></p>
+        <aside class="onboarding-sidebar" aria-label="Índice da página">
+          <strong>Primeiros passos</strong>
+          <a href="#secao-0">Solicitação de acessos</a>
+          <a href="#secao-1">Sistemas</a>
+          <a href="#secao-2">Fabricantes</a>
+        </aside>` : ''}
+
+      ${(dados.secoes || []).map((secaoDados, indice) => secao(secaoDados, indice, onboarding)).join('')}
+      ${dados.aviso ? `<p class="notice">${esc(dados.aviso)}</p>` : ''}
+      </div>`;
   };
 
   /* O que js/fabricantes.js precisa para montar a janela: a ficha pelo índice

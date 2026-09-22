@@ -213,6 +213,112 @@ test('portal no navegador real, com API simulada e dados descartáveis', { timeo
     assert.equal(await avaliar("!!document.querySelector('.team-aviso')"), false);
   });
 
+  /* Central de onboarding (md/12-primeiros-passos-layout.md). A navegação rápida
+     e a barra lateral apontam para âncoras da própria página (#secao-1), e o
+     portal roteia por hash: sem o tratamento em js/router.js, cada um desses
+     cliques resolvia para "página desconhecida" e devolvia a pessoa à home,
+     apagando o conteúdo. Este teste prende as duas pontas — a âncora rola e a
+     chave de página continua navegando. */
+  await t.test('primeiros passos: âncoras internas, busca local e fichas de fabricante', async () => {
+    modo = 'estatico'; await browser.navegar(origem + '#primeiros-passos');
+    await esperar("!!document.querySelector('.primeiros-passos')");
+
+    const vivaEm = async seletor => {
+      await click(seletor);
+      await new Promise(resolve => setTimeout(resolve, 150));
+      return avaliar("!!document.querySelector('.primeiros-passos') && !document.getElementById('view-pagina').hidden");
+    };
+
+    for (const alvo of ['#secao-0', '#secao-1', '#secao-2']){
+      assert.ok(await vivaEm(`.onboarding-nav a[href="${alvo}"]`), `nav ${alvo} derrubou a página`);
+      assert.equal(await avaliar('location.hash'), alvo);
+      // scroll-margin-top tira o título de baixo do cabeçalho grudado.
+      assert.ok(await avaliar(`document.getElementById('${alvo.slice(1)}').getBoundingClientRect().top > 0`), `${alvo} ficou sob o cabeçalho`);
+    }
+    assert.ok(await vivaEm('.onboarding-sidebar a[href="#secao-2"]'), 'sidebar derrubou a página');
+
+    // A busca é só filtro de DOM: o texto digitado tem de sobreviver ao pulo.
+    await avaliar("const i = document.querySelector('[data-onboarding-search]'); i.value = 'Avid'; i.dispatchEvent(new Event('input'));");
+    const filtrados = await avaliar("[...document.querySelectorAll('[data-onboarding-item]')].filter(e => !e.hidden).length");
+    const total = await avaliar("document.querySelectorAll('[data-onboarding-item]').length");
+    assert.ok(filtrados > 0 && filtrados < total, `busca não filtrou (${filtrados}/${total})`);
+    assert.match(await avaliar("document.querySelector('[data-onboarding-status]').textContent"), /resultado/);
+    assert.ok(await vivaEm('.onboarding-nav a[href="#secao-0"]'));
+    assert.equal(await avaliar("document.querySelector('[data-onboarding-search]').value"), 'Avid');
+
+    /* Buscar pelo contato tem de devolver o contato. Antes a busca só escondia
+       caixas: sobravam o nome do sistema, sete <summary> de setor vazios e duas
+       seções sem nada dentro, e o telefone continuava a um clique de distância. */
+    const VIS = '(e => !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length))';
+    const buscar = async termo => {
+      await avaliar(`(() => { const c = document.querySelector('[data-onboarding-search]');
+        c.value = ${JSON.stringify(termo)}; c.dispatchEvent(new Event('input')); })()`);
+      await new Promise(resolve => setTimeout(resolve, 120));
+    };
+
+    await buscar('Rafael Rolando');
+    const contato = await avaliar(`(() => { const d = [...document.querySelectorAll('.fab-contato')].filter(${VIS});
+      return d.length === 1 ? d[0].textContent : null; })()`);
+    assert.ok(contato, 'a busca por contato não mostrou nenhum bloco de contato');
+    assert.match(contato, /Rafael Rolando/);
+    assert.match(contato, /99511-0429/);
+    assert.ok(await avaliar(`[...document.querySelectorAll('.fab-contato a[href^="mailto:"]')].filter(${VIS}).length > 0`),
+      'e-mail do contato não veio como link');
+
+    // Contêiner esvaziado pela busca sai da tela em vez de virar casca.
+    assert.deepEqual(
+      JSON.parse(await avaliar(`JSON.stringify([...document.querySelectorAll('.onboarding-group')].filter(${VIS}).map(d => d.querySelector('summary').textContent))`)),
+      ['Todos os setores']);
+    assert.equal(await avaliar(`[...document.querySelectorAll('.page-section')].filter(${VIS}).length`), 1);
+
+    // Campo limpo devolve a página inteira, e o contato volta a ser da janela.
+    await buscar('');
+    assert.equal(await avaliar(`[...document.querySelectorAll('.fab-contato')].filter(${VIS}).length`), 0);
+    assert.equal(await avaliar(`[...document.querySelectorAll('.onboarding-group')].filter(${VIS}).length`), 8);
+    assert.equal(await avaliar(`[...document.querySelectorAll('.page-section')].filter(${VIS}).length`), 3);
+    // Escondido não pode continuar tabulável.
+    assert.equal(await avaliar(`[...document.querySelectorAll('.fab-contato a')].filter(${VIS}).length`), 0);
+
+    // Chave de página ainda vence a âncora, e o data-ficha da janela de
+    // fabricantes continua casando com o índice do renderer.
+    await click('.onboarding-nav a[href="#documentacao"]');
+    await esperar("document.querySelectorAll('.link-list').length > 0");
+    assert.equal(await avaliar("!!document.querySelector('.primeiros-passos')"), false);
+
+    await browser.navegar(origem + '#primeiros-passos');
+    await esperar("!!document.querySelector('.onboarding-group[open] .fab-item')");
+    await click('.onboarding-group[open] .fab-item');
+    await esperar("!!document.querySelector('.fab-janela')?.open");
+    assert.ok(await avaliar("document.querySelector('.fab-janela-titulo').textContent.trim().length > 0"));
+    await click('.fab-fechar');
+
+    // Hash que não é página nem âncora daqui continua caindo na home.
+    await avaliar("location.hash = '#nao-existe-isto'");
+    await esperar("!document.getElementById('view-home').hidden");
+
+    // Sem overflow horizontal nas três larguras da suíte.
+    await browser.navegar(origem + '#primeiros-passos');
+    for (const largura of [360, 900, 1280]){
+      await browser.enviar('Emulation.setDeviceMetricsOverride', { width: largura, height: 900, deviceScaleFactor: 1, mobile: false });
+      await esperar("!!document.querySelector('.primeiros-passos')");
+      for (const termo of ['', 'Rafael']){
+        await buscar(termo);
+        await new Promise(resolve => setTimeout(resolve, 200));
+        assert.ok(await avaliar('document.documentElement.scrollWidth <= innerWidth + 1'),
+          `Overflow em ${largura}px${termo ? ' com busca ativa' : ''}`);
+      }
+      // O contato não pode transbordar do card: foi o que `height: 100%` no
+      // botão causava assim que o <li> ganhou um segundo filho.
+      await buscar('Rafael');
+      assert.ok(await avaliar(`(() => { const dl = [...document.querySelectorAll('.fab-contato')].filter(${VIS})[0];
+        if (!dl) return false; const li = dl.closest('li');
+        return Math.round(dl.getBoundingClientRect().bottom) <= Math.round(li.getBoundingClientRect().bottom) + 1; })()`),
+        `Contato vazou para fora do card em ${largura}px`);
+      await buscar('');
+    }
+    await browser.enviar('Emulation.clearDeviceMetricsOverride');
+  });
+
   await t.test('layout responsivo e comparação de estilos com a referência opcional', async () => {
     modo = 'estatico'; await browser.navegar(origem);
     const referencia = process.env.PAJB_BASELINE;

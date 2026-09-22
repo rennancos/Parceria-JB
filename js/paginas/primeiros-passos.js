@@ -3,6 +3,7 @@
    markdown. Formato dos campos: ver o cabeçalho de js/paginas.js. */
 PAGINAS['primeiros-passos'] = {
   titulo: 'Primeiros passos',
+  classe: 'primeiros-passos',
   eyebrow: 'Comece por aqui',
   descricao: 'Seja bem-vindo(a)! Este guia foi criado para ajudá-lo(a) a obter rapidamente todos os acessos e contatos necessários para iniciar suas atividades.',
 

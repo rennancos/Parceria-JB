@@ -34,14 +34,37 @@
   // continua chegando ao conteúdo, em vez de cair na home sem explicação.
   const APELIDOS = { manuais: 'documentacao' };
 
+  // Hash cru, sem decidir nada: serve a chaveAtual e às âncoras internas.
+  function hashCru(){
+    try { return decodeURIComponent(location.hash.replace(/^#/, '')).trim(); }
+    catch (erro) { return ''; } // Hash externo malformado mantém o fallback para home.
+  }
+
   // Hash desconhecido (ou âncora da própria home, tipo #team-title) devolve ""
   // e cai na home — nada de tela de erro para um link antigo.
   function chaveAtual(){
-    let bruta;
-    try { bruta = decodeURIComponent(location.hash.replace(/^#/, '')).trim(); }
-    catch (erro) { return ''; } // Hash externo malformado mantém o fallback para home.
+    const bruta = hashCru();
     const chave = APELIDOS[bruta] || bruta;
     return Object.prototype.hasOwnProperty.call(window.PAGINAS, chave) ? chave : '';
+  }
+
+  /* Âncora dentro da página interna que JÁ está aberta — #secao-1 da central
+     de onboarding, por exemplo.
+
+     Sem isto o hash de âncora cai em chaveAtual() === '' e mostrar() mandava a
+     pessoa para a home, apagando a página: pelo hash, o router não distingue
+     "link antigo que não existe mais" de "pular para uma seção daqui". Quem
+     separa os dois é o DOM — esse id existe na página desenhada?
+
+     Chave de página ganha da âncora: #documentacao navega, mesmo que um dia
+     exista um id igual. Cobertura: tests/browser.cjs. */
+  function ancoraDaPaginaAberta(){
+    if (!chaveAnterior || viewPagina.hidden) return null;
+    const bruta = hashCru();
+    if (!bruta) return null;
+    if (Object.prototype.hasOwnProperty.call(window.PAGINAS, APELIDOS[bruta] || bruta)) return null;
+    const alvo = document.getElementById(bruta);
+    return alvo && viewPagina.contains(alvo) ? alvo : null;
   }
 
   function marcarMenu(chave){
@@ -106,7 +129,13 @@
 
   // Cobre clique no menu, clique nos cards, botão voltar/avançar e link colado
   // direto na barra de endereços.
-  window.addEventListener('hashchange', () => mostrar(chaveAtual(), { focar: true }));
+  window.addEventListener('hashchange', () => {
+    // Âncora da página aberta: rolar, e só. Redesenhar aqui descartaria o que
+    // só vive no DOM — texto digitado na busca da página, <details> aberto.
+    const ancora = ancoraDaPaginaAberta();
+    if (ancora){ ancora.scrollIntoView({ block: 'start' }); return; }
+    mostrar(chaveAtual(), { focar: true });
+  });
 
   /* Redesenha a página atual com os dados que estiverem em PAGINAS agora. Existe
      para quem altera esses dados depois do carregamento — js/documentos.js, ao

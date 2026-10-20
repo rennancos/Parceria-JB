@@ -1,5 +1,7 @@
 # Portal Parceria JB
 
+PublicaÃ§Ã£o segura com backup e rollback: [docs/publicacao.md](docs/publicacao.md).
+
 Para alterar o código, consulte o [Guia de Manutenção](docs/manutencao.md): arquitetura, contratos, dependências, riscos e validações.
 
 Portal interno da Parceria JB: ponto único de entrada para primeiros passos, documentação, manuais, acessos e SharePoint da operação.

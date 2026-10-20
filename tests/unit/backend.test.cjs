@@ -52,7 +52,7 @@ test('fronteiras do backend, numa raiz descartável', async t => {
     const req = http.request({ host: '127.0.0.1', port, path: caminho, method: opcoes.metodo || 'GET', headers: { 'X-Portal-Request': '1', 'Content-Type': 'application/json', ...opcoes.headers } }, res => {
       const partes = [];
       res.on('data', parte => partes.push(parte));
-      res.on('end', () => resolve({ status: res.statusCode, corpo: Buffer.concat(partes).toString() }));
+      res.on('end', () => resolve({ status: res.statusCode, headers: res.headers, corpo: Buffer.concat(partes).toString() }));
     });
     req.on('error', reject);
     if (opcoes.corpo) req.write(opcoes.corpo);
@@ -76,6 +76,21 @@ test('fronteiras do backend, numa raiz descartável', async t => {
     assert.equal((await pedir('/md/auditoria.md')).status, 403);
     assert.equal((await pedir('/package.json')).status, 403);
     assert.equal((await pedir('/css/nao-existe.css')).status, 404);
+
+    const antes = await pedir('/css/pagina.css');
+    fs.writeFileSync(path.join(falsa, 'css/pagina.css'), 'body{color:red}');
+    const depois = await pedir('/css/pagina.css');
+    assert.equal(antes.status, 200);
+    assert.equal(depois.status, 200);
+    assert.equal(depois.corpo, 'body{color:red}');
+    assert.equal(depois.headers['cache-control'], 'no-cache');
+    assert.notEqual(depois.headers.etag, antes.headers.etag);
+  });
+
+  await t.test('saúde não expõe dados nem exige sessão', async () => {
+    const resposta = await pedir('/api/saude');
+    assert.equal(resposta.status, 200);
+    assert.deepEqual(JSON.parse(resposta.corpo), { ok: true });
   });
 
   await t.test('nomeSeguro achata o nome vindo do navegador', () => {

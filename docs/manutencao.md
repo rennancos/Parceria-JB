@@ -115,6 +115,8 @@ Para publicação: atualizar a versão numérica do pacote, gerar instalador com
 
 ### API HTTP
 
+`GET /api/saude` retorna `{ok:true}` sem exigir sessÃ£o e Ã© usado pelo fluxo de publicaÃ§Ã£o para confirmar que o processo voltou a responder.
+
 | Método e rota | Entrada | Saída / autorização |
 | --- | --- | --- |
 | GET `/api/sessao` | Cookie | `{autenticado:false}` ou `{autenticado:true,nome,login,papel}` |

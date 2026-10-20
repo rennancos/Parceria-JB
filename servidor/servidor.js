@@ -106,6 +106,9 @@ async function tratarApi(req, res, url){
   const rota = url.pathname;
   const metodo = req.method;
 
+  if (rota === '/api/saude' && metodo === 'GET')
+    return responderJson(res, 200, { ok: true });
+
   /* Sessão */
 
   if (rota === '/api/sessao'){

@@ -39,6 +39,7 @@ servidor/dados/
 docs/*
 !docs/LEIA-ME.md
 !docs/manutencao.md
+!docs/publicacao.md
 
 # docs/fornecedores/ é a única subpasta versionada. São três linhas porque o
 # Git não desce numa pasta excluída: `docs/*` esconde a pasta inteira, e sem
